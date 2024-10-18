@@ -85,6 +85,7 @@ namespace opensis.data.Repository
                     }
                     staffAddViewModel.staffMaster.StaffGuid = GuidId;
                     staffAddViewModel.staffMaster.CreatedOn = DateTime.UtcNow;
+                    staffAddViewModel.staffMaster.IsActive = true;
 
                     if (!string.IsNullOrEmpty(staffAddViewModel.staffMaster.StaffInternalId))
                     {
@@ -418,8 +419,8 @@ namespace opensis.data.Repository
                         FirstGivenName = e.FirstGivenName,
                         MiddleName = e.MiddleName,
                         LastFamilyName = e.LastFamilyName,
-                        //Profile = e.StaffSchoolInfo.Count > 0 ? e.StaffSchoolInfo.Where(x => x.SchoolAttachedId == pageResult.SchoolId && (x.EndDate == null || x.EndDate >= DateTime.UtcNow.Date)).FirstOrDefault().Profile : null,
-                        Profile = e.StaffSchoolInfo.Count > 0 ? e.StaffSchoolInfo.Where(x =>(pageResult.SearchAllSchool !=true)? x.SchoolAttachedId == pageResult.SchoolId && (x.EndDate == null || x.EndDate >= DateTime.UtcNow.Date) : x.EndDate == null || x.EndDate >= DateTime.UtcNow.Date).FirstOrDefault()!.Profile : null,
+                        //Profile = e.StaffSchoolInfo.Count > 0 ? e.StaffSchoolInfo.Where(x => (pageResult.SearchAllSchool != true) ? x.SchoolAttachedId == pageResult.SchoolId && (pageResult.IncludeInactive != true || x.EndDate == null || x.EndDate >= DateTime.UtcNow.Date) : x.EndDate == null || x.EndDate >= DateTime.UtcNow.Date).First().Profile : e.Profile,
+                        Profile = e.StaffSchoolInfo.Count > 0 ? e.StaffSchoolInfo.Where(x => (pageResult.SearchAllSchool == true || x.SchoolAttachedId == pageResult.SchoolId) && (pageResult.IncludeInactive == true || x.EndDate == null || x.EndDate >= DateTime.UtcNow.Date)).FirstOrDefault()!.Profile : e.Profile,
                         JobTitle = e.JobTitle,
                         SchoolEmail = e.SchoolEmail,
                         MobilePhone = e.MobilePhone,
@@ -431,14 +432,13 @@ namespace opensis.data.Repository
                         FirstLanguage = e.FirstLanguage,
                         SecondLanguage = e.SecondLanguage,
                         ThirdLanguage = e.ThirdLanguage,
-                        //StaffPhoto = pageResult.ProfilePhoto != null ? e.StaffPhoto : null,
                         StaffPhoto = pageResult.ProfilePhoto != null ? e.StaffThumbnailPhoto : null,
                         CreatedBy = e.CreatedBy,
                         CreatedOn = e.CreatedOn,
                         UpdatedBy = e.UpdatedBy,
                         UpdatedOn = e.UpdatedOn,
                         IsActive = e.IsActive,
-                        StaffSchoolInfo = e.StaffSchoolInfo.Count > 0 ? e.StaffSchoolInfo.Select(s => new StaffSchoolInfo { StartDate = s.StartDate, EndDate = s.EndDate , SchoolAttachedId = s.SchoolAttachedId, SchoolId = s.SchoolId, SchoolAttachedName = s.SchoolAttachedName }).ToList() : new()
+                        StaffSchoolInfo = e.StaffSchoolInfo.Count > 0 ? e.StaffSchoolInfo.Select(s => new StaffSchoolInfo { StartDate = s.StartDate, EndDate = s.EndDate, SchoolAttachedId = s.SchoolAttachedId, SchoolId = s.SchoolId, SchoolAttachedName = s.SchoolAttachedName }).ToList() : new()
                     }).Skip((pageResult.PageNumber - 1) * pageResult.PageSize).Take(pageResult.PageSize);
                 }
                 else
@@ -452,8 +452,8 @@ namespace opensis.data.Repository
                         FirstGivenName = e.FirstGivenName,
                         MiddleName = e.MiddleName,
                         LastFamilyName = e.LastFamilyName,
-                        //Profile = e.StaffSchoolInfo.Count > 0 ? e.StaffSchoolInfo.Where(x => x.SchoolAttachedId == pageResult.SchoolId && (x.EndDate == null || x.EndDate >= DateTime.UtcNow.Date)).FirstOrDefault().Profile : null,
-                        Profile = e.StaffSchoolInfo.Count > 0 ? e.StaffSchoolInfo.Where(x => (pageResult.SearchAllSchool != true) ? x.SchoolAttachedId == pageResult.SchoolId && (x.EndDate == null || x.EndDate >= DateTime.UtcNow.Date) : x.EndDate == null || x.EndDate >= DateTime.UtcNow.Date).FirstOrDefault()!.Profile : null,
+                        //Profile = e.StaffSchoolInfo.Count > 0 ? e.StaffSchoolInfo.Where(x => (pageResult.SearchAllSchool != true) ? x.SchoolAttachedId == pageResult.SchoolId && (pageResult.IncludeInactive != true || x.EndDate == null || x.EndDate >= DateTime.UtcNow.Date) : x.EndDate == null || x.EndDate >= DateTime.UtcNow.Date).First().Profile : e.Profile,
+                        Profile = e.StaffSchoolInfo.Count > 0 ? e.StaffSchoolInfo.Where(x => (pageResult.SearchAllSchool == true || x.SchoolAttachedId == pageResult.SchoolId) && (pageResult.IncludeInactive == true || x.EndDate == null || x.EndDate >= DateTime.UtcNow.Date)).FirstOrDefault()!.Profile : e.Profile,
                         JobTitle = e.JobTitle,
                         SchoolEmail = e.SchoolEmail,
                         MobilePhone = e.MobilePhone,
@@ -465,14 +465,13 @@ namespace opensis.data.Repository
                         FirstLanguage = e.FirstLanguage,
                         SecondLanguage = e.SecondLanguage,
                         ThirdLanguage = e.ThirdLanguage,
-                        //StaffPhoto = pageResult.ProfilePhoto != null ? e.StaffPhoto : null,
                         StaffPhoto = pageResult.ProfilePhoto != null ? e.StaffThumbnailPhoto : null,
                         CreatedBy = e.CreatedBy,
                         CreatedOn = e.CreatedOn,
                         UpdatedBy = e.UpdatedBy,
                         UpdatedOn = e.UpdatedOn,
                         IsActive = e.IsActive,
-                        StaffSchoolInfo = e.StaffSchoolInfo.Count > 0 ? e.StaffSchoolInfo.Select(s => new StaffSchoolInfo { StartDate = s.StartDate, EndDate = s.EndDate , SchoolAttachedId = s.SchoolAttachedId, SchoolId = s.SchoolId, SchoolAttachedName = s.SchoolAttachedName }).ToList() : new()
+                        StaffSchoolInfo = e.StaffSchoolInfo.Count > 0 ? e.StaffSchoolInfo.Select(s => new StaffSchoolInfo { StartDate = s.StartDate, EndDate = s.EndDate, SchoolAttachedId = s.SchoolAttachedId, SchoolId = s.SchoolId, SchoolAttachedName = s.SchoolAttachedName }).ToList() : new()
                     });
                 }
                 if(transactionIQ!=null && transactionIQ.Any())
@@ -1598,6 +1597,7 @@ namespace opensis.data.Repository
                                 staff.staffMaster.StaffId = (int)staffId;
                                 staff.staffMaster.CreatedOn = DateTime.UtcNow;
                                 staff.staffMaster.CreatedBy = staffListAddViewModel.CreatedBy;
+                                staff.staffMaster.IsActive = true;
                                 Guid GuidId = Guid.NewGuid();
                                 var GuidIdExist = this.context?.StaffMaster.FirstOrDefault(x => x.StaffGuid == GuidId);
 
