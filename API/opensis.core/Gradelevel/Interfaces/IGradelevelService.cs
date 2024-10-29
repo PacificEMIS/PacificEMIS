@@ -23,6 +23,7 @@ Copyright (c) Open Solutions for Education, Inc.
 All rights reserved.
 ***********************************************************************************/
 
+using opensis.data.ViewModels.Gradelevel;
 using opensis.data.ViewModels.GradeLevel;
 using System;
 using System.Collections.Generic;
@@ -38,5 +39,6 @@ namespace opensis.core.GradeLevel.Interfaces
         public GradelevelViewModel DeleteGradelevel(GradelevelViewModel gradelevel);
         public GradelevelListViewModel GetAllGradeLevels(GradelevelListViewModel gradelevel);
         public GradeEquivalencyListViewModel GetAllGradeEquivalency(GradeEquivalencyListViewModel gradeEquivalencyListModel);
+        public GradelevelSortOrderViewModel UpdateGradeLevelSortOrder(GradelevelSortOrderViewModel gradelevelSortOrderViewModel);
     }
 }

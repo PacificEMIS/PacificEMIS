@@ -151,5 +151,25 @@ namespace opensis.core.StudentEnrollmentCodes.Services
             }
             return studentEnrollmentCodeList;
         }
+
+        /// <summary>
+        /// UpdateStudentEnrollmentCodeSortOrder
+        /// </summary>
+        /// <param name="studentEnrollmentCodeSortOrderViewModel"></param>
+        /// <returns></returns>
+        public StudentEnrollmentCodeSortOrderViewModel UpdateStudentEnrollmentCodeSortOrder(StudentEnrollmentCodeSortOrderViewModel studentEnrollmentCodeSortOrderViewModel)
+        {
+            StudentEnrollmentCodeSortOrderViewModel studentEnrollmentCodeSortOrder = new();
+            if (tokenManager.CheckToken(studentEnrollmentCodeSortOrderViewModel._tenantName + studentEnrollmentCodeSortOrderViewModel._userName, studentEnrollmentCodeSortOrderViewModel._token))
+            {
+                studentEnrollmentCodeSortOrder = this.studentEnrollmentCodeRepository.UpdateStudentEnrollmentCodeSortOrder(studentEnrollmentCodeSortOrderViewModel);
+            }
+            else
+            {
+                studentEnrollmentCodeSortOrder._failure = true;
+                studentEnrollmentCodeSortOrder._message = TOKENINVALID;
+            }
+            return studentEnrollmentCodeSortOrder;
+        }
     }
 }

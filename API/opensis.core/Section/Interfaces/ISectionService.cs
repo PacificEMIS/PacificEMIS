@@ -38,5 +38,6 @@ namespace opensis.core.Section.Interfaces
         public SectionAddViewModel ViewSection(SectionAddViewModel section);
         public SectionListViewModel GetAllsection(SectionListViewModel section);
         public SectionAddViewModel DeleteSection(SectionAddViewModel section);
+        public SectionSortOrderViewModel UpdateSectionSortOrder(SectionSortOrderViewModel sectionSortOrderViewModel);
     }
 }

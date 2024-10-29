@@ -69,5 +69,6 @@ namespace opensis.core.Common.Interfaces
         public ScheduledCourseSectionViewModel GetMissingAttendanceCountForDashboardView(ScheduledCourseSectionViewModel scheduledCourseSectionViewModel);
         public ChangePasswordViewModel ChangePasswordForUser(ChangePasswordViewModel changePasswordViewModel);
         public ActiveDeactiveUserViewModel ActiveDeactiveUser(ActiveDeactiveUserViewModel activeDeactiveUserViewModel);
+        public DropdownValueSortOrderModel UpdateDropdownValueSortOrder(DropdownValueSortOrderModel dpValueSortOrderModel);
     }
 }

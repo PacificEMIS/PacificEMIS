@@ -402,32 +402,32 @@ namespace opensis.data.Repository
         {
             try
             {
-                var roomsRecords = new List<Rooms>();
-                var targetRoom = this.context?.Rooms.FirstOrDefault(x => x.SortOrder == roomSortOrderViewModel.PreviousSortOrder && x.SchoolId == roomSortOrderViewModel.SchoolId && x.TenantId == roomSortOrderViewModel.TenantId && x.AcademicYear == roomSortOrderViewModel._academicYear);
-                if (targetRoom != null)
-                {
-                    targetRoom.SortOrder = roomSortOrderViewModel.CurrentSortOrder;
-                    targetRoom.UpdatedBy = roomSortOrderViewModel.UpdatedBy;
-                    targetRoom.UpdatedOn = DateTime.UtcNow;
-                    if (roomSortOrderViewModel.PreviousSortOrder > roomSortOrderViewModel.CurrentSortOrder)
-                    {
-                        roomsRecords = this.context?.Rooms.Where(x => x.SortOrder >= roomSortOrderViewModel.CurrentSortOrder && x.SortOrder < roomSortOrderViewModel.PreviousSortOrder && x.TenantId == roomSortOrderViewModel.TenantId && x.SchoolId == roomSortOrderViewModel.SchoolId && x.AcademicYear == roomSortOrderViewModel._academicYear).ToList();
+                var roomList = this.context?.Rooms.Where(a => a.TenantId == roomSortOrderViewModel.TenantId && a.SchoolId == roomSortOrderViewModel.SchoolId && a.AcademicYear == roomSortOrderViewModel._academicYear);
 
-                        if (roomsRecords != null && roomsRecords.Any())
-                        {
-                            roomsRecords.ForEach(x => { x.SortOrder = x.SortOrder + 1; x.UpdatedOn = DateTime.UtcNow; x.UpdatedBy = roomSortOrderViewModel.UpdatedBy; });
-                        }
-                    }
-                    if (roomSortOrderViewModel.CurrentSortOrder > roomSortOrderViewModel.PreviousSortOrder)
+                if (roomList?.Any() == true)
+                {
+                    var sortOrderValues = roomSortOrderViewModel.SortOrderValues.OrderBy(c => c.Id);
+                    foreach (var sortOrderValue in sortOrderValues)
                     {
-                        roomsRecords = this.context?.Rooms.Where(x => x.SortOrder <= roomSortOrderViewModel.CurrentSortOrder && x.SortOrder > roomSortOrderViewModel.PreviousSortOrder && x.SchoolId == roomSortOrderViewModel.SchoolId && x.TenantId == roomSortOrderViewModel.TenantId && x.AcademicYear == roomSortOrderViewModel._academicYear).ToList();
-                        if (roomsRecords != null && roomsRecords.Any())
+                        var roomData = roomList.FirstOrDefault(d => d.TenantId == roomSortOrderViewModel.TenantId && d.SchoolId == roomSortOrderViewModel.SchoolId && d.RoomId == sortOrderValue.Id);
+
+                        if (roomData != null)
                         {
-                            roomsRecords.ForEach(x => { x.SortOrder = x.SortOrder - 1; x.UpdatedOn = DateTime.UtcNow; x.UpdatedBy = roomSortOrderViewModel.UpdatedBy; });
+                            var oldRoomData = roomData;
+                            roomData.SortOrder = sortOrderValue.SortOrder;
+                            roomData.UpdatedOn = DateTime.UtcNow;
+                            roomData.UpdatedBy = roomSortOrderViewModel.UpdatedBy;
+                            this.context?.Entry(oldRoomData).CurrentValues.SetValues(roomData);
                         }
                     }
                     this.context?.SaveChanges();
                     roomSortOrderViewModel._failure = false;
+                    roomSortOrderViewModel._message = "Sort order updated successfully";
+                }
+                else
+                {
+                    roomSortOrderViewModel._failure = true;
+                    roomSortOrderViewModel._message = NORECORDFOUND;
                 }
             }
             catch (Exception es)
