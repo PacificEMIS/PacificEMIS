@@ -178,5 +178,21 @@ namespace opensisAPI.Controllers
             }
             return roomlDelete;
         }
+
+        [HttpPut("updateRoomSortOrder")]
+        public ActionResult<RoomSortOrderViewModel> UpdateRoomSortOrder(RoomSortOrderViewModel roomSortOrderViewModel)
+        {
+            RoomSortOrderViewModel roomSortOrderUpdate = new RoomSortOrderViewModel();
+            try
+            {
+                roomSortOrderUpdate = _roomRegisterService.UpdateRoomSortOrder(roomSortOrderViewModel);
+            }
+            catch (Exception es)
+            {
+                roomSortOrderUpdate._failure = true;
+                roomSortOrderUpdate._message = es.Message;
+            }
+            return roomSortOrderUpdate;
+        }
     }
 }

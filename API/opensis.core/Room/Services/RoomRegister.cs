@@ -176,5 +176,33 @@ namespace opensis.core.Room.Services
             }
             return roomListdelete;
         }
+
+        /// <summary>
+        /// Update Room Sort Order
+        /// </summary>
+        /// <param name="roomSortOrderViewModel"></param>
+        /// <returns></returns>
+        public RoomSortOrderViewModel UpdateRoomSortOrder(RoomSortOrderViewModel roomSortOrderViewModel)
+        {
+            RoomSortOrderViewModel roomSortOrderUpdate = new();
+            try
+            {
+                if (tokenManager.CheckToken(roomSortOrderViewModel._tenantName + roomSortOrderViewModel._userName, roomSortOrderViewModel._token))
+                {
+                    roomSortOrderUpdate = this.roomRepository.UpdateRoomSortOrder(roomSortOrderViewModel);
+                }
+                else
+                {
+                    roomSortOrderUpdate._failure = true;
+                    roomSortOrderUpdate._message = TOKENINVALID;
+                }
+            }
+            catch (Exception es)
+            {
+                roomSortOrderUpdate._failure = true;
+                roomSortOrderUpdate._message = es.Message;
+            }
+            return roomSortOrderUpdate;
+        }
     }
 }
