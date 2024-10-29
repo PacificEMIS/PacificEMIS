@@ -177,5 +177,33 @@ namespace opensis.core.Section.Services
             }
             return sectionDelete;
         }
+
+        /// <summary>
+        /// Update Section Sort Order
+        /// </summary>
+        /// <param name="sectionSortOrderViewModel"></param>
+        /// <returns></returns>
+        public SectionSortOrderViewModel UpdateSectionSortOrder(SectionSortOrderViewModel sectionSortOrderViewModel)
+        {
+            SectionSortOrderViewModel sectionSortOrderUpdate = new();
+            try
+            {
+                if (tokenManager.CheckToken(sectionSortOrderViewModel._tenantName + sectionSortOrderViewModel._userName, sectionSortOrderViewModel._token))
+                {
+                    sectionSortOrderUpdate = this.sectionRepository.UpdateSectionSortOrder(sectionSortOrderViewModel);
+                }
+                else
+                {
+                    sectionSortOrderUpdate._failure = true;
+                    sectionSortOrderUpdate._message = TOKENINVALID;
+                }
+            }
+            catch (Exception es)
+            {
+                sectionSortOrderUpdate._failure = true;
+                sectionSortOrderUpdate._message = es.Message;
+            }
+            return sectionSortOrderUpdate;
+        }
     }
 }

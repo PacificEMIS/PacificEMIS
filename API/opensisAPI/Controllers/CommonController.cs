@@ -600,5 +600,21 @@ namespace opensisAPI.Controllers
             }
             return activeDeactiveUser;
         }
+
+        [HttpPut("updateDropdownValueSortOrder")]
+        public ActionResult<DropdownValueSortOrderModel> UpdateDropdownValueSortOrder(DropdownValueSortOrderModel dpValueSortOrderModel)
+        {
+            DropdownValueSortOrderModel dpValueSortOrderUpdate = new();
+            try
+            {
+                dpValueSortOrderUpdate = _commonService.UpdateDropdownValueSortOrder(dpValueSortOrderModel);
+            }
+            catch (Exception es)
+            {
+                dpValueSortOrderUpdate._failure = true;
+                dpValueSortOrderUpdate._message = es.Message;
+            }
+            return dpValueSortOrderUpdate;
+        }
     }
 }

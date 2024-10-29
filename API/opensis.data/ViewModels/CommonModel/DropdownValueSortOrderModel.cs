@@ -23,20 +23,30 @@ Copyright (c) Open Solutions for Education, Inc.
 All rights reserved.
 ***********************************************************************************/
 
-using opensis.data.ViewModels.StudentEnrollmentCodes;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
-namespace opensis.core.StudentEnrollmentCodes.Interfaces
+namespace opensis.data.ViewModels.CommonModel
 {
-    public interface IStudentEnrollmentCodeService
+    public class DropdownValueSortOrderModel : CommonFields
     {
-        public StudentEnrollmentCodeAddViewModel SaveStudentEnrollmentCode(StudentEnrollmentCodeAddViewModel studentEnrollmentCodeAddViewModel);
-        public StudentEnrollmentCodeAddViewModel ViewStudentEnrollmentCode(StudentEnrollmentCodeAddViewModel studentEnrollmentCodeAddViewModel);
-        public StudentEnrollmentCodeAddViewModel DeleteStudentEnrollmentCode(StudentEnrollmentCodeAddViewModel studentEnrollmentCodeAddViewModel);
-        public StudentEnrollmentCodeAddViewModel UpdateStudentEnrollmentCode(StudentEnrollmentCodeAddViewModel studentEnrollmentCodeAddViewModel);
-        public StudentEnrollmentCodeListViewModel GetAllStudentEnrollmentCode(StudentEnrollmentCodeListViewModel studentEnrollmentCodeListView);
-        public StudentEnrollmentCodeSortOrderViewModel UpdateStudentEnrollmentCodeSortOrder(StudentEnrollmentCodeSortOrderViewModel studentEnrollmentCodeSortOrderViewModel);
+        public DropdownValueSortOrderModel()
+        {
+            SortOrderValues = new List<SortOrderValueModel>();
+        }
+        public Guid TenantId { get; set; }
+        public int SchoolId { get; set; }
+        public string LovName { get; set; } = null!;
+        public string? UpdatedBy { get; set; }
+        public List<SortOrderValueModel> SortOrderValues { get; set; }
+
+    }
+    public class SortOrderValueModel
+    {
+        public int Id { get; set; }
+        public int SortOrder { get; set; }
     }
 }

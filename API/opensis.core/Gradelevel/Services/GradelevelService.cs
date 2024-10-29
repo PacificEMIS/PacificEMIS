@@ -27,6 +27,7 @@ using opensis.core.GradeLevel.Interfaces;
 using opensis.core.helper;
 using opensis.core.helper.Interfaces;
 using opensis.data.Interface;
+using opensis.data.ViewModels.Gradelevel;
 using opensis.data.ViewModels.GradeLevel;
 using System;
 using System.Collections.Generic;
@@ -222,6 +223,34 @@ namespace opensis.core.GradeLevel.Services
             }
             return gradeEquivalencyListViewModel;
 
+        }
+
+        /// <summary>
+        /// UpdateGradeLevelSortOrder
+        /// </summary>
+        /// <param name="gradelevelSortOrderViewModel"></param>
+        /// <returns></returns>
+        public GradelevelSortOrderViewModel UpdateGradeLevelSortOrder(GradelevelSortOrderViewModel gradelevelSortOrderViewModel)
+        {
+            GradelevelSortOrderViewModel gradelevelSortOrder = new();
+            try
+            {
+                if (tokenManager.CheckToken(gradelevelSortOrderViewModel._tenantName + gradelevelSortOrderViewModel._userName, gradelevelSortOrderViewModel._token))
+                {
+                    gradelevelSortOrder = this.gradelevelRepository.UpdateGradeLevelSortOrder(gradelevelSortOrderViewModel);
+                }
+                else
+                {
+                    gradelevelSortOrder._failure = true;
+                    gradelevelSortOrder._message = TOKENINVALID;
+                }
+            }
+            catch (Exception ex)
+            {
+                gradelevelSortOrder._failure = true;
+                gradelevelSortOrder._message = ex.Message;
+            }
+            return gradelevelSortOrder;
         }
     }
 }

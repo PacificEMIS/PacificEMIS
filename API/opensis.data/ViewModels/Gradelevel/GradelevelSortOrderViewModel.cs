@@ -23,20 +23,24 @@ Copyright (c) Open Solutions for Education, Inc.
 All rights reserved.
 ***********************************************************************************/
 
-using opensis.data.ViewModels.StudentEnrollmentCodes;
+using opensis.data.ViewModels.CommonModel;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
-namespace opensis.core.StudentEnrollmentCodes.Interfaces
+namespace opensis.data.ViewModels.Gradelevel
 {
-    public interface IStudentEnrollmentCodeService
+    public class GradelevelSortOrderViewModel : CommonFields
     {
-        public StudentEnrollmentCodeAddViewModel SaveStudentEnrollmentCode(StudentEnrollmentCodeAddViewModel studentEnrollmentCodeAddViewModel);
-        public StudentEnrollmentCodeAddViewModel ViewStudentEnrollmentCode(StudentEnrollmentCodeAddViewModel studentEnrollmentCodeAddViewModel);
-        public StudentEnrollmentCodeAddViewModel DeleteStudentEnrollmentCode(StudentEnrollmentCodeAddViewModel studentEnrollmentCodeAddViewModel);
-        public StudentEnrollmentCodeAddViewModel UpdateStudentEnrollmentCode(StudentEnrollmentCodeAddViewModel studentEnrollmentCodeAddViewModel);
-        public StudentEnrollmentCodeListViewModel GetAllStudentEnrollmentCode(StudentEnrollmentCodeListViewModel studentEnrollmentCodeListView);
-        public StudentEnrollmentCodeSortOrderViewModel UpdateStudentEnrollmentCodeSortOrder(StudentEnrollmentCodeSortOrderViewModel studentEnrollmentCodeSortOrderViewModel);
+        public GradelevelSortOrderViewModel()
+        {
+            SortOrderValues = new List<SortOrderValueModel>();
+        }
+        public Guid TenantId { get; set; }
+        public int SchoolId { get; set; }
+        public string? UpdatedBy { get; set; }
+        public List<SortOrderValueModel> SortOrderValues { get; set; }
     }
 }
