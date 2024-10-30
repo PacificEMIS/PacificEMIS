@@ -28,7 +28,7 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { SharedModuleModule } from '../../shared-module/shared-module.module';
-
+import { MatSortModule } from '@angular/material/sort';
 
 @NgModule({
   declarations: [GroupDeleteComponent, AddCourseSectionComponent],
@@ -59,7 +59,8 @@ import { SharedModuleModule } from '../../shared-module/shared-module.module';
     MatPaginatorModule,
     FormsModule,
     ReactiveFormsModule,
-    SharedModuleModule
+    SharedModuleModule,
+    MatSortModule
   ]
 })
 export class GroupDeleteModule { }

@@ -299,6 +299,7 @@ export class GetUnassociatedStudentListByCourseSectionModel extends CommonField 
 
 export class ScheduledStudentDeleteModel extends CommonField {
   studentIds: any[];
+  staffIds?: any[];
   courseSectionId: number;
 
   constructor() {
