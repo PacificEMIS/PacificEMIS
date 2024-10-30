@@ -29,6 +29,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { AddCourseSectionComponent } from './add-course-section/add-course-section.component';
 import icInfo from '@iconify/icons-ic/twotone-info';
 import icCheckCircle from '@iconify/icons-ic/check-circle';
+import icDeleteForever from '@iconify/icons-ic/twotone-delete-forever';
 import { StudentScheduleService } from 'src/app/services/student-schedule.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { CourseManagerService } from 'src/app/services/course-manager.service';
@@ -46,9 +47,13 @@ import { GetUnassociatedStudentListByCourseSectionModel, ScheduledStudentDeleteM
 import { Permissions } from '../../../models/roll-based-access.model';
 import { MatTableDataSource } from '@angular/material/table';
 import { FormControl } from '@angular/forms';
-import { MatPaginator } from '@angular/material/paginator';
+import { MatPaginator, MatPaginatorIntl } from '@angular/material/paginator';
 import { MatCheckbox } from '@angular/material/checkbox';
 import { ConfirmDialogComponent } from '../../shared-module/confirm-dialog/confirm-dialog.component';
+import { RemoveStaffCourseSectionSchedule, ScheduledStaffForCourseSection } from 'src/app/models/course-section.model';
+import { CourseSectionService } from 'src/app/services/course-section.service';
+import { TeacherScheduleService } from 'src/app/services/teacher-schedule.service';
+import { MatSort, Sort } from '@angular/material/sort';
 
 @Component({
   selector: 'vex-group-delete',
@@ -59,9 +64,11 @@ export class GroupDeleteComponent implements OnInit, AfterViewInit, OnDestroy {
 
   icInfo = icInfo;
   icCheckCircle = icCheckCircle;
+  icDeleteForever = icDeleteForever;
   showScheduledStudents: boolean = true;
 
   displayedColumns: string[] = ['studentSelected', 'name', 'studentId', 'alternateId', 'grade', 'phone'];
+  displayedStaffColumns: string[] = ['staffSelected', 'firstGivenName', 'staffId', 'profile', 'jobTitle', 'schoolEmail', 'mobilePhone'];
   studentDetails: MatTableDataSource<any>;
   programList = [];
   subjectList = [];
@@ -76,19 +83,30 @@ export class GroupDeleteComponent implements OnInit, AfterViewInit, OnDestroy {
   pageSize: number;
   searchCtrl: FormControl;
   isVisible: boolean = false;
+  isStaffVisible: boolean = false;
   isGroupDelete: boolean = false;
+  isGroupStaffDelete: boolean = false;
   showCourseSectionName: boolean = false;
-  studentNotFound: boolean = false;
+  showErrorMessage: string = '';
+  showStaffErrorMessage: string = '';
   listOfStudents = [];
   selectedStudents = [];
+  listOfStaffs = [];
+  selectedStaffs = [];
+  staffCoursesectionSchedule: MatTableDataSource<any>;
+  totalStaffCount: number = 0;
   getAllProgramModel: GetAllProgramModel = new GetAllProgramModel();
   getAllSubjectModel: GetAllSubjectModel = new GetAllSubjectModel();
   getAllCourseListModel: GetAllCourseListModel = new GetAllCourseListModel();
   getMarkingPeriodTitleListModel: GetMarkingPeriodTitleListModel = new GetMarkingPeriodTitleListModel();
   scheduleStudentListViewModel: GetUnassociatedStudentListByCourseSectionModel = new GetUnassociatedStudentListByCourseSectionModel();
   scheduledStudentDeleteModel: ScheduledStudentDeleteModel = new ScheduledStudentDeleteModel();
+  scheduledTeacher:ScheduledStaffForCourseSection = new ScheduledStaffForCourseSection();
+  removeStaffDetails : RemoveStaffCourseSectionSchedule = new RemoveStaffCourseSectionSchedule();
   @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
   @ViewChild('masterCheckBox') masterCheckBox: MatCheckbox;
+  @ViewChild('masterCheckBoxStaff') masterCheckBoxStaff: MatCheckbox;
+  @ViewChild(MatSort) sort: MatSort;
 
   constructor(private dialog: MatDialog,
     public translateService: TranslateService,
@@ -100,7 +118,12 @@ export class GroupDeleteComponent implements OnInit, AfterViewInit, OnDestroy {
     private commonFunction: SharedFunction,
     private pageRolePermissions: PageRolesPermission,
     private loaderService: LoaderService,
-    private commonService: CommonService) {
+    private paginatorObj: MatPaginatorIntl,
+    private commonService: CommonService,
+    private courseSectionService:CourseSectionService,
+    private teacherScheduleService:TeacherScheduleService,
+  ) {
+    paginatorObj.itemsPerPageLabel = translateService.instant('itemsPerPage');
     this.loaderService.isLoading.pipe(takeUntil(this.destroySubject$)).subscribe((val) => {
       this.loading = val;
     });
@@ -117,6 +140,10 @@ export class GroupDeleteComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngAfterViewInit(): void {
     this.searchInStudentList();
+  }
+
+  announceSortChange(sortState: Sort) {
+      this.staffCoursesectionSchedule.sort = this.sort;
   }
 
   // For searching
@@ -154,10 +181,15 @@ export class GroupDeleteComponent implements OnInit, AfterViewInit, OnDestroy {
       this.searchInStudentList();
       this.listOfStudents = [];
       this.selectedStudents = [];
+      this.listOfStaffs = [];
+      this.selectedStaffs = [];
       this.isVisible = false;
+      this.isStaffVisible = false;
       this.isGroupDelete = false;
+      this.isGroupStaffDelete = false;
       this.showCourseSectionName = false;
-      this.studentNotFound = false;
+      this.showErrorMessage = '';
+      this.showStaffErrorMessage = '';
       this.dialog.open(AddCourseSectionComponent, {
         width: '900px',
         data: {
@@ -171,6 +203,7 @@ export class GroupDeleteComponent implements OnInit, AfterViewInit, OnDestroy {
         if (this.courseSectionData) {
           this.showCourseSectionName = true;
           this.getUnassociatedStudentListByCourseSection(this.courseSectionData.courseSectionId);
+          this.getScheduledTeachers();
         } else {
           this.showCourseSectionName = false;
         }
@@ -268,6 +301,63 @@ export class GroupDeleteComponent implements OnInit, AfterViewInit, OnDestroy {
       }
     })
   }
+
+  getScheduledTeachers() {
+    this.scheduledTeacher.courseId = this.courseSectionData.courseId;
+    this.scheduledTeacher.courseSectionId = this.courseSectionData.courseSectionId;
+    this.courseSectionService.getUnassociatedStaffListByCourseSection(this.scheduledTeacher).subscribe((res) => {
+      if (typeof (res) == 'undefined') {
+        this.snackbar.open('Teacher schedule failed ' + this.defaultService.getHttpError(), '', {
+          duration: 10000
+        });
+      }
+      else {
+        if (res._failure) {
+          this.staffCoursesectionSchedule = new MatTableDataSource([]);
+          this.totalStaffCount = 0;
+          this.isStaffVisible = false;
+          this.showStaffErrorMessage = res._message;
+        } else {
+          this.isStaffVisible = true;
+          this.scheduledTeacher.courseSectionsList = res.courseSectionsList;
+          this.totalStaffCount = res.courseSectionsList[0].staffCoursesectionSchedule?.length;
+          if(this.totalStaffCount > 0){
+            res.courseSectionsList[0].staffCoursesectionSchedule.forEach((staff) => {
+              staff.checked = false;
+            });
+            this.listOfStaffs = res.courseSectionsList[0].staffCoursesectionSchedule.map((item) => {
+              this.selectedStaffs.map((selectedUser) => {
+                if (item.staffId === selectedUser.staffId) {
+                  item.checked = true;
+                  return item;
+                }
+              });
+              return item;
+            });
+            this.masterCheckBox.checked = this.listOfStaffs.every((item) => {
+              return item.checked;
+            });
+            res.courseSectionsList[0]?.staffCoursesectionSchedule.map( (item: any) => {
+              item.firstGivenName = item?.staffMaster?.firstGivenName;
+              item.lastFamilyName = item?.staffMaster?.lastFamilyName;
+              item.staffInternalId = item?.staffMaster?.staffInternalId;
+              item.profile = item?.staffMaster?.profile;
+              item.jobTitle = item?.staffMaster?.jobTitle;
+              item.schoolEmail = item?.staffMaster?.schoolEmail;
+              item.mobilePhone = item?.staffMaster?.mobilePhone;
+            })
+            this.staffCoursesectionSchedule = new MatTableDataSource(res.courseSectionsList[0]?.staffCoursesectionSchedule);
+            this.staffCoursesectionSchedule.sort = this.sort;
+            this.showStaffErrorMessage = '';
+          }
+          else{
+            this.isStaffVisible = false;
+            this.showStaffErrorMessage = this.defaultService.translateKey('noStaffFound');
+          }
+        }
+      }
+    })
+  }
   /********** Calling Dropdown API's End **********/
 
   // For call unassociated student list API
@@ -278,11 +368,13 @@ export class GroupDeleteComponent implements OnInit, AfterViewInit, OnDestroy {
       if (res) {
         if (res._failure) {
           this.commonService.checkTokenValidOrNot(res._message);
-          this.studentNotFound = true;
+          //if(!this.searchCtrl.value)
+          this.showErrorMessage = this.defaultService.translateKey(res._message);
+          this.isVisible = false;
           this.studentDetails = new MatTableDataSource([]);
           this.totalCount = null;
         } else {
-          this.studentNotFound = false;
+          this.showErrorMessage = '';
           this.isVisible = true;
           this.totalCount = res.totalCount;
           this.pageNumber = res.pageNumber;
@@ -400,8 +492,9 @@ export class GroupDeleteComponent implements OnInit, AfterViewInit, OnDestroy {
 
   // For open deleteGroupStudents confirmation dialog.
   confirmDeleteGroupStudents() {
-    if (!this.selectedStudents.length) {
-      this.snackbar.open('Please select a student or group of students.', '', {
+    let selectedStudentsStaffsLength = this.selectedStudents.length + this.selectedStaffs.length;
+    if (selectedStudentsStaffsLength === 0) {
+      this.snackbar.open('Please Select a Student and/or Teacher', '', {
         duration: 5000
       });
       return;
@@ -409,8 +502,8 @@ export class GroupDeleteComponent implements OnInit, AfterViewInit, OnDestroy {
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
       maxWidth: '400px',
       data: {
-        title: 'Are you sure?',
-        message: 'Are you sure you want to dalete that Schedule?'
+        title: this.defaultService.translateKey('areYouSure?'),
+        message: selectedStudentsStaffsLength > 1 ? this.defaultService.translateKey('areYouSureYouWantToDeleteTheSelectedStudentsFromTheCourseSection?') : this.defaultService.translateKey('areYouSureYouWantToDeleteTheSelectedStudentFromTheCourseSection?')
       }
     });
     dialogRef.afterClosed().subscribe(dialogResult => {
@@ -426,6 +519,9 @@ export class GroupDeleteComponent implements OnInit, AfterViewInit, OnDestroy {
     this.scheduledStudentDeleteModel.studentIds = this.selectedStudents.map(item => {
       return item.studentId;
     });
+    this.scheduledStudentDeleteModel.staffIds = this.selectedStaffs.map(item => {
+      return item.staffId;
+    });
     this.studentScheduleService.groupDeleteForScheduledStudent(this.scheduledStudentDeleteModel).subscribe((res) => {
       if (res) {
         if (res._failure) {
@@ -434,10 +530,13 @@ export class GroupDeleteComponent implements OnInit, AfterViewInit, OnDestroy {
             duration: 10000
           });
         } else {
-          this.studentNotFound = false;
+          this.showErrorMessage = '';
           this.isVisible = false;
+          this.showStaffErrorMessage = '';
+          this.isStaffVisible = false;
           this.isGroupDelete = true;
           this.showCourseSectionName = false;
+          // this.checkShowCourseSectionName();
         }
       } else {
         this.snackbar.open(this.defaultService.getHttpError(), '', {
@@ -445,6 +544,128 @@ export class GroupDeleteComponent implements OnInit, AfterViewInit, OnDestroy {
         });
       }
     });
+  }
+
+  confirmDeleteScheduledStaff () {
+    if (!this.selectedStaffs.length) {
+      this.snackbar.open(this.defaultService.translateKey('selectStaffOrGroupStaff'), '', {
+        duration: 5000
+      });
+      return;
+    }
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      maxWidth: '400px',
+      data: {
+        title: this.selectedStaffs.length > 1 ? this.defaultService.translateKey('areYouSureWantToDeleteScheduledTeachers') : this.defaultService.translateKey('areYouSureWantToDeleteScheduledTeacher'),
+        message: ''
+      }
+    });
+    dialogRef.afterClosed().subscribe(dialogResult => {
+      if (dialogResult) {
+        this.removeStaffDetails.staffIds = this.selectedStaffs.map(item => {
+          return item.staffId;
+        });
+        this.removeStaffDetails.courseSectionId = this.courseSectionData.courseSectionId;
+        this.teacherScheduleService.removeStaffCourseSectionSchedule(this.removeStaffDetails).subscribe(res => {
+          if (res._failure) {
+            this.snackbar.open(res._message, '', {
+              duration: 10000
+            });
+          }
+          else {
+            this.snackbar.open(res._message, '', {
+              duration: 10000
+            });
+            this.isGroupStaffDelete = true;
+            this.isStaffVisible = false;
+            this.showStaffErrorMessage = '';
+            this.checkShowCourseSectionName();
+            this.getScheduledTeachers();
+          }
+        })
+      }
+    });
+  }
+
+  someStaffComplete(): boolean {
+    let indetermine = false;
+    for (let user of this.listOfStaffs) {
+      for (let selectedUser of this.selectedStaffs) {
+        if (user.staffId === selectedUser.staffId) {
+          indetermine = true;
+        }
+      }
+    }
+    if (indetermine) {
+      this.masterCheckBoxStaff.checked = this.listOfStaffs.every((item) => {
+        return item.checked;
+      })
+      if (this.masterCheckBoxStaff.checked) {
+        return false;
+      } else {
+        return true;
+      }
+    }
+  }
+
+  setStaffAll(event) {
+    this.listOfStaffs.forEach(user => { user.checked = event; });
+    this.staffCoursesectionSchedule = new MatTableDataSource(this.listOfStaffs);
+    this.decideStaffCheckUncheck();
+  }
+
+  onChangeStaffSelection(eventStatus: boolean, staffId) {
+    for (let item of this.listOfStaffs) {
+      if (item.staffId === staffId) {
+        item.checked = eventStatus;
+        break;
+      }
+    }
+    this.staffCoursesectionSchedule = new MatTableDataSource(this.listOfStaffs);
+    this.masterCheckBoxStaff.checked = this.listOfStaffs.every((item) => {
+      return item.checked;
+    });
+
+    this.decideStaffCheckUncheck();
+  }
+
+  decideStaffCheckUncheck() {
+    this.listOfStaffs.map((item) => {
+      let isIdIncludesInSelectedList = false;
+      if (item.checked) {
+        for (let selectedUser of this.selectedStaffs) {
+          if (item.staffId === selectedUser.staffId) {
+            isIdIncludesInSelectedList = true;
+            break;
+          }
+        }
+        if (!isIdIncludesInSelectedList) {
+          this.selectedStaffs.push(item);
+        }
+      }
+      else {
+        for (let selectedUser of this.selectedStaffs) {
+          if (item.staffId === selectedUser.staffId) {
+            this.selectedStaffs = this.selectedStaffs.filter((user) => user.staffId !== item.staffId);
+            break;
+          }
+        }
+      }
+      isIdIncludesInSelectedList = false;
+    });
+    this.selectedStaffs = this.selectedStaffs.filter((item) => item.checked);
+  }
+
+  checkShowCourseSectionName() {
+    if (this.totalStaffCount === 0) {
+      if (this.isGroupDelete)
+        this.showCourseSectionName = false;
+    }
+    else {
+      if (this.isGroupStaffDelete && this.isGroupDelete) {
+        this.showCourseSectionName = false;
+      }
+    }
   }
 
   // For destroy the isLoading subject.

@@ -1822,8 +1822,8 @@
     "selectACourseSectionToDeleteStudentFromIt": "Select a course section to delete student from it.",
     "selectStudentsToDeleteFromCourseSection": "Select Students to Delete from Course Section",
     "totalSeats": "Total Seats",
-    "deleteSelectedStudentsFromCourseSection": "Delete Selected Students from Course Section",
-    "studentsSuccessfullyDeletedFrom": "Students successfully deleted from",
+    "deleteSelectedStudentsFromCourseSection": "Delete Selected Students and/or Teachers from Course Section",
+    "studentsSuccessfullyDeletedFrom": "Students and/or Teachers successfully deleted from",
     "completed": "Completed",
     "selectScheduleDateForSelectedStudentsIntoCourseSections": "Select schedule date for selected student(s) into course section(s)",
     "studentInfo":"Student Info",
@@ -1947,5 +1947,15 @@
     "sunText": "Sun",
     "satText": "Sat",
     "theSchoolYearBeginAndEndDateShouldBeBetween": "The School Year Begin and End date should be between",
-    "allowRoomConflict": "Allow Room Conflict"
+    "allowRoomConflict": "Allow Room Conflict",
+    "courseSections": "Course Sections",
+    "noStaffFound": "No staff were found",
+    "areYouSureYouWantToDeleteTheSelectedStudentsFromTheCourseSection?": "Are you sure you want to delete the selected students and/or teachers from the course section?",
+    "areYouSureYouWantToDeleteTheSelectedStudentFromTheCourseSection?": "Are you sure you want to delete the selected student and/or teacher from the course section?",
+    "selectStaffOrGroupStaff": "Please select a teacher or group of teachers",
+    "areYouSureWantToDeleteScheduledTeachers":"Are you sure you want to remove the scheduled teachers?",
+    "areYouSureWantToDeleteScheduledTeacher":"Are you sure you want to remove the scheduled teacher?",
+    "selectTeacherToDeleteFromCourseSection": "Select Teacher To Delete From Course Section",
+    "staffsWhoDontHaveAnyAttendanceAssignmentDataAssociatedWithTheCourseSectionAboveAreShownInTheListBelow": "Staffs who don't have any Attendance, Assignment data associated with the course section above are shown in the list below.",
+    "staffsSuccessfullyDeletedFrom": "Satffs successfully deleted from"
 }

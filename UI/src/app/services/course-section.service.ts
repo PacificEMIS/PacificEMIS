@@ -115,4 +115,10 @@ export class CourseSectionService {
     let apiurl = this.apiUrl + courseSection._tenantName + "/CourseManager/getAllStaffScheduleInCourseSection";
     return this.http.post<ScheduledStaffForCourseSection>(apiurl, courseSection,this.httpOptions)
   }
+
+  getUnassociatedStaffListByCourseSection(courseSection: ScheduledStaffForCourseSection) {
+    courseSection = this.defaultValuesService.getAllMandatoryVariable(courseSection);
+    let apiurl = this.apiUrl + courseSection._tenantName + "/StaffSchedule/getUnassociatedStaffListByCourseSection";
+    return this.http.post<ScheduledStaffForCourseSection>(apiurl, courseSection,this.httpOptions)
+  }
 }
