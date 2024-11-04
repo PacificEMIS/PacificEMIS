@@ -5998,7 +5998,7 @@ namespace opensis.data.Repository
                 {
                     var studentIds = studentDeleteViewModel.studentListViews.Select(s => s.StudentId).ToList();
 
-                    var studentMasterData = this.context?.StudentMaster.Include(s => s.StudentEnrollment).Include(s => s.StudentComments).Include(s => s.StudentDocuments).Include(s => s.StudentMedicalAlert).Include(s => s.StudentMedicalImmunization).Include(s => s.StudentMedicalNote).Include(s => s.StudentMedicalNurseVisit).Include(s => s.StudentMedicalProvider).Where(x => x.TenantId == studentDeleteViewModel.TenantId && x.SchoolId == studentDeleteViewModel.SchoolId && studentIds.Contains(x.StudentId)).ToList();
+                    var studentMasterData = this.context?.StudentMaster.Include(s => s.StudentEnrollment).Include(s => s.StudentComments).Include(s => s.StudentDocuments).Include(s => s.StudentMedicalAlert).Include(s => s.StudentMedicalImmunization).Include(s => s.StudentMedicalNote).Include(s => s.StudentMedicalNurseVisit).Include(s => s.StudentMedicalProvider).Include(s => s.StudentCoursesectionSchedule).Where(x => x.TenantId == studentDeleteViewModel.TenantId && x.SchoolId == studentDeleteViewModel.SchoolId && studentIds.Contains(x.StudentId)).ToList();
 
                     var customFieldsValueData = this.context?.CustomFieldsValue.Where(x => x.TenantId == studentDeleteViewModel.TenantId && x.SchoolId == studentDeleteViewModel.SchoolId && x.Module == "Student" && studentIds.Contains(x.TargetId)).ToList();
 
