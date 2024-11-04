@@ -7,7 +7,7 @@ import { MatTableDataSource } from '@angular/material/table';
 import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { SearchFilter, SearchFilterAddViewModel, SearchFilterListViewModel } from 'src/app/models/search-filter.model';
-import { GetAllStaffModel, StaffAddModel, StaffMasterModel } from 'src/app/models/staff.model';
+import { GetAllStaffModel, StaffAddModel, StaffMasterModel, DeleteStaffModel } from 'src/app/models/staff.model';
 import { FinalGradeService } from 'src/app/services/final-grade.service';
 import { LoaderService } from 'src/app/services/loader.service';
 import { StaffService } from 'src/app/services/staff.service';
@@ -22,6 +22,7 @@ import { CommonService } from 'src/app/services/common.service';
 import moment from 'moment';
 import icAdd from '@iconify/icons-ic/baseline-add';
 import icFilterList from '@iconify/icons-ic/filter-list';
+import icDelete from '@iconify/icons-ic/twotone-delete-forever';
 import { ConfirmDialogComponent } from 'src/app/pages/shared-module/confirm-dialog/confirm-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
 import { ImageCropperService } from 'src/app/services/image-cropper.service';
@@ -63,9 +64,11 @@ export class CommonStaffListComponent implements OnInit {
   icAdd = icAdd;
   searchFilterAddViewModel: SearchFilterAddViewModel = new SearchFilterAddViewModel();
   searchFilterListViewModel: SearchFilterListViewModel = new SearchFilterListViewModel();
+  deleteStaffModel: DeleteStaffModel = new DeleteStaffModel();
   searchFilter: SearchFilter = new SearchFilter();
   displayedColumns: string[] = ['lastFamilyName', 'staffInternalId', 'profile', 'jobTitle', 'schoolEmail', 'mobilePhone', 'status'];
   icFilterList = icFilterList;
+  icDelete = icDelete;
   showAdvanceSearchPanel: boolean = false;
   showSaveFilter: boolean = false;
   filterJsonParams;
@@ -647,6 +650,94 @@ export class CommonStaffListComponent implements OnInit {
     this.staffList = new MatTableDataSource(res.staffMaster);
     this.getAllStaff = new GetAllStaffModel();
   }
+
+  deleteStaff(item, index) {
+    /*if(this.defaultValuesService.getUserMembershipType() === this.profiles.SuperAdmin){
+      this.confirmDelete(item, index);
+    } else {
+      this.checkIFExternalSchoolWithoutCategory(item).then((res:any) => {
+        this.confirmDelete(item, index);
+      });
+    }*/
+      this.checkIFExternalSchoolWithoutCategory(item).then((res:any) => {
+        this.confirmDelete(item, index);
+      });
+  }
+
+  confirmDelete(item, index) {
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      maxWidth: '400px',
+      data: {
+        title: this.defaultValuesService.translateKey('areYouSure'),
+        message: this.defaultValuesService.translateKey('youWantToDeleteStaff') + ' ' + item.firstGivenName + ' ' + item.lastFamilyName
+      }
+    });
+    dialogRef.afterClosed().subscribe(dialogResult => {
+      if (dialogResult) {
+        this.staffList.filteredData[index].loading = true;
+        this.deleteStaffModel.staffMasters = [{...item}];
+        this.staffService.deleteStaff(this.deleteStaffModel).subscribe((res) => {
+          if(res._failure){
+            this.snackbar.open(res._message, '', {
+              duration: 10000
+            });
+          } else {
+            this.snackbar.open(res._message, '', {
+              duration: 10000
+            });
+            // set pagination
+            this.getAllStaff.pageSize = this.defaultValuesService.getPageSize() ? this.defaultValuesService.getPageSize() : 10;
+            this.getAllStaff.pageNumber = 1;
+
+            // set search filterparams
+            if(this.filterParameters){
+              this.getAllStaff.filterParams = this.filterParameters;
+            }
+
+            // set search filter
+            if (this.searchCtrl.value != null && this.searchCtrl.value != "") {
+              let filterParams = [
+                {
+                  columnName: null,
+                  filterValue: this.searchCtrl.value,
+                  filterOption: 3
+                }
+              ]
+              Object.assign(this.getAllStaff, { filterParams: filterParams });
+            }
+
+            // set sorting (if any)
+            if (this.sort.active !== undefined && this.sort.direction !== "") {
+              this.getAllStaff.sortingModel.sortColumn = this.sort.active;
+              this.getAllStaff.sortingModel.sortDirection = this.sort.direction;
+            }
+            this.callStaffList();
+          }
+        })
+      }
+    });
+  }
+
+  checkIFExternalSchoolWithoutCategory(model) {
+    return new Promise((resolve, reject) => {
+      let defaultSchool = model.staffSchoolInfo.find(x => x.schoolId === x.schoolAttachedId);
+      let enxternalSchools = model.staffSchoolInfo.filter(x => x.schoolId !== x.schoolAttachedId);
+      if (enxternalSchools?.length > 0) {
+        const index = enxternalSchools.findIndex(x => x.schoolAttachedId === this.defaultValuesService.getSchoolID())
+        if (index >= 0) {
+          this.snackbar.open(
+            `This staff is associated to ${defaultSchool.schoolAttachedName}. Please go to ${defaultSchool.schoolAttachedName} for any changes`, '', 
+            { duration: 10000 }
+          );
+        } else {
+          resolve('');
+        }
+      } else {
+        resolve('');
+      }
+    });
+  }
+
   ngOnDestroy(){
     this.getAllStaff.includeInactive=false;
     this.getAllStaff.searchAllSchool=false;

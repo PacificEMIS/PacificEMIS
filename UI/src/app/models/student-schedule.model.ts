@@ -92,6 +92,8 @@ export class ScheduleStudentForView {
   public mobilePhone: string;
   public schoolEmail: string;
   public isDropped: boolean;
+  public isCurrentSchool?: boolean;
+  public studentGuid?: string;
 }
 
 export class ScheduledStudentDropModel extends CommonField {
