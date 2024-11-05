@@ -34,3 +34,16 @@ export class LovList extends CommonField{
     public tenantId: string;
     public isHasSchoolId:boolean;
 }
+
+export class UpdateLovSortingModel extends CommonField {
+    public tenantId: string;
+    public schoolId: number;
+    public lovName: string;
+    public updatedBy: string;
+    public sortOrderValues: LoVSortOrderValuesModel[]
+}
+
+export class LoVSortOrderValuesModel {
+    id: number;
+    sortOrder: number;
+}
