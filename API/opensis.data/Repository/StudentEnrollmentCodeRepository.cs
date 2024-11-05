@@ -244,7 +244,7 @@ namespace opensis.data.Repository
             try
             {
 
-                var StudentEnrollmentCodeAll = this.context?.StudentEnrollmentCode.Where(x => x.TenantId == studentEnrollmentCodeListView.TenantId && x.SchoolId == studentEnrollmentCodeListView.SchoolId && x.AcademicYear == studentEnrollmentCodeListView.AcademicYear).ToList();
+                var StudentEnrollmentCodeAll = this.context?.StudentEnrollmentCode.Where(x => x.TenantId == studentEnrollmentCodeListView.TenantId && x.SchoolId == studentEnrollmentCodeListView.SchoolId && x.AcademicYear == studentEnrollmentCodeListView.AcademicYear).OrderBy(x => x.SortOrder).ToList();
 
                 if (StudentEnrollmentCodeAll!=null && StudentEnrollmentCodeAll.Any())
                 {
