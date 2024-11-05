@@ -142,7 +142,7 @@ namespace opensisAPI.Controllers
             return studentEnrollmentCodeList;
         }
 
-        [HttpPost("updateStudentEnrollmentCodeSortOrder")]
+        [HttpPut("updateStudentEnrollmentCodeSortOrder")]
         public ActionResult<StudentEnrollmentCodeSortOrderViewModel> UpdateStudentEnrollmentCodeSortOrder(StudentEnrollmentCodeSortOrderViewModel studentEnrollmentCodeSortOrderViewModel)
         {
             StudentEnrollmentCodeSortOrderViewModel studentEnrollmentCodeSortOrder = new();

@@ -185,7 +185,7 @@ namespace opensisAPI.Controllers
             return sectionDelete;
         }
 
-        [HttpPost("updateSectionSortOrder")]
+        [HttpPut("updateSectionSortOrder")]
         public ActionResult<SectionSortOrderViewModel> UpdateSectionSortOrder(SectionSortOrderViewModel sectionSortOrderViewModel)
         {
             SectionSortOrderViewModel sectionSortOrderUpdate = new();
