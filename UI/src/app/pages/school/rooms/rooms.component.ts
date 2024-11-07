@@ -50,6 +50,8 @@ import { Permissions, RolePermissionListViewModel, RolePermissionViewModel } fro
 import { PageRolesPermission } from '../../../common/page-roles-permissions.service';
 import { CommonService } from 'src/app/services/common.service';
 import { DefaultValuesService } from 'src/app/common/default-values.service';
+import { CdkDragDrop } from '@angular/cdk/drag-drop';
+import { LoVSortOrderValuesModel, UpdateLovSortingModel } from 'src/app/models/lov.model';
 @Component({
   selector: 'vex-rooms',
   templateUrl: './rooms.component.html',
@@ -68,6 +70,7 @@ export class RoomsComponent implements OnInit {
   icFilterList = icFilterList;
   roomaddviewmodel: RoomAddView = new RoomAddView();
   roomListViewModel: RoomListViewModel = new RoomListViewModel();
+  updateLovSortingModel: UpdateLovSortingModel = new UpdateLovSortingModel();
   roomDetails: any;
   loading: boolean;
   searchKey: string;
@@ -92,6 +95,7 @@ export class RoomsComponent implements OnInit {
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
   columns = [
+    { label: 'sort', property: 'lovId', type: 'text', visible: true },
     { label: 'title', property: 'title', type: 'text', visible: true },
     { label: 'capacity', property: 'capacity', type: 'text', visible: true, cssClasses: ['font-medium'] },
     { label: 'sortOrder', property: 'sortOrder', type: 'text', visible: true, cssClasses: ['text-secondary', 'font-medium'] },
@@ -246,5 +250,54 @@ export class RoomsComponent implements OnInit {
         duration: 5000
       });
     }
+  }
+
+  sortLovList(event: CdkDragDrop<string[]>) {
+    
+    if (event.currentIndex > event.previousIndex) {
+      this.roomModelList.filteredData[event.currentIndex].sortOrder = Number(this.roomModelList.filteredData[event.currentIndex].sortOrder) - 1;
+    }
+    else if (event.currentIndex < event.previousIndex) {
+      this.roomModelList.filteredData[event.currentIndex].sortOrder = Number(this.roomModelList.filteredData[event.currentIndex].sortOrder) + 1;
+    }
+    this.roomModelList.filteredData[event.previousIndex].sortOrder = Number(event.currentIndex) + 1;
+
+    let dropdownListMod = this.roomModelList.filteredData?.sort((a, b) => a.sortOrder < b.sortOrder ? -1 : 1);
+
+    let sortOrderValues = [];
+
+    dropdownListMod.forEach((oneLov, idxLov) => {
+      let thisItemSort = new LoVSortOrderValuesModel();
+      thisItemSort.id = oneLov.roomId;
+      thisItemSort.sortOrder = Number(idxLov) + 1;
+
+      sortOrderValues.push(thisItemSort);
+    })
+
+    this.updateLovSortingModel.sortOrderValues = sortOrderValues;
+    this.updateLovSortingModel.tenantId = this.defaultValuesService.getTenantID();
+    this.updateLovSortingModel.schoolId = this.defaultValuesService.getSchoolID();
+    this.updateLovSortingModel.updatedBy = this.defaultValuesService.getUserGuidId();
+
+    this.roomService.updateRoomSortOrder(this.updateLovSortingModel).subscribe((res) => {
+      if (res) {
+        if (res._failure) {
+          this.snackbar.open(res._message, '', {
+            duration: 3000
+          });
+        }
+        else {
+          this.snackbar.open(res._message, '', {
+            duration: 3000
+          });
+          this.getAllRooms();
+        }
+      }
+      else {
+        this.snackbar.open(this.defaultValuesService.getHttpError(), '', {
+          duration: 3000
+        });
+      }
+    })
   }
 }

@@ -23,7 +23,7 @@ Copyright (c) Open Solutions for Education, Inc.
 All rights reserved.
 ***********************************************************************************/
 
-import { LovList, LovAddView } from '../../../models/lov.model';
+import { LovList, LovAddView, UpdateLovSortingModel, LoVSortOrderValuesModel } from '../../../models/lov.model';
 import { CommonService } from './../../../services/common.service';
 import { Component, OnInit, Input, ViewChild } from '@angular/core';
 import icMoreVert from '@iconify/icons-ic/twotone-more-vert';
@@ -52,6 +52,7 @@ import { CryptoService } from '../../../services/Crypto.service';
 import { Permissions } from '../../../models/roll-based-access.model';
 import { PageRolesPermission } from '../../../common/page-roles-permissions.service';
 import { DefaultValuesService } from 'src/app/common/default-values.service';
+import { CdkDragDrop } from '@angular/cdk/drag-drop';
 
 @Component({
   selector: 'vex-school-level',
@@ -64,6 +65,7 @@ import { DefaultValuesService } from 'src/app/common/default-values.service';
 })
 export class SchoolLevelComponent implements OnInit {
   columns = [
+    // { label: 'sort', property: 'lovId', type: 'text', visible: true },
     { label: 'title', property: 'lovColumnValue', type: 'text', visible: true },
     { label: 'createdBy', property: 'createdBy', type: 'text', visible: true },
     { label: 'createDate', property: 'createdOn', type: 'text', visible: true },
@@ -95,6 +97,7 @@ export class SchoolLevelComponent implements OnInit {
   addPermission = false;
   permissionListViewModel: RolePermissionListViewModel = new RolePermissionListViewModel();
   permissionGroup: RolePermissionViewModel = new RolePermissionViewModel();
+  updateLovSortingModel: UpdateLovSortingModel = new UpdateLovSortingModel();
   permissions: Permissions;
   constructor(
     private router: Router,
@@ -262,6 +265,55 @@ export class SchoolLevelComponent implements OnInit {
       duration: 5000
     });
   }
+}
+
+sortLovList(event: CdkDragDrop<string[]>) {
+    
+  if (event.currentIndex > event.previousIndex) {
+    this.schoolLevelList.filteredData[event.currentIndex].sortOrder = Number(this.schoolLevelList.filteredData[event.currentIndex].sortOrder) - 1;
+  }
+  else if (event.currentIndex < event.previousIndex) {
+    this.schoolLevelList.filteredData[event.currentIndex].sortOrder = Number(this.schoolLevelList.filteredData[event.currentIndex].sortOrder) + 1;
+  }
+  this.schoolLevelList.filteredData[event.previousIndex].sortOrder = Number(event.currentIndex) + 1;
+
+  let dropdownListMod = this.schoolLevelList.filteredData?.sort((a, b) => a.sortOrder < b.sortOrder ? -1 : 1);
+
+  let sortOrderValues = [];
+
+  dropdownListMod.forEach((oneLov, idxLov) => {
+    let thisItemSort = new LoVSortOrderValuesModel();
+    thisItemSort.id = oneLov.id;
+    thisItemSort.sortOrder = Number(idxLov) + 1;
+    sortOrderValues.push(thisItemSort);
+  })
+
+  this.updateLovSortingModel.sortOrderValues = sortOrderValues;
+  this.updateLovSortingModel.tenantId = this.defaultValuesService.getTenantID();
+  this.updateLovSortingModel.schoolId = this.defaultValuesService.getSchoolID();
+  this.updateLovSortingModel.updatedBy = this.defaultValuesService.getUserGuidId();
+  this.updateLovSortingModel.lovName = this.lovName
+
+  this.commonService.updateDropdownValueSortOrder(this.updateLovSortingModel).subscribe((res) => {
+    if (res) {
+      if (res._failure) {
+        this.snackbar.open(res._message, '', {
+          duration: 3000
+        });
+      }
+      else {
+        this.snackbar.open(res._message, '', {
+          duration: 3000
+        });
+        this.getAllSchoolLevel();
+      }
+    }
+    else {
+      this.snackbar.open(this.defaultValuesService.getHttpError(), '', {
+        duration: 3000
+      });
+    }
+  })
 }
 
 }
