@@ -6,6 +6,7 @@ import { CryptoService } from './Crypto.service';
 import {
   CheckStaffInternalIdViewModel,
   GetAllStaffModel, StaffAddModel,
+  DeleteStaffModel,
   StaffCertificateModel,
   StaffCertificateListModel,
   StaffSchoolInfoModel,
@@ -196,6 +197,15 @@ export class StaffService {
     obj.staffMaster.tenantId = this.defaultValuesService.getTenantID();
     const apiurl = this.apiUrl + obj._tenantName + '/Staff/viewStaff';
     return this.http.post<StaffAddModel>(apiurl, obj,this.httpOptions);
+  }
+
+  deleteStaff(obj: DeleteStaffModel) {
+    obj = this.defaultValuesService.getAllMandatoryVariable(obj);
+    obj.schoolId = this.defaultValuesService.getSchoolID();
+    obj.tenantId = this.defaultValuesService.getTenantID();
+    obj.updatedBy = this.defaultValuesService.getUserGuidId();
+    const apiurl = this.apiUrl + obj._tenantName + '/Staff/deleteStaff';
+    return this.http.post<DeleteStaffModel>(apiurl, obj,this.httpOptions);
   }
 
   getAllStaffList(obj: GetAllStaffModel){

@@ -107,6 +107,16 @@ export class StaffAddModel extends CommonField {
     }
 }
 
+export class DeleteStaffModel extends CommonField {
+    public staffMasters: [staffMasterCloneModel];
+    public tenantId: string;
+    public schoolId: string | number;
+    public updatedBy: string;
+    constructor(){
+        super();
+    }
+}
+
 
 export class CheckStaffInternalIdViewModel extends CommonField {
     public tenantId: string;

@@ -98,6 +98,14 @@
                                 <a>{{'importStudents' | translate}}</a>
                             </button>
                         </mat-menu>
+                        <button class="ml-1" [matMenuTriggerFor]="communicationActivity">
+                            <mat-icon class="-mr-2 w-auto h-auto align-middle">more_vert</mat-icon>
+                        </button>
+                        <mat-menu #communicationActivity="matMenu">
+                            <button mat-menu-item matTooltip="{{(selectedStudents?.length < 1 ? 'noStudentsSelected':'') | translate}}" (click)="deleteSelectedStudents()"  *ngIf="defaultValuesService.getUserMembershipType() === profiles.SuperAdmin || defaultValuesService.getUserMembershipType() === profiles.AdminAssitant || defaultValuesService.getUserMembershipType() === profiles.SchoolAdmin">
+                                <mat-icon [icIcon]="icDelete"></mat-icon>{{'deleteSelected' | translate}}
+                            </button>
+                        </mat-menu>
                     </div>
                 </div>
                 <mat-menu #loadfilter="matMenu" xPosition="before">
@@ -114,7 +122,19 @@
 
             <div class="overflow-auto">
                 <table @stagger mat-table [dataSource]="StudentModelList" class="mat-elevation-z8" matSort>
-
+                    <ng-container matColumnDef="selectedStudent">
+                        <th mat-header-cell *matHeaderCellDef>
+                            <mat-checkbox color="primary" [class.hidden]="totalCount === 0 || totalCount === null" #masterCheckBox
+                                [indeterminate]="someComplete()" (change)="setAll($event.checked)">
+                            </mat-checkbox>
+                        </th>
+                        <td mat-cell *matCellDef="let element">
+                            <mat-checkbox *ngIf="element.isCurrentSchool && element.isActive" color="primary" [checked]="element.checked"
+                                (change)="onChangeSelection($event.checked, element.studentGuid)">
+                            </mat-checkbox>
+                        </td>
+                    </ng-container>
+                    
                     <ng-container matColumnDef="lastFamilyName">
                         <th mat-header-cell *matHeaderCellDef mat-sort-header>{{'name' | translate}}</th>
                         <td mat-cell *matCellDef="let element">

@@ -1957,5 +1957,10 @@
     "areYouSureWantToDeleteScheduledTeacher":"Are you sure you want to remove the scheduled teacher?",
     "selectTeacherToDeleteFromCourseSection": "Select Teacher To Delete From Course Section",
     "staffsWhoDontHaveAnyAttendanceAssignmentDataAssociatedWithTheCourseSectionAboveAreShownInTheListBelow": "Staffs who don't have any Attendance, Assignment data associated with the course section above are shown in the list below.",
-    "staffsSuccessfullyDeletedFrom": "Satffs successfully deleted from"
+    "staffsSuccessfullyDeletedFrom": "Satffs successfully deleted from",
+    "noStudentsSelected": "No students were selected",
+    "deleteSelected": "Delete Selected",
+    "youWantToDeleteSelectedStudents": "You want to delete selected students",
+    "deleteStaff": "Delete Staff",
+    "youWantToDeleteStaff": "You want to delete staff"
 }

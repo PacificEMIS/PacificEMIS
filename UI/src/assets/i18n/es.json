@@ -1956,5 +1956,10 @@
     "areYouSureWantToDeleteScheduledTeacher":"¿Estás seguro de que deseas eliminar al profesor programado?",
     "selectTeacherToDeleteFromCourseSection": "Seleccionar profesor para eliminar de la sección del curso",
     "staffsWhoDontHaveAnyAttendanceAssignmentDataAssociatedWithTheCourseSectionAboveAreShownInTheListBelow": "El personal que no tiene datos de asistencia o tareas asociados con la sección del curso anterior se muestra en la lista a continuación.",
-    "staffsSuccessfullyDeletedFrom": "Satffs eliminados exitosamente de"
+    "staffsSuccessfullyDeletedFrom": "Satffs eliminados exitosamente de",
+    "noStudentsSelected": "No se seleccionó ningún estudiante",
+    "deleteSelected": "Eliminar seleccionados",
+    "youWantToDeleteSelectedStudents": "¿Quieres eliminar a los estudiantes seleccionados?",
+    "deleteStaff": "Eliminar personal",
+    "youWantToDeleteStaff": "¿Quieres eliminar al personal?"
 }
