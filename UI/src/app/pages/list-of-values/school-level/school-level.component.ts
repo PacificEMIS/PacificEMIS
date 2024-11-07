@@ -65,7 +65,7 @@ import { CdkDragDrop } from '@angular/cdk/drag-drop';
 })
 export class SchoolLevelComponent implements OnInit {
   columns = [
-    { label: 'sort', property: 'lovId', type: 'text', visible: true },
+    // { label: 'sort', property: 'lovId', type: 'text', visible: true },
     { label: 'title', property: 'lovColumnValue', type: 'text', visible: true },
     { label: 'createdBy', property: 'createdBy', type: 'text', visible: true },
     { label: 'createDate', property: 'createdOn', type: 'text', visible: true },

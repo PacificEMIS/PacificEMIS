@@ -48,12 +48,12 @@
         <table @stagger mat-table [dataSource]="schoolLevelList" class="mat-elevation-z8 table-auto w-full"
             matSort cdkDropList (cdkDropListDropped)="sortLovList($event)">
             
-            <ng-container matColumnDef="lovId">
+            <!-- <ng-container matColumnDef="lovId">
                 <th mat-header-cell *matHeaderCellDef>{{'sort'|translate}}</th>
                 <td mat-cell *matCellDef="let element">
                     <mat-icon class="cursor-move" cdkDragHandle>reorder</mat-icon>
                 </td>
-            </ng-container>
+            </ng-container> -->
 
             <ng-container matColumnDef="lovColumnValue">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header>{{'title'|translate}}</th>
