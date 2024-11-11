@@ -51,6 +51,7 @@ import { CommonService } from 'src/app/services/common.service';
 import { DefaultValuesService } from 'src/app/common/default-values.service';
 import { LoVSortOrderValuesModel, UpdateLovSortingModel } from 'src/app/models/lov.model';
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
+import { MatPaginator } from '@angular/material/paginator';
 @Component({
   selector: 'vex-sections',
   templateUrl: './sections.component.html',
@@ -82,6 +83,7 @@ export class SectionsComponent implements OnInit {
   SectionModelList: MatTableDataSource<any>;
   searchKey:string;
   @ViewChild(MatSort) sort: MatSort;
+  @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
   permissions: Permissions
   constructor(
     private dialog: MatDialog,
@@ -146,6 +148,7 @@ export class SectionsComponent implements OnInit {
       }else{     
         this.SectionModelList = new MatTableDataSource(data.tableSectionsList);
         this.SectionModelList.sort=this.sort;      
+        this.SectionModelList.paginator=this.paginator;      
       }
     });
   }

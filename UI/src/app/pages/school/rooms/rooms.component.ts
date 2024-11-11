@@ -132,6 +132,7 @@ export class RoomsComponent implements OnInit {
           else {
             this.roomModelList = new MatTableDataSource(res.tableroomList);
             this.roomModelList.sort = this.sort;
+            this.roomModelList.paginator = this.paginator;
           }
         }
       });

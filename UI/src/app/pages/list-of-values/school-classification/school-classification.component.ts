@@ -38,7 +38,7 @@ import { fadeInUp400ms } from '../../../../@vex/animations/fade-in-up.animation'
 import { stagger40ms } from '../../../../@vex/animations/stagger.animation';
 import { TranslateService } from '@ngx-translate/core';
 import { EditSchoolClassificationComponent } from './edit-school-classification/edit-school-classification.component';
-import {LovList,LovAddView} from '../../../models/lov.model';
+import {LovList,LovAddView, LoVSortOrderValuesModel, UpdateLovSortingModel} from '../../../models/lov.model';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatSort } from '@angular/material/sort';
 import { LoaderService } from '../../../services/loader.service';
@@ -52,6 +52,7 @@ import { PageRolesPermission } from '../../../common/page-roles-permissions.serv
 import { Permissions } from '../../../models/roll-based-access.model';
 import { DefaultValuesService } from 'src/app/common/default-values.service';
 import { MatPaginatorIntl } from '@angular/material/paginator';
+import { CdkDragDrop } from '@angular/cdk/drag-drop';
 
 @Component({
   selector: 'vex-school-classification',
@@ -64,6 +65,7 @@ import { MatPaginatorIntl } from '@angular/material/paginator';
 })
 export class SchoolClassificationComponent implements OnInit {
   columns = [
+    { label: 'sort', property: 'lovId', type: 'text', visible: true },
     { label: 'title', property: 'lovColumnValue', type: 'text', visible: true },
     { label: 'createdBy', property: 'createdBy', type: 'text', visible: true },
     { label: 'createDate', property: 'createdOn', type: 'text', visible: true },
@@ -95,6 +97,7 @@ export class SchoolClassificationComponent implements OnInit {
   addPermission = false;
   permissionListViewModel: RolePermissionListViewModel = new RolePermissionListViewModel();
   permissionGroup: RolePermissionViewModel = new RolePermissionViewModel();
+  updateLovSortingModel: UpdateLovSortingModel = new UpdateLovSortingModel();
   permissions: Permissions;
   constructor(private router: Router,
     private dialog: MatDialog,
@@ -119,7 +122,7 @@ export class SchoolClassificationComponent implements OnInit {
 
   ngOnInit(): void {
     this.permissions = this.pageRolePermissions.checkPageRolePermission('/school/settings/lov-settings/school-classification')
-    
+    this.updateLovSortingModel.lovName = "School Classification";
   }
 
   getSchoolClassificationList(){
@@ -265,6 +268,54 @@ export class SchoolClassificationComponent implements OnInit {
       duration: 5000
     });
   }
+}
+
+sortLovList(event: CdkDragDrop<string[]>) {
+  if (event.currentIndex > event.previousIndex) {
+    this.ClassificationModelList.filteredData[event.currentIndex].sortOrder = Number(this.ClassificationModelList.filteredData[event.currentIndex].sortOrder) - 1;
+  }
+  else if (event.currentIndex < event.previousIndex) {
+    this.ClassificationModelList.filteredData[event.currentIndex].sortOrder = Number(this.ClassificationModelList.filteredData[event.currentIndex].sortOrder) + 1;
+  }
+  this.ClassificationModelList.filteredData[event.previousIndex].sortOrder = Number(event.currentIndex) + 1;
+
+  let dropdownListMod = this.ClassificationModelList.filteredData?.sort((a, b) => a.sortOrder < b.sortOrder ? -1 : 1);
+
+  let sortOrderValues = [];
+
+  dropdownListMod.forEach((oneLov, idxLov) => {
+    let thisItemSort = new LoVSortOrderValuesModel();
+    thisItemSort.id = oneLov.id;
+    thisItemSort.sortOrder = Number(idxLov) + 1;
+
+    sortOrderValues.push(thisItemSort);
+  })
+
+  this.updateLovSortingModel.sortOrderValues = sortOrderValues;
+  this.updateLovSortingModel.tenantId = this.defaultValuesService.getTenantID();
+  this.updateLovSortingModel.schoolId = this.defaultValuesService.getSchoolID();
+  this.updateLovSortingModel.updatedBy = this.defaultValuesService.getUserGuidId();
+
+  this.commonService.updateDropdownValueSortOrder(this.updateLovSortingModel).subscribe((res) => {
+    if (res) {
+      if (res._failure) {
+        this.snackbar.open(res._message, '', {
+          duration: 3000
+        });
+      }
+      else {
+        this.snackbar.open(res._message, '', {
+          duration: 3000
+        });
+        this.getSchoolClassificationList();
+      }
+    }
+    else {
+      this.snackbar.open(this.defaultValuesService.getHttpError(), '', {
+        duration: 3000
+      });
+    }
+  })
 }
 
 }

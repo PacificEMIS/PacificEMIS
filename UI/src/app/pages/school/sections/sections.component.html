@@ -91,6 +91,8 @@
       <mat-footer-row *matFooterRowDef="['loading']" [class.hide]="!loading"></mat-footer-row>
       <tr mat-footer-row *matFooterRowDef="['noData']" [class.hide]="SectionModelList?.data.length!=0"></tr>
     </table>
+    <mat-paginator #paginator [class.hide]="SectionModelList?.data.length==0" [length]="SectionModelList?.data.length" [pageSizeOptions]="[10, 20, 30, 40]" aria-label="Select page of periodic elements" showFirstLastButtons></mat-paginator>
+
   </div>
 </mat-card>
 
