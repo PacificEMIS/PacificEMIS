@@ -258,6 +258,7 @@ export class GradeLevelsComponent implements OnInit {
           this.gradeLevelList = new MatTableDataSource(res.tableGradelevelList);
           this.gradeLevelList.sort = this.sort;
           this.sendGradeLevelsToDialog = res.tableGradelevelList;
+          this.gradeLevelList.paginator = this.paginator;
         }
       }
     })
