@@ -42,7 +42,7 @@ import { MatTableDataSource } from '@angular/material/table';
 import { MatSort } from '@angular/material/sort';
 import { LoaderService } from './../../../services/loader.service';
 import { ConfirmDialogComponent } from '../../shared-module/confirm-dialog/confirm-dialog.component';
-import { LovList, LovAddView } from '../../../models/lov.model';
+import { LovList, LovAddView, LoVSortOrderValuesModel, UpdateLovSortingModel } from '../../../models/lov.model';
 import { CommonService } from './../../../services/common.service';
 import { MatPaginator, MatPaginatorIntl } from '@angular/material/paginator';
 import { ExcelService } from '../../../services/excel.service';
@@ -52,6 +52,7 @@ import { CryptoService } from '../../../services/Crypto.service';
 import { Permissions } from '../../../models/roll-based-access.model';
 import { PageRolesPermission } from '../../../common/page-roles-permissions.service';
 import { DefaultValuesService } from 'src/app/common/default-values.service';
+import { CdkDragDrop } from '@angular/cdk/drag-drop';
 
 @Component({
   selector: 'vex-male-toilet-type',
@@ -64,6 +65,7 @@ import { DefaultValuesService } from 'src/app/common/default-values.service';
 })
 export class MaleToiletTypeComponent implements OnInit {
   columns = [
+    { label: 'sort', property: 'lovId', type: 'text', visible: true },
     { label: 'title', property: 'lovColumnValue', type: 'text', visible: true },
     { label: 'createdBy', property: 'createdBy', type: 'text', visible: true },
     { label: 'createDate', property: 'createdOn', type: 'text', visible: true },
@@ -95,6 +97,7 @@ export class MaleToiletTypeComponent implements OnInit {
   addPermission = false;
   permissionListViewModel: RolePermissionListViewModel = new RolePermissionListViewModel();
   permissionGroup: RolePermissionViewModel = new RolePermissionViewModel();
+  updateLovSortingModel: UpdateLovSortingModel = new UpdateLovSortingModel();
   permissions: Permissions;
   constructor(
     private router: Router,
@@ -264,5 +267,54 @@ export class MaleToiletTypeComponent implements OnInit {
       duration: 5000
     });
   }
+}
+
+sortLovList(event: CdkDragDrop<string[]>) {
+  if (event.currentIndex > event.previousIndex) {
+    this.maleToiletTypeList.filteredData[event.currentIndex].sortOrder = Number(this.maleToiletTypeList.filteredData[event.currentIndex].sortOrder) - 1;
+  }
+  else if (event.currentIndex < event.previousIndex) {
+    this.maleToiletTypeList.filteredData[event.currentIndex].sortOrder = Number(this.maleToiletTypeList.filteredData[event.currentIndex].sortOrder) + 1;
+  }
+  this.maleToiletTypeList.filteredData[event.previousIndex].sortOrder = Number(event.currentIndex) + 1;
+
+  let dropdownListMod = this.maleToiletTypeList.filteredData?.sort((a, b) => a.sortOrder < b.sortOrder ? -1 : 1);
+
+  let sortOrderValues = [];
+
+  dropdownListMod.forEach((oneLov, idxLov) => {
+    let thisItemSort = new LoVSortOrderValuesModel();
+    thisItemSort.id = oneLov.id;
+    thisItemSort.sortOrder = Number(idxLov) + 1;
+
+    sortOrderValues.push(thisItemSort);
+  })
+
+  this.updateLovSortingModel.sortOrderValues = sortOrderValues;
+  this.updateLovSortingModel.tenantId = this.defaultValuesService.getTenantID();
+  this.updateLovSortingModel.schoolId = this.defaultValuesService.getSchoolID();
+  this.updateLovSortingModel.updatedBy = this.defaultValuesService.getUserGuidId();
+  this.updateLovSortingModel.lovName = this.lovName
+
+  this.commonService.updateDropdownValueSortOrder(this.updateLovSortingModel).subscribe((res) => {
+    if (res) {
+      if (res._failure) {
+        this.snackbar.open(res._message, '', {
+          duration: 3000
+        });
+      }
+      else {
+        this.snackbar.open(res._message, '', {
+          duration: 3000
+        });
+        this.getAllMaleToiletType();
+      }
+    }
+    else {
+      this.snackbar.open(this.defaultValuesService.getHttpError(), '', {
+        duration: 3000
+      });
+    }
+  })
 }
 }
