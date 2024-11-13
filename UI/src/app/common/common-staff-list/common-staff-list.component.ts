@@ -739,8 +739,10 @@ export class CommonStaffListComponent implements OnInit {
   }
 
   ngOnDestroy(){
-    this.getAllStaff.includeInactive=false;
-    this.getAllStaff.searchAllSchool=false;
+    // this.getAllStaff.includeInactive=false;
+    // this.getAllStaff.searchAllSchool=false;
+    this.defaultValuesService.sendIncludeInactiveFlag(false);
+    this.defaultValuesService.sendAllSchoolFlag(false);
   }
 }
 
