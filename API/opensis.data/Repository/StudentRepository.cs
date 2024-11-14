@@ -5690,92 +5690,103 @@ namespace opensis.data.Repository
 
         public StudentEnrollmentAssignModel AssignEnrollmentInfoForStudents(StudentEnrollmentAssignModel studentEnrollmentAssignModel)
         {
-            using (var transaction = this.context?.Database.BeginTransaction())
+            try
             {
-                try
+                if (studentEnrollmentAssignModel.studentIds?.Any() == true)
                 {
-                    if (studentEnrollmentAssignModel.studentIds?.Any() == true)
+                    foreach (var studentId in studentEnrollmentAssignModel.studentIds)
                     {
-                        foreach (var studentId in studentEnrollmentAssignModel.studentIds)
+                        var studentMasterData = this.context?.StudentMaster.FirstOrDefault(x => x.TenantId == studentEnrollmentAssignModel.TenantId && x.SchoolId == studentEnrollmentAssignModel.SchoolId && x.StudentId == studentId);
+
+                        if (studentMasterData != null)
                         {
-                            var studentMasterData = this.context?.StudentMaster.FirstOrDefault(x => x.TenantId == studentEnrollmentAssignModel.TenantId && x.SchoolId == studentEnrollmentAssignModel.SchoolId && x.StudentId == studentId);
-
-                            if (studentMasterData != null)
+                            if (studentEnrollmentAssignModel.SectionId != null)
                             {
-                                if (studentEnrollmentAssignModel.SectionId != null)
-                                {
-                                    studentMasterData.SectionId = studentEnrollmentAssignModel.SectionId;
-                                }
-                                if (studentEnrollmentAssignModel.EstimatedGradDate != null)
-                                {
-                                    studentMasterData.EstimatedGradDate = studentEnrollmentAssignModel.EstimatedGradDate;
-                                }
-                                if (studentEnrollmentAssignModel.Eligibility504 != null)
-                                {
-                                    studentMasterData.Eligibility504 = studentEnrollmentAssignModel.Eligibility504;
-                                }
-                                if (studentEnrollmentAssignModel.EconomicDisadvantage != null)
-                                {
-                                    studentMasterData.EconomicDisadvantage = studentEnrollmentAssignModel.EconomicDisadvantage;
-                                }
-                                if (studentEnrollmentAssignModel.FreeLunchEligibility != null)
-                                {
-                                    studentMasterData.FreeLunchEligibility = studentEnrollmentAssignModel.FreeLunchEligibility;
-                                }
-                                if (studentEnrollmentAssignModel.SpecialEducationIndicator != null)
-                                {
-                                    studentMasterData.SpecialEducationIndicator = studentEnrollmentAssignModel.SpecialEducationIndicator;
-                                }
-                                if (studentEnrollmentAssignModel.LepIndicator != null)
-                                {
-                                    studentMasterData.LepIndicator = studentEnrollmentAssignModel.LepIndicator;
-                                }
-
-                                studentMasterData.UpdatedBy = studentEnrollmentAssignModel.studentEnrollments?.UpdatedBy;
-                                studentMasterData.UpdatedOn = DateTime.UtcNow;
+                                studentMasterData.SectionId = studentEnrollmentAssignModel.SectionId;
+                            }
+                            if (studentEnrollmentAssignModel.EstimatedGradDate != null)
+                            {
+                                studentMasterData.EstimatedGradDate = studentEnrollmentAssignModel.EstimatedGradDate;
+                            }
+                            if (studentEnrollmentAssignModel.Eligibility504 != null)
+                            {
+                                studentMasterData.Eligibility504 = studentEnrollmentAssignModel.Eligibility504;
+                            }
+                            if (studentEnrollmentAssignModel.EconomicDisadvantage != null)
+                            {
+                                studentMasterData.EconomicDisadvantage = studentEnrollmentAssignModel.EconomicDisadvantage;
+                            }
+                            if (studentEnrollmentAssignModel.FreeLunchEligibility != null)
+                            {
+                                studentMasterData.FreeLunchEligibility = studentEnrollmentAssignModel.FreeLunchEligibility;
+                            }
+                            if (studentEnrollmentAssignModel.SpecialEducationIndicator != null)
+                            {
+                                studentMasterData.SpecialEducationIndicator = studentEnrollmentAssignModel.SpecialEducationIndicator;
+                            }
+                            if (studentEnrollmentAssignModel.LepIndicator != null)
+                            {
+                                studentMasterData.LepIndicator = studentEnrollmentAssignModel.LepIndicator;
                             }
 
-                            var studentEnrollmentData = this.context?.StudentEnrollment.FirstOrDefault(x => x.TenantId == studentEnrollmentAssignModel.TenantId && x.SchoolId == studentEnrollmentAssignModel.SchoolId && x.StudentId == studentId && x.IsActive == true);
-
-                            if (studentEnrollmentData != null)
-                            {
-                                if (studentEnrollmentAssignModel.studentEnrollments?.RollingOption != null)
-                                {
-                                    studentEnrollmentData.RollingOption = studentEnrollmentAssignModel.studentEnrollments.RollingOption;
-                                }
-                                if (studentEnrollmentAssignModel.studentEnrollments?.CalenderId != null)
-                                {
-                                    studentEnrollmentData.CalenderId = studentEnrollmentAssignModel.studentEnrollments.CalenderId;
-                                }
-                                if (studentEnrollmentAssignModel.studentEnrollments?.GradeId != null && studentEnrollmentAssignModel.studentEnrollments?.GradeLevelTitle != null)
-                                {
-                                    studentEnrollmentData.GradeId = studentEnrollmentAssignModel.studentEnrollments.GradeId;
-                                    studentEnrollmentData.GradeLevelTitle = studentEnrollmentAssignModel.studentEnrollments.GradeLevelTitle;
-                                }
-
-                                studentEnrollmentData.UpdatedBy = studentEnrollmentAssignModel.studentEnrollments?.UpdatedBy;
-                                studentEnrollmentData.UpdatedOn = DateTime.UtcNow;
-                            }
-
-                            this.context?.SaveChanges();
+                            studentMasterData.UpdatedBy = studentEnrollmentAssignModel.studentEnrollments?.UpdatedBy;
+                            studentMasterData.UpdatedOn = DateTime.UtcNow;
                         }
-                        transaction?.Commit();
-                        studentEnrollmentAssignModel._failure = false;
-                        studentEnrollmentAssignModel._message = "Student enrollment info is updated successfully";
 
-                    }
-                    else
-                    {
-                        studentEnrollmentAssignModel._failure = true;
-                        studentEnrollmentAssignModel._message = "Please select atleast one student";
+                        var studentEnrollmentData = this.context?.StudentEnrollment.FirstOrDefault(x => x.TenantId == studentEnrollmentAssignModel.TenantId && x.SchoolId == studentEnrollmentAssignModel.SchoolId && x.StudentId == studentId && x.IsActive == true);
+
+                        if (studentEnrollmentData != null)
+                        {
+                            if (studentEnrollmentAssignModel.studentEnrollments?.RollingOption != null)
+                            {
+                                studentEnrollmentData.RollingOption = studentEnrollmentAssignModel.studentEnrollments.RollingOption;
+                            }
+                            if (studentEnrollmentAssignModel.studentEnrollments?.CalenderId != null)
+                            {
+                                studentEnrollmentData.CalenderId = studentEnrollmentAssignModel.studentEnrollments.CalenderId;
+                            }
+                            if (studentEnrollmentAssignModel.studentEnrollments?.GradeId != null && studentEnrollmentAssignModel.studentEnrollments?.GradeLevelTitle != null)
+                            {
+                                studentEnrollmentData.GradeId = studentEnrollmentAssignModel.studentEnrollments.GradeId;
+                                studentEnrollmentData.GradeLevelTitle = studentEnrollmentAssignModel.studentEnrollments.GradeLevelTitle;
+
+                                //for update related table
+                                var academicYear = Utility.GetCurrentAcademicYear(this.context!, studentEnrollmentAssignModel.TenantId, studentEnrollmentAssignModel.SchoolId);
+
+                                var studentCourseSectionScheduleData = this.context?.StudentCoursesectionSchedule.Where(x => x.TenantId == studentEnrollmentAssignModel.TenantId && x.SchoolId == studentEnrollmentAssignModel.SchoolId && x.StudentId == studentId && x.AcademicYear == academicYear).ToList();
+
+                                if (studentCourseSectionScheduleData?.Any() != null)
+                                {
+                                    studentCourseSectionScheduleData.ForEach(x => x.GradeId = studentEnrollmentAssignModel.studentEnrollments.GradeId);
+                                }
+
+                                var studentInputFinalGradeData = this.context?.StudentFinalGrade.Where(x => x.TenantId == studentEnrollmentAssignModel.TenantId && x.SchoolId == studentEnrollmentAssignModel.SchoolId && x.StudentId == studentId && x.AcademicYear == academicYear).ToList();
+
+                                if (studentInputFinalGradeData?.Any() != null)
+                                {
+                                    studentInputFinalGradeData.ForEach(x => x.GradeId = studentEnrollmentAssignModel.studentEnrollments.GradeId);
+                                }
+                            }
+
+                            studentEnrollmentData.UpdatedBy = studentEnrollmentAssignModel.studentEnrollments?.UpdatedBy;
+                            studentEnrollmentData.UpdatedOn = DateTime.UtcNow;
+                        }
+
+                        this.context?.SaveChanges();
+
+                        studentEnrollmentAssignModel._message = "Student Enrollment Info is Updated Successfully";
                     }
                 }
-                catch (Exception es)
+                else
                 {
-                    transaction?.Rollback();
                     studentEnrollmentAssignModel._failure = true;
-                    studentEnrollmentAssignModel._message = es.Message;
+                    studentEnrollmentAssignModel._message = "Please Select Atleast One Student";
                 }
+            }
+            catch (Exception es)
+            {
+                studentEnrollmentAssignModel._failure = true;
+                studentEnrollmentAssignModel._message = es.Message;
             }
             return studentEnrollmentAssignModel;
         }
