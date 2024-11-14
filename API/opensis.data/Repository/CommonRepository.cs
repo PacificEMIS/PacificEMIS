@@ -498,7 +498,25 @@ namespace opensis.data.Repository
             }
             else
             {
-                long? dpdownValueId = Utility.GetMaxLongPK(this.context, new Func<DpdownValuelist, long>(x => x.Id));
+                //long? dpdownValueId = Utility.GetMaxLongPK(this.context, new Func<DpdownValuelist, long>(x => x.Id));
+                long? dpdownValueId = 1;
+
+                var dpValueAllData = this.context?.DpdownValuelist.Where(x => x.TenantId == dpdownValue.DropdownValue.TenantId);
+
+                if (dpValueAllData != null)
+                {
+                    var dpValueData = dpValueAllData.OrderByDescending(x => x.Id).FirstOrDefault();
+                    if (dpValueData != null)
+                    {
+                        dpdownValueId = dpValueData.Id + 1;
+                    }
+                    var dpDownSortData = dpValueAllData.Where(x => Equals(x.LovName, dpdownValue.DropdownValue.LovName)).OrderByDescending(x => x.SortOrder).FirstOrDefault();
+                    if (dpDownSortData != null)
+                    {
+                        dpdownValue.DropdownValue.SortOrder = dpDownSortData.SortOrder + 1;
+                    }
+                }
+
                 dpdownValue.DropdownValue!.Id = (long)dpdownValueId!;
                 dpdownValue.DropdownValue.CreatedOn = DateTime.UtcNow;
                 this.context?.DpdownValuelist.Add(dpdownValue.DropdownValue);
