@@ -83,8 +83,11 @@ export class CommonStaffListComponent implements OnInit {
     { label: 'staffId', property: 'staffInternalId', type: 'text', visible: true },
     { label: 'profile', property: 'profile', type: 'text', visible: true },
     { label: 'jobTitle', property: 'jobTitle', type: 'text', visible: true },
-    { label: 'schoolEmail', property: 'schoolEmail', type: 'text', visible: true },
-    { label: 'mobilePhone', property: 'mobilePhone', type: 'number', visible: true },
+    { label: 'loginEmail', property: 'loginEmailAddress', type: 'text', visible: true },
+    { label: 'gender', property: 'gender', type: 'text', visible: true },
+    { label: 'dob', property: 'dob', type: 'text', visible: true },
+    { label: 'schoolEmail', property: 'schoolEmail', type: 'text', visible: false },
+    { label: 'mobilePhone', property: 'mobilePhone', type: 'number', visible: false },
     { label: 'schoolName', property: 'schoolName', type: 'text', visible: false },
     { label: 'status', property: 'status', type: 'text', visible: false },
     { label: 'actions', property: 'actions', type: 'text', visible: true }
