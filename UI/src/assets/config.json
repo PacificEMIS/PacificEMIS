@@ -1,7 +1,7 @@
 {
   
-    "apiURLOpensis":"http://110.227.203.159:8087/",
-    "apiURL":"http://110.227.203.159:8087/",
+    "apiURLOpensis":"https://misis.pss.edu.mh:8088/",
+    "apiURL":"https://misis.pss.edu.mh:8088/",
 
     "encryptionKey" :"oPen$!$.b14Ca5898a4e4133b!",
     "dataEncryptionKey" :"oPen$!$.b14Ca58!"
