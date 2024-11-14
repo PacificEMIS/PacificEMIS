@@ -312,7 +312,7 @@ namespace opensis.data.Repository
                                                                     x.JobTitle != null && x.JobTitle.Contains(Searchvalue) ||
                                                                     x.SchoolEmail != null && x.SchoolEmail.Contains(Searchvalue) ||
                                                                     x.MobilePhone != null && x.MobilePhone.Contains(Searchvalue)
-                                                                    || (x.StaffSchoolInfo.Count > 0 ? (x.StaffSchoolInfo.Any(x => (x.Profile ?? "").ToLower().Contains(Searchvalue.ToLower()) && x.SchoolAttachedId == pageResult.SchoolId)) : string.Empty.Contains(Searchvalue)));
+                                                                    || x.Gender != null && x.Gender.Contains(Searchvalue) || (x.StaffSchoolInfo.Count > 0 ? (x.StaffSchoolInfo.Any(x => (x.Profile ?? "").ToLower().Contains(Searchvalue.ToLower()) && x.SchoolAttachedId == pageResult.SchoolId)) : string.Empty.Contains(Searchvalue)));
 
                         //var ProfileFilter = StaffMasterList.Where(x => x.StaffSchoolInfo.FirstOrDefault() != null ? x.StaffSchoolInfo.FirstOrDefault().Profile.ToLower().Contains(Columnvalue.ToLower()) : string.Empty.Contains(Columnvalue));
 
@@ -433,6 +433,8 @@ namespace opensis.data.Repository
                         ThirdLanguage = e.ThirdLanguage,
                         //StaffPhoto = pageResult.ProfilePhoto != null ? e.StaffPhoto : null,
                         StaffPhoto = pageResult.ProfilePhoto != null ? e.StaffThumbnailPhoto : null,
+                        Dob = e.Dob,
+                        Gender = e.Gender,
                         CreatedBy = e.CreatedBy,
                         CreatedOn = e.CreatedOn,
                         UpdatedBy = e.UpdatedBy,
@@ -467,6 +469,8 @@ namespace opensis.data.Repository
                         ThirdLanguage = e.ThirdLanguage,
                         //StaffPhoto = pageResult.ProfilePhoto != null ? e.StaffPhoto : null,
                         StaffPhoto = pageResult.ProfilePhoto != null ? e.StaffThumbnailPhoto : null,
+                        Dob = e.Dob,
+                        Gender = e.Gender,
                         CreatedBy = e.CreatedBy,
                         CreatedOn = e.CreatedOn,
                         UpdatedBy = e.UpdatedBy,
