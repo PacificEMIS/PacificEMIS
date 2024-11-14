@@ -401,4 +401,5 @@ export class RemoveStaffCourseSectionSchedule extends CommonField{
     schoolId : number;
     courseSectionId : number;
     staffId : number;
+    staffIds?: any[];
 }

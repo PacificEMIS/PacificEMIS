@@ -16,7 +16,8 @@ import {
   StudentEnrollmentSchoolListModel,
   StudentImportModel,
   StudentName,
-  StudentMedicalInfoListModel
+  StudentMedicalInfoListModel,
+  DeleteStudentModel
 } from '../models/student.model';
 import { StudentCommentsAddForGroupAssign, StudentCommentsAddView, StudentCommentsListViewModel } from '../models/student-comments.model';
 import { BehaviorSubject, Subject } from 'rxjs';
@@ -133,6 +134,15 @@ export class StudentService {
     const apiurl = this.apiUrl + obj._tenantName + '/Student/updateStudent';
     obj.studentMaster.studentPhoto = this.studentImage;
     return this.http.put<StudentAddModel>(apiurl, obj,this.httpOptions);
+  }
+
+  DeleteStudent(obj: DeleteStudentModel) {
+    obj = this.defaultValuesService.getAllMandatoryVariable(obj);
+    obj.tenantId = this.defaultValuesService.getTenantID();
+    obj.schoolId = this.defaultValuesService.getSchoolID();
+    obj.updatedBy = this.defaultValuesService.getUserGuidId();
+    const apiurl = this.apiUrl + obj._tenantName + '/Student/deleteStudent';
+    return this.http.post<DeleteStudentModel>(apiurl, obj,this.httpOptions);
   }
 
   GetAllStudentList(obj: StudentListModel) {

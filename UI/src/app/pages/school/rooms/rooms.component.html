@@ -4,8 +4,8 @@
             <div class="py-2" fxFlex="300px" fxFlex.lt-md="auto" fxHide.xs fxLayout="row" fxLayoutAlign="start center">
                 <div class="flex">
                     <input matInput [(ngModel)]="searchKey" (keyup)="applyFilter()"
-                        class="pt-3 pb-2 border-0 outline-none w-full bg-transparent" appearance="outline" color="primary"
-                        placeholder="Search..." type="search">
+                        class="pt-3 pb-2 border-0 outline-none w-full bg-transparent" appearance="outline"
+                        color="primary" placeholder="Search..." type="search">
                     <button mat-button matSuffix mat-icon-button aria-label="clear" *ngIf="searchKey"
                         (click)="onSearchClear()">
                         <mat-icon>close</mat-icon>
@@ -18,8 +18,8 @@
 
             <hr class="-mx-4 block md:hidden" />
             <div fxFlex="200px" class="pt-2 pb-2 mb:pb-0">
-                <button fxFlex="none" mat-icon-button (click)="exportToExcel()" matTooltip="{{'exportToExcel' | translate}}"
-                    type="button" class="inline-block align-middle">
+                <button fxFlex="none" mat-icon-button (click)="exportToExcel()"
+                    matTooltip="{{'exportToExcel' | translate}}" type="button" class="inline-block align-middle">
                     <img src="assets/img/microsoft_office_excel.svg" alt="Excel Icon" width="24">
                 </button>
                 <button [matMenuTriggerFor]="columnFilterMenu" class="ml-3" fxFlex="none" mat-icon-button
@@ -27,8 +27,8 @@
                     <mat-icon [icIcon]="icFilterList"></mat-icon>
                 </button>
 
-                <button *ngIf="permissions?.add && this.defaultValuesService.checkAcademicYear()" color="primary" class="ml-4" fxFlex="none" mat-raised-button type="button"
-                    (click)='openAddNew()'>
+                <button *ngIf="permissions?.add && this.defaultValuesService.checkAcademicYear()" color="primary"
+                    class="ml-4" fxFlex="none" mat-raised-button type="button" (click)='openAddNew()'>
                     <ic-icon [icon]="icAdd" class="mr-0 md:mr-2" inline="true" size="24px">
                     </ic-icon>
                     <span class="hidden md:inline-block">{{'addNewRoom' | translate}}</span>
@@ -37,7 +37,15 @@
         </div>
     </div>
     <div class="overflow-x-auto overflow-y-hidden">
-        <table @stagger class="w-full" [dataSource]="roomModelList" mat-table matSort>
+        <table @stagger class="w-full" [dataSource]="roomModelList" mat-table matSort cdkDropList (cdkDropListDropped)="sortLovList($event)">
+
+            <ng-container matColumnDef="lovId">
+                <th mat-header-cell *matHeaderCellDef>{{'sort'|translate}}</th>
+                <td mat-cell *matCellDef="let element">
+                    <mat-icon class="cursor-move" cdkDragHandle>reorder</mat-icon>
+                </td>
+            </ng-container>
+
             <ng-container matColumnDef="title">
 
                 <th mat-header-cell *matHeaderCellDef mat-sort-header>{{'title' | translate}}</th>
@@ -70,12 +78,14 @@
                     <ng-container *ngIf="this.defaultValuesService.checkAcademicYear()">
                         {{'action' | translate}}
                     </ng-container>
-                   </th>
+                </th>
                 <td mat-cell *matCellDef="let element">
-                    <a *ngIf="permissions?.edit && this.defaultValuesService.checkAcademicYear()" class="mr-3 cursor-pointer" (click)="openEditdata(element)">
+                    <a *ngIf="permissions?.edit && this.defaultValuesService.checkAcademicYear()"
+                        class="mr-3 cursor-pointer" (click)="openEditdata(element)">
                         <mat-icon [icIcon]="icEdit"></mat-icon>
                     </a>
-                    <a *ngIf="permissions?.edit && this.defaultValuesService.checkAcademicYear()" class="cursor-pointer" (click)="confirmDelete(element)">
+                    <a *ngIf="permissions?.edit && this.defaultValuesService.checkAcademicYear()" class="cursor-pointer"
+                        (click)="confirmDelete(element)">
                         <mat-icon [icIcon]="icDelete"></mat-icon>
                     </a>
                 </td>
@@ -91,11 +101,12 @@
                 </td>
             </ng-container>
             <tr mat-header-row *matHeaderRowDef="visibleColumns"></tr>
-            <tr mat-row *matRowDef="let row; columns: visibleColumns;"></tr>
+            <tr mat-row cdkDrag *matRowDef="let row; columns: visibleColumns;"></tr>
             <tr mat-footer-row *matFooterRowDef="['loading']" [class.hide]="!loading"></tr>
             <tr mat-footer-row *matFooterRowDef="['noData']" [class.hide]="roomModelList?.data.length!=0"></tr>
 
         </table>
+        <mat-paginator #paginator [class.hide]="roomModelList?.data.length==0" [length]="roomModelList?.data.length" [pageSizeOptions]="[10, 20, 30, 40]" aria-label="Select page of periodic elements" showFirstLastButtons></mat-paginator>
     </div>
 </mat-card>
 

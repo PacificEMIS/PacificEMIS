@@ -38,8 +38,10 @@ export class DefaultValuesService {
 
     let tenant = '';
     if (url.includes('localhost')) {
-      sessionStorage.setItem('tenant', JSON.stringify('opensisv2_ef6'));
-      tenant = 'opensisv2_ef6';
+      // sessionStorage.setItem('tenant', JSON.stringify('opensisv2_ef6'));
+      // tenant = 'opensisv2_ef6';
+      sessionStorage.setItem('tenant', JSON.stringify('110'));
+      tenant = '110';
     } else {
       let startIndex = url.indexOf('//');
       let endIndex = url.indexOf('.');

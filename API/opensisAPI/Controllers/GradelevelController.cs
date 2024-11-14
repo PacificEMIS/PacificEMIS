@@ -195,7 +195,7 @@ namespace opensisAPI.Controllers
             return GradeEquivalencyList;
         }
 
-        [HttpPost("updateGradeLevelSortOrder")]
+        [HttpPut("updateGradeLevelSortOrder")]
         public ActionResult<GradelevelSortOrderViewModel> UpdateGradeLevelSortOrder(GradelevelSortOrderViewModel gradelevelSortOrderViewModel)
         {
             GradelevelSortOrderViewModel gradelevelSortOrder = new();
