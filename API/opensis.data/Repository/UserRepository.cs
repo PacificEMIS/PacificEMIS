@@ -369,7 +369,7 @@ namespace opensis.data.Repository
                                                 if (lastSchoolMembershipId != null)
                                                 {
                                                     ReturnModel.MembershipId = lastSchoolMembershipId.MembershipId;
-                                                    ReturnModel.MembershipType = lastSchoolMembershipId.Profile;
+                                                    ReturnModel.MembershipType = lastSchoolMembershipId.Membership?.ProfileType;
                                                     ReturnModel.MembershipName = lastSchoolMembershipId.Membership?.Profile;
                                                 }
                                                 else
@@ -401,7 +401,7 @@ namespace opensis.data.Repository
                                                 ReturnModel.UserGuid = userData.StaffGuid.ToString();
 
                                                 ReturnModel.MembershipId = schoolInfoData.MembershipId;
-                                                ReturnModel.MembershipType = schoolInfoData.Profile;
+                                                ReturnModel.MembershipType = schoolInfoData.Membership.ProfileType;
                                                 ReturnModel.MembershipName = schoolInfoData.Membership?.Profile;
 
                                                 //update
