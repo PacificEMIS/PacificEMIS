@@ -200,20 +200,25 @@ namespace opensis.data.Repository
                                 {
                                     if (customFields.CustomFieldsValue != null && customFields.CustomFieldsValue.ToList().Any())
                                     {
-                                        customFields.CustomFieldsValue.FirstOrDefault()!.Module = "Student";
-                                        customFields.CustomFieldsValue.FirstOrDefault()!.CategoryId = customFields.CategoryId;
-                                        customFields.CustomFieldsValue.FirstOrDefault()!.FieldId = customFields.FieldId;
-                                        customFields.CustomFieldsValue.FirstOrDefault()!.CustomFieldTitle = customFields.Title;
-                                        customFields.CustomFieldsValue.FirstOrDefault()!.CustomFieldType = customFields.Type;
-                                        customFields.CustomFieldsValue.FirstOrDefault()!.SchoolId = student.studentMaster.SchoolId;
-                                        customFields.CustomFieldsValue.FirstOrDefault()!.TenantId = student.studentMaster.TenantId;
-                                        customFields.CustomFieldsValue.FirstOrDefault()!.TargetId = student.studentMaster.StudentId;
-                                        customFields.CustomFieldsValue.FirstOrDefault()!.CreatedBy = student.studentMaster.CreatedBy;
-                                        customFields.CustomFieldsValue.FirstOrDefault()!.UpdatedBy = student.studentMaster.CreatedBy;
-                                        customFields.CustomFieldsValue.FirstOrDefault()!.CreatedOn = DateTime.UtcNow;
-                                        customFields.CustomFieldsValue.FirstOrDefault()!.UpdateOn = DateTime.UtcNow;
-                                        this.context?.CustomFieldsValue.AddRange(customFields.CustomFieldsValue);
-                                        this.context?.SaveChanges();
+                                        var dataExits = this.context?.CustomFieldsValue.Any(x => x.TenantId == student.studentMaster.TenantId && x.SchoolId == student.studentMaster.SchoolId && x.CategoryId == customFields.CategoryId && x.FieldId == customFields.FieldId && x.Module == "Student" && x.TargetId == student.studentMaster.StudentId);
+
+                                        if (dataExits != true)
+                                        {
+                                            customFields.CustomFieldsValue.FirstOrDefault()!.Module = "Student";
+                                            customFields.CustomFieldsValue.FirstOrDefault()!.CategoryId = customFields.CategoryId;
+                                            customFields.CustomFieldsValue.FirstOrDefault()!.FieldId = customFields.FieldId;
+                                            customFields.CustomFieldsValue.FirstOrDefault()!.CustomFieldTitle = customFields.Title;
+                                            customFields.CustomFieldsValue.FirstOrDefault()!.CustomFieldType = customFields.Type;
+                                            customFields.CustomFieldsValue.FirstOrDefault()!.SchoolId = student.studentMaster.SchoolId;
+                                            customFields.CustomFieldsValue.FirstOrDefault()!.TenantId = student.studentMaster.TenantId;
+                                            customFields.CustomFieldsValue.FirstOrDefault()!.TargetId = student.studentMaster.StudentId;
+                                            customFields.CustomFieldsValue.FirstOrDefault()!.CreatedBy = student.studentMaster.CreatedBy;
+                                            customFields.CustomFieldsValue.FirstOrDefault()!.UpdatedBy = student.studentMaster.CreatedBy;
+                                            customFields.CustomFieldsValue.FirstOrDefault()!.CreatedOn = DateTime.UtcNow;
+                                            customFields.CustomFieldsValue.FirstOrDefault()!.UpdateOn = DateTime.UtcNow;
+                                            this.context?.CustomFieldsValue.AddRange(customFields.CustomFieldsValue);
+                                            this.context?.SaveChanges();
+                                        }
                                     }
                                 }
 
@@ -3551,17 +3556,24 @@ namespace opensis.data.Repository
                                         {
                                             if (customFields.CustomFieldsValue.ToList()?.Any() == true)
                                             {
-                                                customFields.CustomFieldsValue.FirstOrDefault()!.TenantId = studentListAddViewModel.TenantId;
-                                                customFields.CustomFieldsValue.FirstOrDefault()!.Module = "Student";
-                                                customFields.CustomFieldsValue.FirstOrDefault()!.CategoryId = customFields.CategoryId;
-                                                customFields.CustomFieldsValue.FirstOrDefault()!.FieldId = customFields.FieldId;
-                                                customFields.CustomFieldsValue.FirstOrDefault()!.CustomFieldTitle = customFields.Title;
-                                                customFields.CustomFieldsValue.FirstOrDefault()!.CustomFieldType = customFields.Type;
-                                                customFields.CustomFieldsValue.FirstOrDefault()!.SchoolId = student.studentMaster.SchoolId;
-                                                customFields.CustomFieldsValue.FirstOrDefault()!.TenantId = student.studentMaster.TenantId;
-                                                customFields.CustomFieldsValue.FirstOrDefault()!.TargetId = student.studentMaster.StudentId;
-                                                this.context?.CustomFieldsValue.AddRange(customFields.CustomFieldsValue);
-                                                this.context?.SaveChanges();
+                                                var dataExits = this.context?.CustomFieldsValue.Any(x => x.TenantId == studentListAddViewModel.TenantId && x.SchoolId == student.studentMaster.SchoolId && x.CategoryId == customFields.CategoryId && x.FieldId == customFields.FieldId && x.Module == "Student" && x.TargetId == student.studentMaster.StudentId);
+
+                                                if (dataExits != true)
+                                                {
+                                                    customFields.CustomFieldsValue.FirstOrDefault()!.TenantId = studentListAddViewModel.TenantId;
+                                                    customFields.CustomFieldsValue.FirstOrDefault()!.Module = "Student";
+                                                    customFields.CustomFieldsValue.FirstOrDefault()!.CategoryId = customFields.CategoryId;
+                                                    customFields.CustomFieldsValue.FirstOrDefault()!.FieldId = customFields.FieldId;
+                                                    customFields.CustomFieldsValue.FirstOrDefault()!.CustomFieldTitle = customFields.Title;
+                                                    customFields.CustomFieldsValue.FirstOrDefault()!.CustomFieldType = customFields.Type;
+                                                    customFields.CustomFieldsValue.FirstOrDefault()!.SchoolId = student.studentMaster.SchoolId;
+                                                    customFields.CustomFieldsValue.FirstOrDefault()!.TenantId = student.studentMaster.TenantId;
+                                                    customFields.CustomFieldsValue.FirstOrDefault()!.TargetId = student.studentMaster.StudentId;
+                                                    customFields.CustomFieldsValue.FirstOrDefault()!.CreatedBy = studentListAddViewModel.CreatedBy;
+                                                    customFields.CustomFieldsValue.FirstOrDefault()!.CreatedOn = DateTime.UtcNow;
+                                                    this.context?.CustomFieldsValue.AddRange(customFields.CustomFieldsValue);
+                                                    this.context?.SaveChanges();
+                                                }
                                             }
 
                                         }
