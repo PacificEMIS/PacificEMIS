@@ -146,7 +146,9 @@ namespace opensis.data.Repository
                             gradeId = gradeLevel.GradeId;
                         }
 
-                        var StudentEnrollmentData = new StudentEnrollment() { TenantId = student.studentMaster.TenantId, SchoolId = student.studentMaster.SchoolId, StudentId = student.studentMaster.StudentId, EnrollmentId = 1, SchoolName = schoolName, RollingOption = "Next grade at current school", EnrollmentCode = enrollmentCode, CalenderId = calenderId, GradeLevelTitle = (gradeLevel != null) ? gradeLevel.Title : null, EnrollmentDate = DateTime.UtcNow, StudentGuid = GuidId, IsActive = true, GradeId = gradeId, CreatedBy = student.studentMaster.CreatedBy, CreatedOn = DateTime.UtcNow };
+                        var schoolYearStartDate = this.context?.SchoolYears.Where(x => x.TenantId == student.studentMaster.TenantId && x.SchoolId == student.studentMaster.SchoolId && x.AcademicYear.ToString() == student.AcademicYear).Min(s=>s.StartDate);
+
+                        var StudentEnrollmentData = new StudentEnrollment() { TenantId = student.studentMaster.TenantId, SchoolId = student.studentMaster.SchoolId, StudentId = student.studentMaster.StudentId, EnrollmentId = 1, SchoolName = schoolName, RollingOption = "Next grade at current school", EnrollmentCode = enrollmentCode, CalenderId = calenderId, GradeLevelTitle = gradeLevel?.Title, EnrollmentDate = schoolYearStartDate ?? DateTime.UtcNow, StudentGuid = GuidId, IsActive = true, GradeId = gradeId, CreatedBy = student.studentMaster.CreatedBy, CreatedOn = DateTime.UtcNow };
 
                         //Add student portal access
                         if (!string.IsNullOrWhiteSpace(student.PasswordHash) && !string.IsNullOrWhiteSpace(student.LoginEmail))
@@ -3233,7 +3235,9 @@ namespace opensis.data.Repository
                 }
 
                 var academicYear = Utility.GetCurrentAcademicYear(this.context!, studentListAddViewModel.TenantId, studentListAddViewModel.SchoolId);
-                
+
+                var schoolYearStartDate = this.context?.SchoolYears.Where(x => x.TenantId == studentListAddViewModel.TenantId && x.SchoolId == studentListAddViewModel.SchoolId && x.AcademicYear == academicYear).Min(s => s.StartDate);
+
                 int? indexNo = -1;
                 foreach (var student in studentListAddViewModel.studentAddViewModelList)
                 {
@@ -3462,7 +3466,7 @@ namespace opensis.data.Repository
                                             gradeId = gradeLevel.GradeId;
                                         }
 
-                                        StudentEnrollmentData = new StudentEnrollment() { TenantId = student.studentMaster.TenantId, SchoolId = student.studentMaster.SchoolId, StudentId = student.studentMaster.StudentId, EnrollmentId = 1, SchoolName = schoolName, RollingOption = "Next grade at current school", EnrollmentCode = enrollmentCode, CalenderId = calenderId, GradeLevelTitle = (gradeLevel != null) ? gradeLevel.Title : null, EnrollmentDate = DateTime.UtcNow, StudentGuid = GuidId, IsActive = true, GradeId = gradeId, CreatedBy = studentListAddViewModel.CreatedBy, CreatedOn = DateTime.UtcNow };
+                                        StudentEnrollmentData = new StudentEnrollment() { TenantId = student.studentMaster.TenantId, SchoolId = student.studentMaster.SchoolId, StudentId = student.studentMaster.StudentId, EnrollmentId = 1, SchoolName = schoolName, RollingOption = "Next grade at current school", EnrollmentCode = enrollmentCode, CalenderId = calenderId, GradeLevelTitle = gradeLevel?.Title, EnrollmentDate = schoolYearStartDate ?? DateTime.UtcNow, StudentGuid = GuidId, IsActive = true, GradeId = gradeId, CreatedBy = studentListAddViewModel.CreatedBy, CreatedOn = DateTime.UtcNow };
                                     }
                                 }
                                 else
@@ -3475,7 +3479,7 @@ namespace opensis.data.Repository
                                         gradeId = gradeLevel.GradeId;
                                     }
 
-                                    StudentEnrollmentData = new StudentEnrollment() { TenantId = student.studentMaster.TenantId, SchoolId = student.studentMaster.SchoolId, StudentId = student.studentMaster.StudentId, EnrollmentId = 1, SchoolName = schoolName, RollingOption = "Next grade at current school", EnrollmentCode = enrollmentCode, CalenderId = calenderId, GradeLevelTitle = (gradeLevel != null) ? gradeLevel.Title : null, EnrollmentDate = DateTime.UtcNow, StudentGuid = GuidId, IsActive = true, GradeId = gradeId, CreatedBy = studentListAddViewModel.CreatedBy, CreatedOn = DateTime.UtcNow };
+                                    StudentEnrollmentData = new StudentEnrollment() { TenantId = student.studentMaster.TenantId, SchoolId = student.studentMaster.SchoolId, StudentId = student.studentMaster.StudentId, EnrollmentId = 1, SchoolName = schoolName, RollingOption = "Next grade at current school", EnrollmentCode = enrollmentCode, CalenderId = calenderId, GradeLevelTitle = gradeLevel?.Title, EnrollmentDate = schoolYearStartDate ?? DateTime.UtcNow, StudentGuid = GuidId, IsActive = true, GradeId = gradeId, CreatedBy = studentListAddViewModel.CreatedBy, CreatedOn = DateTime.UtcNow };
                                 }
 
                                 if (student.EnrollmentDate != null)
