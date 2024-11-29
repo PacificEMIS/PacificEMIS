@@ -1134,7 +1134,7 @@ namespace opensis.data.Repository
 
                             if (membership != null)
                             {
-                                userMaster.MembershipId = membership.MembershipId;                                
+                                userMaster.MembershipId = membership.MembershipId;
                             }
                             else
                             {
@@ -1142,6 +1142,7 @@ namespace opensis.data.Repository
                             }
 
                             userMaster.UpdatedOn = DateTime.Now;
+                            userMaster.UpdatedBy = staffSchoolInfoAddViewModel.staffSchoolInfoList.FirstOrDefault()!.UpdatedBy;
                         }
 
                         this.context?.SaveChanges();
