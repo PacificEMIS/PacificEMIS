@@ -727,6 +727,7 @@ export class GroupAssignStudentInfoComponent implements OnInit, OnDestroy{
       this.AddEditStudentMedicalProviderForGroupAssignModel.studentIds = [];
       this.StudentCommentsAddForGroupAssign.studentIds = [];
       this.StudentDocumentAddForGroupAssignModel.studentIds = [];
+      this.callAllStudent();
     });
   }
 

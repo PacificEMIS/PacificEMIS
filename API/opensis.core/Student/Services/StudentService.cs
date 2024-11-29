@@ -1213,5 +1213,25 @@ namespace opensis.core.Student.Services
             }
             return studentList;
         }
+
+        /// <summary>
+        /// Delete Student
+        /// </summary>
+        /// <param name="studentDeleteViewModel"></param>
+        /// <returns></returns>
+        public StudentDeleteViewModel DeleteStudent(StudentDeleteViewModel studentDeleteViewModel)
+        {
+            StudentDeleteViewModel studentDelete = new();
+            if (tokenManager.CheckToken(studentDeleteViewModel._tenantName + studentDeleteViewModel._userName, studentDeleteViewModel._token))
+            {
+                studentDelete = this.studentRepository.DeleteStudent(studentDeleteViewModel);
+            }
+            else
+            {
+                studentDelete._failure = true;
+                studentDelete._message = TOKENINVALID;
+            }
+            return studentDelete;
+        }
     }
 }

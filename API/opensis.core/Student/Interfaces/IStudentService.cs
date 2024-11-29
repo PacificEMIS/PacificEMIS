@@ -92,5 +92,6 @@ namespace opensis.core.Student.Interfaces
         public StudentDocumentAddViewModel AssignDocumentForStudents(StudentDocumentAddViewModel studentDocumentAddViewModel);
         public StudentEnrollmentAssignModel AssignEnrollmentInfoForStudents(StudentEnrollmentAssignModel studentEnrollmentAssignModel);
         public StudentListModel GetAllStudentListByDateRange(PageResult pageResult);
+        public StudentDeleteViewModel DeleteStudent(StudentDeleteViewModel studentDeleteViewModel);
     }
 }

@@ -67,6 +67,7 @@
     "simplebar": "~5.1.0",
     "tailwindcss": "^1.9.6",
     "tslib": "^2.0.0",
+    "vex": "file:",
     "xlsx": "^0.16.9",
     "zone.js": "~0.10.3"
   },
@@ -86,6 +87,7 @@
     "@types/showdown": "~1.9.3",
     "@types/simplebar": "~5.1.1",
     "codelyzer": "^6.0.0",
+    "crypto-js": "^4.0.0",
     "faker": "^4.1.0",
     "jasmine-core": "~3.5.0",
     "jasmine-spec-reporter": "~5.0.0",
@@ -101,7 +103,6 @@
     "ts-node": "^8.9.0",
     "tslint": "~6.1.0",
     "typescript": "^3.9.6",
-    "webpack": "^4.43.0",
-    "crypto-js": "^4.0.0"
+    "webpack": "^4.43.0"
   }
 }

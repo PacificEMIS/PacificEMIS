@@ -49,6 +49,8 @@ import { Permissions, RolePermissionListViewModel, RolePermissionViewModel } fro
 import { DefaultValuesService } from '../../../common/default-values.service';
 import { PageRolesPermission } from '../../../common/page-roles-permissions.service';
 import { CommonService } from 'src/app/services/common.service';
+import { CdkDragDrop } from '@angular/cdk/drag-drop';
+import { LoVSortOrderValuesModel, UpdateLovSortingModel } from 'src/app/models/lov.model';
 
 @Component({
   selector: 'vex-enrollment-codes',
@@ -61,6 +63,7 @@ import { CommonService } from 'src/app/services/common.service';
 })
 export class EnrollmentCodesComponent implements OnInit {
   columns = [
+    { label: 'sort', property: 'lovId', type: 'text', visible: true },
     { label: 'title', property: 'title', type: 'text', visible: true },
     { label: 'shortName', property: 'shortName', type: 'text', visible: true },
     { label: 'sortOrder', property: 'sortOrder', type: 'text', visible: true },
@@ -78,6 +81,7 @@ export class EnrollmentCodesComponent implements OnInit {
   searchKey: string;
   enrollmentCodelistView: EnrollmentCodeListView = new EnrollmentCodeListView();
   enrollmentAddView: EnrollmentCodeAddView = new EnrollmentCodeAddView();
+  updateLovSortingModel: UpdateLovSortingModel = new UpdateLovSortingModel();
   enrollmentListForExcel: EnrollmentCodeListView;
   permissions: Permissions
   constructor(
@@ -237,6 +241,55 @@ export class EnrollmentCodesComponent implements OnInit {
   }
   applyFilter() {
     this.enrollmentList.filter = this.searchKey.trim().toLowerCase();
+  }
+
+  sortLovList(event: CdkDragDrop<string[]>) {
+    
+    if (event.currentIndex > event.previousIndex) {
+      this.enrollmentList.filteredData[event.currentIndex].sortOrder = Number(this.enrollmentList.filteredData[event.currentIndex].sortOrder) - 1;
+    }
+    else if (event.currentIndex < event.previousIndex) {
+      this.enrollmentList.filteredData[event.currentIndex].sortOrder = Number(this.enrollmentList.filteredData[event.currentIndex].sortOrder) + 1;
+    }
+    this.enrollmentList.filteredData[event.previousIndex].sortOrder = Number(event.currentIndex) + 1;
+
+    let dropdownListMod = this.enrollmentList.filteredData?.sort((a, b) => a.sortOrder < b.sortOrder ? -1 : 1);
+
+    let sortOrderValues = [];
+
+    dropdownListMod.forEach((oneLov, idxLov) => {
+      let thisItemSort = new LoVSortOrderValuesModel();
+      thisItemSort.id = oneLov.enrollmentCode;
+      thisItemSort.sortOrder = Number(idxLov) + 1;
+
+      sortOrderValues.push(thisItemSort);
+    })
+
+    this.updateLovSortingModel.sortOrderValues = sortOrderValues;
+    this.updateLovSortingModel.tenantId = this.defaultValuesService.getTenantID();
+    this.updateLovSortingModel.schoolId = this.defaultValuesService.getSchoolID();
+    this.updateLovSortingModel.updatedBy = this.defaultValuesService.getUserGuidId();
+
+    this.enrollmentCodeService.updateStudentEnrollmentCodeSortOrder(this.updateLovSortingModel).subscribe((res) => {
+      if (res) {
+        if (res._failure) {
+          this.snackbar.open(res._message, '', {
+            duration: 3000
+          });
+        }
+        else {
+          this.snackbar.open(res._message, '', {
+            duration: 3000
+          });
+          this.getAllStudentEnrollmentCode();
+        }
+      }
+      else {
+        this.snackbar.open(this.defaultValuesService.getHttpError(), '', {
+          duration: 3000
+        });
+      }
+    })
   }
 
 }

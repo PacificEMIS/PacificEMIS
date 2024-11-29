@@ -862,5 +862,132 @@ namespace opensis.data.Repository
             }
             return removeStaffScheduleViewModel;
         }
+
+        /// <summary>
+		/// Get Unassociated Staff List By CourseSection
+		/// </summary>
+		/// <param name="staffListViewModel"></param>
+		/// <returns></returns>
+        public StaffListViewModel GetUnassociatedStaffListByCourseSection(StaffListViewModel staffListViewModel)
+        {
+            StaffListViewModel staffListView = new StaffListViewModel();
+            try
+            {
+                staffListView.TenantId = staffListViewModel.TenantId;
+                staffListView.SchoolId = staffListViewModel.SchoolId;
+                staffListView.CourseId = staffListViewModel.CourseId;
+                staffListView.CourseSectionId = staffListViewModel.CourseSectionId;
+                staffListView._token = staffListViewModel._token;
+                staffListView._tenantName = staffListViewModel._tenantName;
+
+                List<int> staffIds = new List<int>();
+
+                var StaffScheduleCourseSectionMasterData = this.context?.StaffCoursesectionSchedule.Where(x => x.TenantId == staffListViewModel.TenantId && x.SchoolId == staffListViewModel.SchoolId && x.CourseSectionId == staffListViewModel.CourseSectionId).ToList();
+
+                if (StaffScheduleCourseSectionMasterData?.Any() == true)
+                {
+                    var StudentAttendanceMasterData = this.context?.StudentAttendance.Where(x => x.TenantId == staffListViewModel.TenantId && x.SchoolId == staffListViewModel.SchoolId && x.CourseSectionId == staffListViewModel.CourseSectionId);
+
+                    var AssignmentMasterData = this.context?.Assignment.Where(x => x.TenantId == staffListViewModel.TenantId && x.SchoolId == staffListViewModel.SchoolId && x.CourseSectionId == staffListViewModel.CourseSectionId);
+
+                    foreach (var scheduledStaff in StaffScheduleCourseSectionMasterData)
+                    {
+                        var StudentAttendanceData = StudentAttendanceMasterData?.Where(x => x.StaffId == scheduledStaff.StaffId).FirstOrDefault();
+                        var AssignmentData = AssignmentMasterData?.Where(x => x.StaffId == scheduledStaff.StaffId).FirstOrDefault();
+
+                        if (StudentAttendanceData == null && AssignmentData == null)
+                        {
+                            staffIds.Add(scheduledStaff.StaffId);
+                        }
+                    }
+
+                    if (staffIds?.Any() == true)
+                    {
+                        var staffSchedule = this.context?.CourseSection.Include(x => x.SchoolYears).Include(x => x.Semesters).Include(x => x.Quarters).Include(x => x.StaffCoursesectionSchedule).ThenInclude(x => x.StaffMaster).Where(x => x.TenantId == staffListViewModel.TenantId && x.SchoolId == staffListViewModel.SchoolId && x.CourseId == staffListViewModel.CourseId && (staffListViewModel.CourseSectionId == null || x.CourseSectionId == staffListViewModel.CourseSectionId)).AsNoTracking().Select(e => new CourseSection
+                        {
+                            TenantId = e.TenantId,
+                            SchoolId = e.SchoolId,
+                            CourseId = e.CourseId,
+                            CourseSectionId = e.CourseSectionId,
+                            CourseSectionName = e.CourseSectionName,
+                            ScheduleType = e.ScheduleType,
+                            YrMarkingPeriodId = e.YrMarkingPeriodId,
+                            SmstrMarkingPeriodId = e.SmstrMarkingPeriodId,
+                            QtrMarkingPeriodId = e.QtrMarkingPeriodId,
+                            DurationStartDate = e.DurationStartDate,
+                            DurationEndDate = e.DurationEndDate,
+                            ProgressPeriods = e.ProgressPeriods != null ? new ProgressPeriods { Title = e.ProgressPeriods.Title, StartDate = e.ProgressPeriods.StartDate, EndDate = e.ProgressPeriods.EndDate, ShortName = e.ProgressPeriods.ShortName } : null,
+                            Quarters = e.Quarters != null ? new Quarters { Title = e.Quarters.Title, StartDate = e.Quarters.StartDate, EndDate = e.Quarters.EndDate, ShortName = e.Quarters.ShortName } : null,
+                            Semesters = e.Semesters != null ? new Semesters { Title = e.Semesters.Title, StartDate = e.Semesters.StartDate, EndDate = e.Semesters.EndDate, ShortName = e.Semesters.ShortName } : null,
+                            SchoolYears = e.SchoolYears != null ? new SchoolYears { Title = e.SchoolYears.Title, StartDate = e.SchoolYears.StartDate, EndDate = e.SchoolYears.EndDate, ShortName = e.SchoolYears.ShortName } : null,
+                            StaffCoursesectionSchedule = e.StaffCoursesectionSchedule.Where(d => d.IsDropped != true && staffIds.Contains(d.StaffId)).Select(s => new StaffCoursesectionSchedule
+                            {
+                                TenantId = s.TenantId,
+                                SchoolId = s.SchoolId,
+                                StaffId = s.StaffId,
+                                StaffGuid = s.StaffGuid,
+                                CourseId = s.CourseId,
+                                CourseSectionId = s.CourseSectionId,
+                                CourseSectionName = s.CourseSectionName,
+                                IsDropped = s.IsDropped,
+                                MeetingDays = s.MeetingDays,
+                                IsPrimaryStaff = s.IsPrimaryStaff,
+                                StaffMaster = new StaffMaster
+                                {
+                                    TenantId = s.StaffMaster.TenantId,
+                                    SchoolId = s.StaffMaster.SchoolId,
+                                    StaffId = s.StaffMaster.StaffId,
+                                    FirstGivenName = s.StaffMaster.FirstGivenName,
+                                    MiddleName = s.StaffMaster.MiddleName,
+                                    LastFamilyName = s.StaffMaster.LastFamilyName,
+                                    StaffInternalId = s.StaffMaster.StaffInternalId,
+                                    StaffThumbnailPhoto = staffListViewModel.CourseSectionId != null ? s.StaffMaster.StaffThumbnailPhoto : null,
+                                    FirstLanguage = s.StaffMaster.FirstLanguage,
+                                    SecondLanguage = s.StaffMaster.SecondLanguage,
+                                    ThirdLanguage = s.StaffMaster.ThirdLanguage,
+                                    FirstLanguageNavigation = s.StaffMaster.FirstLanguageNavigation,
+                                    SecondLanguageNavigation = s.StaffMaster.SecondLanguageNavigation,
+                                    ThirdLanguageNavigation = s.StaffMaster.ThirdLanguageNavigation,
+                                    JobTitle = s.StaffMaster.JobTitle,
+                                    PrimaryGradeLevelTaught = s.StaffMaster.PrimaryGradeLevelTaught,
+                                    OtherGradeLevelTaught = s.StaffMaster.OtherGradeLevelTaught,
+                                    PrimarySubjectTaught = s.StaffMaster.PrimarySubjectTaught,
+                                    OtherSubjectTaught = s.StaffMaster.OtherSubjectTaught
+                                }
+                            }).ToList()
+                        }).ToList();
+
+                        if (staffSchedule?.Any() == true)
+                        {
+                            staffListView.CourseSectionsList = staffSchedule;
+                            staffListView._failure = false;
+                        }
+                        else
+                        {
+                            staffListView._failure = true;
+                            staffListView._message = "No staff found";
+                        }
+                    }
+                    else
+                    {
+                        staffListView._failure = true;
+                        staffListView._message = "Staff deletion is not permitted due to transactional associations";
+                    }
+                }
+                else
+                {
+                    staffListView._failure = true;
+                    staffListView._message = "No staff found";
+                }
+            }
+            catch (Exception es)
+            {
+                staffListView.CourseSectionsList = null!;
+                staffListView._failure = true;
+                staffListView._message = es.Message;
+            }
+
+            return staffListView;
+        }
     }
 }

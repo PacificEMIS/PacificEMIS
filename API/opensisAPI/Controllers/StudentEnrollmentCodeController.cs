@@ -142,7 +142,21 @@ namespace opensisAPI.Controllers
             return studentEnrollmentCodeList;
         }
 
-
+        [HttpPut("updateStudentEnrollmentCodeSortOrder")]
+        public ActionResult<StudentEnrollmentCodeSortOrderViewModel> UpdateStudentEnrollmentCodeSortOrder(StudentEnrollmentCodeSortOrderViewModel studentEnrollmentCodeSortOrderViewModel)
+        {
+            StudentEnrollmentCodeSortOrderViewModel studentEnrollmentCodeSortOrder = new();
+            try
+            {
+                studentEnrollmentCodeSortOrder = _studentEnrollmentCodeService.UpdateStudentEnrollmentCodeSortOrder(studentEnrollmentCodeSortOrderViewModel);
+            }
+            catch (Exception es)
+            {
+                studentEnrollmentCodeSortOrder._failure = true;
+                studentEnrollmentCodeSortOrder._message = es.Message;
+            }
+            return studentEnrollmentCodeSortOrder;
+        }
 
 
     }

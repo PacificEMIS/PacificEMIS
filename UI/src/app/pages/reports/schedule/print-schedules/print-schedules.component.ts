@@ -677,7 +677,9 @@ export class PrintSchedulesComponent implements OnInit, AfterViewInit, OnDestroy
 
     this.getPrintScheduleReportModel.studentGuids = this.selectedStudents.map(item => item.studentGuid);
 
-    if (this.defaultValuesService.getUserMembershipType() !== this.profiles.SuperAdmin) this.getPrintScheduleReportModel.staffId = +this.defaultValuesService.getUserId();
+    if (this.defaultValuesService.getUserMembershipType() !== this.profiles.SuperAdmin && this.defaultValuesService.getUserMembershipType() !== this.profiles.SchoolAdmin && this.defaultValuesService.getUserMembershipType() !== this.profiles.AdminAssitant) {
+      this.getPrintScheduleReportModel.staffId = +this.defaultValuesService.getUserId();
+    }
 
     this.getPrintScheduleReport().then((res: GetPrintScheduleReportModel) => {
       res.studentDetailsViewModelList.map(studentDetails => {

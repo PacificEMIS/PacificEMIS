@@ -272,5 +272,33 @@ namespace opensis.core.StaffSchedule.Services
             }
             return removeStaffScheduleView;
         }
+
+        /// <summary>
+		/// Get Unassociated Staff List By CourseSection
+		/// </summary>
+		/// <param name="staffListViewModel"></param>
+		/// <returns></returns>
+		public StaffListViewModel GetUnassociatedStaffListByCourseSection(StaffListViewModel staffListViewModel)
+        {
+            StaffListViewModel staffListView = new StaffListViewModel();
+            try
+            {
+                if (tokenManager.CheckToken(staffListViewModel._tenantName + staffListViewModel._userName, staffListViewModel._token))
+                {
+                    staffListView = this.staffScheduleRepository.GetUnassociatedStaffListByCourseSection(staffListViewModel);
+                }
+                else
+                {
+                    staffListView._failure = true;
+                    staffListView._message = TOKENINVALID;
+                }
+            }
+            catch (Exception es)
+            {
+                staffListView._failure = true;
+                staffListView._message = es.Message;
+            }
+            return staffListView;
+        }
     }
 }

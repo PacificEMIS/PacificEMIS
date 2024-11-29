@@ -1,4 +1,5 @@
 <vex-page-layout>
+    <vex-mat-spinner-overlay *ngIf="loading" color="accent"></vex-mat-spinner-overlay>
     <vex-page-layout-header class="pb-16" fxLayout="column" fxLayoutAlign="center start">
         <vex-secondary-toolbar current="{{ 'groupDelete' | translate }}" class="w-full">
             <vex-breadcrumbs [crumbs]="['Scheduling']" class="flex-auto"></vex-breadcrumbs>
@@ -20,15 +21,125 @@
         </div>
 
         <!-- No students found div start -->
-        <div *ngIf="studentNotFound" class="card mt-6 p-4">
+        <div *ngIf="showErrorMessage && !isVisible" class="card mt-6 p-4">
             <div class="flex">
                 <mat-icon aria-hidden="false" aria-label="icon" class="text-red">error</mat-icon>
                 <div class="ml-4">
-                    <span class="text-lg inline-block align-middle text-red font-bold">{{'noStudentsFound' | translate}}</span>
+                    <span class="text-lg inline-block align-middle text-red font-bold">{{showErrorMessage}}</span>
                 </div>
             </div>
         </div>
         <!-- No students found div End -->
+
+        <!-- No teachers found div start -->
+        <div *ngIf="showStaffErrorMessage && !isStaffVisible" class="card mt-6 p-4">
+            <div class="flex">
+                <mat-icon aria-hidden="false" aria-label="icon" class="text-red">error</mat-icon>
+                <div class="ml-4">
+                    <span class="text-lg inline-block align-middle text-red font-bold">{{showStaffErrorMessage}}</span>
+                </div>
+            </div>
+        </div>
+        <!-- No teachers found div End -->
+
+        <!-- Start Scheduled Teachers List -->
+        <div class="card mb-6 mt-6" [class.hidden]="!isStaffVisible">
+            <div class="flex justify-between items-center px-6 py-4">
+                <div>
+                    <h4 class="font-semibold text-green text-base">{{ 'scheduledTeacher' | translate }}</h4>
+                    <p>{{ 'selectTeacherToDeleteFromCourseSection' | translate }}</p>
+                </div>
+                <div class="cursor-pointer"
+                    matTooltip="{{ 'staffsWhoDontHaveAnyAttendanceAssignmentDataAssociatedWithTheCourseSectionAboveAreShownInTheListBelow' | translate }}"
+                    aria-label="Button that displays a tooltip when focused or hovered over"
+                    [matTooltipPosition]="'left'">
+                    <mat-icon [icIcon]="icInfo"></mat-icon>
+                </div>
+            </div>
+
+            <mat-divider></mat-divider>
+
+            <div class="border-t overflow-x-auto overflow-y-hidden">
+
+                <table mat-table [dataSource]="staffCoursesectionSchedule" class="mat-elevation-z8 shadow-none" matSort (matSortChange)="announceSortChange($event)" matSortActive="firstGivenName" matSortDisableClear matSortDirection="asc">
+                    <ng-container matColumnDef="staffSelected">
+                        <th mat-header-cell *matHeaderCellDef>
+                            <mat-checkbox color="primary" [class.hidden]="totalStaffCount == 0 || totalStaffCount == null" #masterCheckBoxStaff
+                                [indeterminate]="someStaffComplete()" (change)="setStaffAll($event.checked)"></mat-checkbox>
+                        </th>
+                        <td mat-cell *matCellDef="let element">
+                            <mat-checkbox color="primary" [checked]="element.checked"
+                                (change)="onChangeStaffSelection($event.checked, element.staffId)"></mat-checkbox>
+                        </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="firstGivenName">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ "name" | translate }}</th>
+                        <td mat-cell *matCellDef="let element">
+                            <div>{{ element.firstGivenName }} {{element.lastFamilyName}}</div>
+                        </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="staffId">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ "staffId" | translate }}</th>
+                        <td mat-cell *matCellDef="let element">{{ element.staffInternalId | EmtyValueCheckPipe }}</td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="profile">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ "profile" | translate }}</th>
+                        <td mat-cell *matCellDef="let element">{{ element.profile | EmtyValueCheckPipe }}</td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="jobTitle">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ "jobTitle" | translate }}</th>
+                        <td mat-cell *matCellDef="let element">{{ element.jobTitle | EmtyValueCheckPipe }}</td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="schoolEmail">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ "schoolEmail" | translate }}</th>
+                        <td mat-cell *matCellDef="let element">{{ element.schoolEmail | EmtyValueCheckPipe }}</td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="mobilePhone">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ "mobilePhone" | translate }}</th>
+                        <td mat-cell *matCellDef="let element">{{ element.mobilePhone | EmtyValueCheckPipe }}</td>
+                    </ng-container>
+
+                    <!-- <ng-container matColumnDef="action">
+                        <th mat-header-cell *matHeaderCellDef>{{ "action" | translate }}</th>
+                        <td mat-cell *matCellDef="let element" class="cursor-pointer">
+                            <span class="cursor-pointer mr-4" (click)="confirmDeleteScheduledStaff(element)"><mat-icon [icIcon]="icDeleteForever"></mat-icon></span>
+                        </td>
+                    </ng-container> -->
+
+                    <ng-container matColumnDef="noData">
+                        <td mat-footer-cell *matFooterCellDef colspan="7">
+                            {{loading?('fetchingData' | translate):('noData' | translate) }}
+                        </td>
+                    </ng-container>
+
+                    <tr mat-header-row *matHeaderRowDef="displayedStaffColumns"></tr>
+                    <tr mat-row *matRowDef="let row; columns: displayedStaffColumns"></tr>
+                    <tr mat-footer-row *matFooterRowDef="['noData']" [class.hidden]="totalStaffCount !== 0 && totalStaffCount !== null"></tr>
+                </table>
+            </div>
+            <!-- <div class="text-right px-6 py-4" *ngIf="permissions?.edit && totalStaffCount > 0">
+                <button mat-raised-button color="primary" (click)="confirmDeleteScheduledStaff()">{{ "deleteSelectedTeachersFromCourseSection" | translate }}</button>
+            </div> -->
+        </div>
+        <!-- End Scheduled Teachers List -->
+
+        <!-- After Completed Delete Scheduling showing Success msg -->
+        <div class="p-4 flex card" *ngIf="isGroupStaffDelete">
+            <div class="text-green mr-2">
+                <mat-icon [icIcon]="icCheckCircle"></mat-icon>
+            </div>
+            <div class="-mt-1">
+                <h4 class="text-green font-bold text-lg">{{ 'completed' | translate }}</h4> 
+                <p>{{ 'staffsSuccessfullyDeletedFrom' | translate }}<span class="ml-1 font-semibold">{{courseSectionData.courseTitle}} - {{courseSectionData.courseSectionName}}</span>.</p>
+            </div>
+        </div>
+        <!-- End Success msg div -->
 
         <!-- Start Scheduled Students List -->
         <div class="card mb-6 mt-6" [class.hidden]="!isVisible">
@@ -118,15 +229,18 @@
             <mat-paginator [length]="totalCount" [class.hidden]="totalCount===0 || totalCount===null" [pageSize]="pageSize"
                 [pageSizeOptions]="[10, 20, 30, 40]" showFirstLastButtons (page)='getPageEvent($event)' aria-label="Select page">
             </mat-paginator>
+        </div>
+        <!-- End Scheduled Students List -->
+        <ng-container *ngIf="isVisible || isStaffVisible">
             <div class="text-right px-6 py-4" *ngIf="permissions?.edit">
                 <button mat-raised-button color="primary" (click)="confirmDeleteGroupStudents()">{{ "deleteSelectedStudentsFromCourseSection" | translate }}</button>
             </div>
-        </div>
+        </ng-container>
         <!-- End Scheduled Students List -->
 
 
         <!-- After Completed Delete Scheduling showing Success msg -->
-        <div class="p-4 flex card" *ngIf="isGroupDelete">
+        <div class="p-4 flex card mt-4" *ngIf="isGroupDelete">
             <div class="text-green mr-2">
                 <mat-icon [icIcon]="icCheckCircle"></mat-icon>
             </div>

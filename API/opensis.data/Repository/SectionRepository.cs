@@ -258,5 +258,50 @@ namespace opensis.data.Repository
             return section;
         }
 
+        /// <summary>
+        /// Update Section Sort Order
+        /// </summary>
+        /// <param name="sectionSortOrderViewModel"></param>
+        /// <returns></returns>
+        public SectionSortOrderViewModel UpdateSectionSortOrder(SectionSortOrderViewModel sectionSortOrderViewModel)
+        {
+            try
+            {
+                var sectionList = this.context?.Sections.Where(a => a.TenantId == sectionSortOrderViewModel.TenantId && a.SchoolId == sectionSortOrderViewModel.SchoolId);
+
+                if (sectionList?.Any() == true)
+                {
+                    var sortOrderValues = sectionSortOrderViewModel.SortOrderValues.OrderBy(c => c.Id);
+                    foreach (var sortOrderValue in sortOrderValues)
+                    {
+                        var sectionData = sectionList.FirstOrDefault(d => d.TenantId == sectionSortOrderViewModel.TenantId && d.SchoolId == sectionSortOrderViewModel.SchoolId && d.SectionId == sortOrderValue.Id);
+
+                        if (sectionData != null)
+                        {
+                            var oldSectionData = sectionData;
+                            sectionData.SortOrder = sortOrderValue.SortOrder;
+                            sectionData.UpdatedOn = DateTime.UtcNow;
+                            sectionData.UpdatedBy = sectionSortOrderViewModel.UpdatedBy;
+                            this.context?.Entry(oldSectionData).CurrentValues.SetValues(sectionData);
+                        }
+                    }
+                    this.context?.SaveChanges();
+                    sectionSortOrderViewModel._failure = false;
+                    sectionSortOrderViewModel._message = "Sort order updated successfully";
+                }
+                else
+                {
+                    sectionSortOrderViewModel._failure = true;
+                    sectionSortOrderViewModel._message = NORECORDFOUND;
+                }
+            }
+            catch (Exception es)
+            {
+                sectionSortOrderViewModel._message = es.Message;
+                sectionSortOrderViewModel._failure = true;
+            }
+            return sectionSortOrderViewModel;
+        }
+
     }
 }

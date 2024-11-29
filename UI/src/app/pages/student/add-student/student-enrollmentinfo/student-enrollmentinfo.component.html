@@ -434,13 +434,13 @@
                                                         </span>
                                                     </ng-container>
                                                     <ng-template #internal>
-                                                        <span
+                                                        <!-- <span
                                                             class="flex items-center bg-blue px-2 pt-3 pb-2 mr-2"
                                                             *ngIf="enrollment.enrollmentType=='Add'">
                                                             <mat-icon [icIcon]="icAdd" class="text-white"
                                                                 matTooltip="{{'new' | translate}}">
                                                             </mat-icon>
-                                                        </span>
+                                                        </span> -->
                                                         <span
                                                             class="flex items-center bg-warn px-2 pt-3 pb-2 mr-2"
                                                             *ngIf="enrollment.enrollmentType=='Drop'">
@@ -473,7 +473,7 @@
                                                 </div>
 
                                                 <div class="flex justify-between items-center w-full flex-wrap">
-                                                    <h5 class="inline-block font-medium">{{enrollment.schoolName}}
+                                                    <h5 class="px-1 inline-block font-medium">{{enrollment.schoolName}}
                                                         <mat-icon *ngIf="index==0" [icIcon]="icHomeSchool"
                                                             class="text-deep-purple align-middle ml-2 text-sm mt-2"
                                                                 matTooltip="{{'homeSchool' | translate}}"></mat-icon>

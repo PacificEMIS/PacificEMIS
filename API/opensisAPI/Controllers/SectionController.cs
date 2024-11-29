@@ -184,5 +184,21 @@ namespace opensisAPI.Controllers
             }
             return sectionDelete;
         }
+
+        [HttpPut("updateSectionSortOrder")]
+        public ActionResult<SectionSortOrderViewModel> UpdateSectionSortOrder(SectionSortOrderViewModel sectionSortOrderViewModel)
+        {
+            SectionSortOrderViewModel sectionSortOrderUpdate = new();
+            try
+            {
+                sectionSortOrderUpdate = _sectionService.UpdateSectionSortOrder(sectionSortOrderViewModel);
+            }
+            catch (Exception es)
+            {
+                sectionSortOrderUpdate._failure = true;
+                sectionSortOrderUpdate._message = es.Message;
+            }
+            return sectionSortOrderUpdate;
+        }
     }
 }

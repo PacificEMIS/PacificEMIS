@@ -32,6 +32,7 @@ import icAdd from '@iconify/icons-ic/baseline-add';
 import icSearch from '@iconify/icons-ic/search';
 import icFilterList from '@iconify/icons-ic/filter-list';
 import icRestore from '@iconify/icons-ic/twotone-restore';
+import icDelete from '@iconify/icons-ic/twotone-delete-forever';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
 import { SelectionModel } from '@angular/cdk/collections';
@@ -54,7 +55,7 @@ import { LoaderService } from '../../services/loader.service';
 import { ImageCropperService } from '../../services/image-cropper.service';
 import { ExcelService } from '../../services/excel.service';
 import { CommonService } from '../../services/common.service';
-import { StudentListModel } from '../../models/student.model';
+import { StudentListModel, DeleteStudentModel } from '../../models/student.model';
 import { StudentService } from '../../services/student.service';
 import { ConfirmDialogComponent } from '../shared-module/confirm-dialog/confirm-dialog.component';
 import { SaveFilterComponent } from './save-filter/save-filter.component';
@@ -67,6 +68,7 @@ import { ScheduleStudentListViewModel } from '../../models/student-schedule.mode
 import { ProfilesTypes } from '../../enums/profiles.enum';
 import { AdvancedSearchExpansionModel } from 'src/app/models/common.model';
 import { SharedFunction } from '../shared/shared-function';
+import { MatCheckbox } from '@angular/material/checkbox';
 
 
 @Component({
@@ -81,12 +83,16 @@ import { SharedFunction } from '../shared/shared-function';
 })
 export class StudentComponent implements OnInit, OnDestroy {
   columns = [
+    { label: 'studentCheck', property: 'selectedStudent', type: 'text', visible: true },
     { label: 'name', property: 'lastFamilyName', type: 'text', visible: true },
     { label: 'studentId', property: 'studentInternalId', type: 'text', visible: true },
-    { label: 'alternateId', property: 'alternateId', type: 'text', visible: true },
+    { label: 'gender', property: 'gender', type: 'text', visible: true },
+    { label: 'dob', property: 'dob', type: 'text', visible: true },
     { label: 'gradeLevel', property: 'gradeLevelTitle', type: 'text', visible: true },
-    { label: 'email', property: 'schoolEmail', type: 'text', visible: true },
-    { label: 'telephone', property: 'homePhone', type: 'text', visible: true },
+    { label: 'section', property: 'sectionId', type: 'text', visible: true },
+    { label: 'alternateId', property: 'alternateId', type: 'text', visible: false },
+    { label: 'email', property: 'schoolEmail', type: 'text', visible: false },
+    { label: 'telephone', property: 'homePhone', type: 'text', visible: false },
     { label: 'schoolName', property: 'schoolName', type: 'text', visible: false },
     { label: 'status', property: 'status', type: 'text', visible: false },
     { label: 'action', property: 'action', type: 'text', visible: true },
@@ -102,6 +108,7 @@ export class StudentComponent implements OnInit, OnDestroy {
   icAdd = icAdd;
   icSearch = icSearch;
   icFilterList = icFilterList;
+  icDelete = icDelete;
   fapluscircle = "fa-plus-circle";
   tenant = "";
   filterValue: number;
@@ -118,6 +125,7 @@ export class StudentComponent implements OnInit, OnDestroy {
   scheduleStudentListViewModel: ScheduleStudentListViewModel = new ScheduleStudentListViewModel();
   searchFilterAddViewModel: SearchFilterAddViewModel = new SearchFilterAddViewModel();
   searchFilterListViewModel: SearchFilterListViewModel = new SearchFilterListViewModel();
+  deleteStudentModel: DeleteStudentModel = new DeleteStudentModel();
   StudentModelList: MatTableDataSource<any>;
   showAdvanceSearchPanel: boolean = false;
   moduleIdentifier = ModuleIdentifier;
@@ -134,6 +142,9 @@ export class StudentComponent implements OnInit, OnDestroy {
   permissionGroup: RolePermissionViewModel = new RolePermissionViewModel();
   @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
+  @ViewChild('masterCheckBox') masterCheckBox: MatCheckbox;
+  listOfStudents = [];
+  selectedStudents = [];
   showLoadFilter = true;
   profiles=ProfilesTypes;
   categories = [
@@ -578,6 +589,22 @@ export class StudentComponent implements OnInit, OnDestroy {
           this.totalCount = data.totalCount;
           this.pageNumber = data.pageNumber;
           this.pageSize = data._pageSize;
+          data.scheduleStudentForView.forEach((student) => {
+            student.checked = false;
+            student.isCurrentSchool = student.schoolId === this.defaultValuesService.getSchoolID() ? true : false;
+          });
+          this.listOfStudents = data.scheduleStudentForView.map((item) => {
+            this.selectedStudents.map((selectedUser) => {
+              if (item.studentGuid === selectedUser.studentGuid) {
+                item.checked = true;
+                return item;
+              }
+            });
+            return item;
+          });
+          this.masterCheckBox.checked = this.listOfStudents.every((item) => {
+            return item.checked;
+          });
           this.StudentModelList = new MatTableDataSource(data.scheduleStudentForView);
           this.scheduleStudentListViewModel = new ScheduleStudentListViewModel();
         }
@@ -601,6 +628,22 @@ export class StudentComponent implements OnInit, OnDestroy {
           this.totalCount = data.totalCount;
           this.pageNumber = data.pageNumber;
           this.pageSize = data._pageSize;
+          data.studentListViews.forEach((student) => {
+            student.checked = false;
+            student.isCurrentSchool = student.schoolId === this.defaultValuesService.getSchoolID() ? true : false;
+          });
+          this.listOfStudents = data.studentListViews.map((item) => {
+            this.selectedStudents.map((selectedUser) => {
+              if (item.studentGuid === selectedUser.studentGuid) {
+                item.checked = true;
+                return item;
+              }
+            });
+            return item;
+          });
+          this.masterCheckBox.checked = this.listOfStudents.every((item) => {
+            return item.checked;
+          });
           this.StudentModelList = new MatTableDataSource(data.studentListViews);
           this.getAllStudent = new StudentListModel();
         }
@@ -773,6 +816,22 @@ export class StudentComponent implements OnInit, OnDestroy {
         this.searchCount = data.totalCount;
         this.pageNumber = data.pageNumber;
         this.pageSize = data._pageSize;
+        data.studentListViews.forEach((student) => {
+          student.checked = false;
+          student.isCurrentSchool = student.schoolId === this.defaultValuesService.getSchoolID() ? true : false;
+        });
+        this.listOfStudents = data.studentListViews.map((item) => {
+          this.selectedStudents.map((selectedUser) => {
+            if (item.studentGuid === selectedUser.studentGuid) {
+              item.checked = true;
+              return item;
+            }
+          });
+          return item;
+        });
+        this.masterCheckBox.checked = this.listOfStudents.every((item) => {
+          return item.checked;
+        });
         this.StudentModelList = new MatTableDataSource(data.studentListViews);
         this.getAllStudent = new StudentListModel();
         this.isFromAdvancedSearch = false;
@@ -809,6 +868,22 @@ export class StudentComponent implements OnInit, OnDestroy {
         this.searchCount = data.totalCount ? data.totalCount : null;
         this.pageNumber = data.pageNumber;
         this.pageSize = data._pageSize;
+        data.scheduleStudentForView.forEach((student) => {
+          student.checked = false;
+          student.isCurrentSchool = student.schoolId === this.defaultValuesService.getSchoolID() ? true : false;
+        });
+        this.listOfStudents = data.scheduleStudentForView.map((item) => {
+          this.selectedStudents.map((selectedUser) => {
+            if (item.studentGuid === selectedUser.studentGuid) {
+              item.checked = true;
+              return item;
+            }
+          });
+          return item;
+        });
+        this.masterCheckBox.checked = this.listOfStudents.every((item) => {
+          return item.checked;
+        });
         this.StudentModelList = new MatTableDataSource(data.scheduleStudentForView);
         this.scheduleStudentListViewModel = new ScheduleStudentListViewModel();
         this.isFromAdvancedSearch = false;
@@ -921,6 +996,123 @@ export class StudentComponent implements OnInit, OnDestroy {
     event.stopPropagation();
     event.stopImmediatePropagation();
     column.visible = !column.visible;
+  }
+
+  deleteSelectedStudents() {
+    if(this.selectedStudents?.length < 1){
+      this.snackbar.open('Select students to delete', '', {
+        duration: 5000
+      });
+    } else {
+      const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+        maxWidth: '400px',
+        data: {
+          title: this.defaultValuesService.translateKey('areYouSure'),
+          message: this.defaultValuesService.translateKey('youWantToDeleteSelectedStudents') + '.'
+        }
+      });
+      dialogRef.afterClosed().subscribe(dialogResult => {
+        if (dialogResult) {
+          this.loading = true;
+          this.deleteStudentModel.studentListViews = this.selectedStudents;
+          this.studentService.DeleteStudent(this.deleteStudentModel).subscribe((res) => {
+            if(res._failure){
+              this.snackbar.open(res._message, '', {
+                duration: 5000
+              });
+              this.loading = false;
+            } else {
+              this.snackbar.open(res._message, '', {
+                duration: 5000
+              });
+              this.loading = false;
+              this.getAllStudent.pageNumber = 1;
+              this.getAllStudent.pageSize = this.pageSize;
+              if (this.sort.active != undefined && this.sort.direction != "") {
+                this.getAllStudent.sortingModel.sortColumn = this.sort.active;
+                this.getAllStudent.sortingModel.sortDirection = this.sort.direction;
+              } else {
+                this.getAllStudent.sortingModel = null;
+              }
+              if(this.filterParameters){
+                this.scheduleStudentListViewModel.filterParams = this.filterParameters;
+              } else {
+                this.scheduleStudentListViewModel.filterParams = null;
+              }
+              this.callAllStudent();
+            }
+          })
+        }
+      });
+    }
+  }
+
+  someComplete(): boolean {
+    let indetermine = false;
+    for (let user of this.listOfStudents) {
+      for (let selectedUser of this.selectedStudents) {
+        if (user.studentGuid === selectedUser.studentGuid) {
+          indetermine = true;
+        }
+      }
+    }
+    if (indetermine) {
+      this.masterCheckBox.checked = this.listOfStudents.every((item) => {
+        return item.checked;
+      })
+      if (this.masterCheckBox.checked) {
+        return false;
+      } else {
+        return true;
+      }
+    }
+  }
+
+  setAll(event) {
+    this.listOfStudents.forEach(user => { user.checked = event; });
+    this.StudentModelList = new MatTableDataSource(this.listOfStudents);
+    this.decideCheckUncheck();
+  }
+
+  onChangeSelection(eventStatus: boolean, studentGuid) {
+    for (let item of this.listOfStudents) {
+      if (item.studentGuid === studentGuid) {
+        item.checked = eventStatus;
+        break;
+      }
+    }
+    this.StudentModelList = new MatTableDataSource(this.listOfStudents);
+    this.masterCheckBox.checked = this.listOfStudents.every((item) => {
+      return item.checked;
+    });
+
+    this.decideCheckUncheck();
+  }
+
+  decideCheckUncheck() {
+    this.listOfStudents.map((item) => {
+      let isIdIncludesInSelectedList = false;
+      if (item.checked) {
+        for (let selectedUser of this.selectedStudents) {
+          if (item.studentGuid === selectedUser.studentGuid) {
+            isIdIncludesInSelectedList = true;
+            break;
+          }
+        }
+        if (!isIdIncludesInSelectedList) {
+          if (item.isCurrentSchool && item.isActive) this.selectedStudents.push(item);
+        }
+      } else {
+        for (let selectedUser of this.selectedStudents) {
+          if (item.studentGuid === selectedUser.studentGuid) {
+            this.selectedStudents = this.selectedStudents.filter((user) => user.studentGuid !== item.studentGuid);
+            break;
+          }
+        }
+      }
+      isIdIncludesInSelectedList = false;
+    });
+    this.selectedStudents = this.selectedStudents.filter((item) => item.checked);    
   }
 
   ngOnDestroy() {

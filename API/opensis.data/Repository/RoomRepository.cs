@@ -392,6 +392,51 @@ namespace opensis.data.Repository
             }
             return room;
         }
+
+        /// <summary>
+        /// Update Room Sort Order
+        /// </summary>
+        /// <param name="roomSortOrderViewModel"></param>
+        /// <returns></returns>
+        public RoomSortOrderViewModel UpdateRoomSortOrder(RoomSortOrderViewModel roomSortOrderViewModel)
+        {
+            try
+            {
+                var roomList = this.context?.Rooms.Where(a => a.TenantId == roomSortOrderViewModel.TenantId && a.SchoolId == roomSortOrderViewModel.SchoolId && a.AcademicYear == roomSortOrderViewModel._academicYear);
+
+                if (roomList?.Any() == true)
+                {
+                    var sortOrderValues = roomSortOrderViewModel.SortOrderValues.OrderBy(c => c.Id);
+                    foreach (var sortOrderValue in sortOrderValues)
+                    {
+                        var roomData = roomList.FirstOrDefault(d => d.TenantId == roomSortOrderViewModel.TenantId && d.SchoolId == roomSortOrderViewModel.SchoolId && d.RoomId == sortOrderValue.Id);
+
+                        if (roomData != null)
+                        {
+                            var oldRoomData = roomData;
+                            roomData.SortOrder = sortOrderValue.SortOrder;
+                            roomData.UpdatedOn = DateTime.UtcNow;
+                            roomData.UpdatedBy = roomSortOrderViewModel.UpdatedBy;
+                            this.context?.Entry(oldRoomData).CurrentValues.SetValues(roomData);
+                        }
+                    }
+                    this.context?.SaveChanges();
+                    roomSortOrderViewModel._failure = false;
+                    roomSortOrderViewModel._message = "Sort order updated successfully";
+                }
+                else
+                {
+                    roomSortOrderViewModel._failure = true;
+                    roomSortOrderViewModel._message = NORECORDFOUND;
+                }
+            }
+            catch (Exception es)
+            {
+                roomSortOrderViewModel._message = es.Message;
+                roomSortOrderViewModel._failure = true;
+            }
+            return roomSortOrderViewModel;
+        }
     }
 }
     

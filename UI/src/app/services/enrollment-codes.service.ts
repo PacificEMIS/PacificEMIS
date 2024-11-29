@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { environment } from 'src/environments/environment';
 import { DefaultValuesService } from '../common/default-values.service';
 import {EnrollmentCodeAddView,EnrollmentCodeListView} from '../models/enrollment-code.model'
+import { UpdateLovSortingModel } from '../models/lov.model';
 
 @Injectable({
   providedIn: 'root'
@@ -47,6 +48,12 @@ export class EnrollmentCodesService {
     obj = this.defaultValuesService.getAllMandatoryVariable(obj);
     let apiurl=this.apiUrl+obj._tenantName+"/StudentEnrollmentCode/deleteStudentEnrollmentCode";
     return this.http.post<EnrollmentCodeAddView>(apiurl,obj,this.httpOptions)
+  }
+
+  updateStudentEnrollmentCodeSortOrder(obj: UpdateLovSortingModel){
+    obj = this.defaultValuesService.getAllMandatoryVariable(obj);
+    let apiurl = this.apiUrl + obj._tenantName+ "/StudentEnrollmentCode/updateStudentEnrollmentCodeSortOrder";
+    return this.http.put<UpdateLovSortingModel>(apiurl,obj,this.httpOptions)
   }
 
 }

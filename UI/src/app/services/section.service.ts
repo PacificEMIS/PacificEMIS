@@ -3,6 +3,7 @@ import { environment } from 'src/environments/environment';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { GetAllSectionModel , SectionAddModel} from 'src/app/models/section.model';
 import { DefaultValuesService } from '../common/default-values.service';
+import { UpdateLovSortingModel } from '../models/lov.model';
 
 @Injectable({
   providedIn: 'root'
@@ -45,5 +46,11 @@ export class SectionService {
     obj.tableSections.tenantId = this.defaultValuesService.getTenantID();
     let apiurl = this.apiUrl + obj._tenantName + '/Section/deleteSection';
     return this.http.post<SectionAddModel>(apiurl, obj,this.httpOptions);
+  }
+
+  updateSectionSortOrder(obj: UpdateLovSortingModel){
+    obj = this.defaultValuesService.getAllMandatoryVariable(obj);
+    let apiurl = this.apiUrl + obj._tenantName+ "/Section/updateSectionSortOrder";
+    return this.http.put<UpdateLovSortingModel>(apiurl,obj,this.httpOptions)
   }
 }

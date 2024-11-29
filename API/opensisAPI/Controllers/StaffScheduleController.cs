@@ -175,5 +175,21 @@ namespace opensisAPI.Controllers
             return removeStaffScheduleView;
 
         }
+
+        [HttpPost("getUnassociatedStaffListByCourseSection")]
+        public ActionResult<StaffListViewModel> GetUnassociatedStaffListByCourseSection(StaffListViewModel staffListViewModel)
+        {
+            StaffListViewModel staffListView = new StaffListViewModel();
+            try
+            {
+                staffListView = _staffScheduleService.GetUnassociatedStaffListByCourseSection(staffListViewModel);
+            }
+            catch (Exception es)
+            {
+                staffListView._failure = true;
+                staffListView._message = es.Message;
+            }
+            return staffListView;
+        }
     }
 }

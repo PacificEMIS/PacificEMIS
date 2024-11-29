@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { environment } from '../../environments/environment';
 import { DefaultValuesService } from '../common/default-values.service';
 import { RoomAddView, RoomListViewModel } from '../models/room.model';
+import { UpdateLovSortingModel } from '../models/lov.model';
 
 @Injectable({
   providedIn: 'root'
@@ -47,5 +48,11 @@ export class RoomService {
     obj.academicYear = this.defaultValuesService.getAcademicYear();
     let apiurl = this.apiUrl + obj._tenantName + '/Room/getAllRoom';
     return this.http.post<RoomListViewModel>(apiurl, obj,this.httpOptions);
+  }
+
+  updateRoomSortOrder(obj: UpdateLovSortingModel){
+    obj = this.defaultValuesService.getAllMandatoryVariable(obj);
+    let apiurl = this.apiUrl + obj._tenantName+ "/Room/updateRoomSortOrder";
+    return this.http.put<UpdateLovSortingModel>(apiurl,obj,this.httpOptions)
   }
 }

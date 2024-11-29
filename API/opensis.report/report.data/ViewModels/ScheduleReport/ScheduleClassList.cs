@@ -22,6 +22,8 @@ namespace opensis.report.report.data.ViewModels.ScheduleReport
         public string? CourseProgram { get; set; }
         public int? BlockPeriodId { get; set; }
         public int? StaffId { get; set; }
+        public DateTime? MarkingPeriodStartDate { get; set; }
+        public DateTime? MarkingPeriodEndDate { get; set; }
     }
 
     public class CourseSectionForStaff {

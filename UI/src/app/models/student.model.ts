@@ -236,6 +236,16 @@ export class CheckStudentInternalIdViewModel extends CommonField {
     public isValidInternalId: boolean;
 }
 
+export class DeleteStudentModel extends CommonField {    
+    public studentListViews: StudentListView[];
+    public tenantId: string;
+    public schoolId: string | number;
+    public updatedBy: string;
+    constructor() {
+        super();
+    }
+}
+
 class studentList {
     tenantId: string;
     schoolId: number;
@@ -452,6 +462,7 @@ export class StudentListView{
     public dentistPhone: string;
     public vision: string;
     public visionPhone: string;
+    public isCurrentSchool?: boolean;
 }
 class sorting {
     sortColumn: string;

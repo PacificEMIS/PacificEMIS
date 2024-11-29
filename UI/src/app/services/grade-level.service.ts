@@ -4,6 +4,7 @@ import { environment } from '../../environments/environment';
 import { AddGradeLevelModel, GelAllGradeEquivalencyModel, GetAllGradeLevelsModel } from '../models/grade-level.model';
 import { BehaviorSubject } from 'rxjs';
 import { DefaultValuesService } from '../common/default-values.service';
+import { UpdateLovSortingModel } from '../models/lov.model';
 
 @Injectable({
   providedIn: 'root'
@@ -57,5 +58,11 @@ export class GradeLevelService {
     obj = this.defaultValuesService.getAllMandatoryVariable(obj);
     let apiurl = this.apiUrl + obj._tenantName+ "/Gradelevel/getAllGradeEquivalency";
     return this.http.post<GelAllGradeEquivalencyModel>(apiurl,obj,this.httpOptions)
+  }
+
+  updateGradeLevelSortOrder(obj: UpdateLovSortingModel){
+    obj = this.defaultValuesService.getAllMandatoryVariable(obj);
+    let apiurl = this.apiUrl + obj._tenantName+ "/Gradelevel/updateGradeLevelSortOrder";
+    return this.http.put<UpdateLovSortingModel>(apiurl,obj,this.httpOptions)
   }
 }
