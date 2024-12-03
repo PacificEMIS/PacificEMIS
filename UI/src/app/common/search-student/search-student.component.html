@@ -72,6 +72,103 @@
                 </ul>
 
             </mat-expansion-panel>
+
+            <mat-expansion-panel *ngIf="advancedSearchExpansion.enrollmentInformation">
+                <mat-expansion-panel-header>
+                    <mat-panel-title class="text-primary font-bold">
+                        {{'enrollmentInformation' | translate}}
+                    </mat-panel-title>
+                </mat-expansion-panel-header>
+
+                <ul class="grid grid-cols-2 col-gap-8">
+                    <li>
+                        <mat-form-field appearance="outline" color="primary">
+                            <mat-label>{{'section' | translate}}</mat-label>
+                            <mat-select name="sectionId" [(ngModel)]="studentMasterSearchModel.sectionId">
+                                <mat-option></mat-option>
+                                <mat-option *ngFor="let section of sectionList"
+                                    [value]='section.sectionId'>
+                                    {{section.name}}</mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </li>
+                    <li>
+                        <mat-form-field appearance="outline" color="primary">
+                            <mat-label>{{'estimatedGraduationDate' | translate}}</mat-label>
+                            <input matInput name="estimatedGradDate" [(ngModel)]="studentMasterSearchModel.estimatedGradDate" [matDatepicker]="graduationDate">
+                            <mat-datepicker-toggle matSuffix [for]="graduationDate"></mat-datepicker-toggle>
+                            <mat-datepicker #graduationDate></mat-datepicker>
+                        </mat-form-field> 
+                    </li>
+                    <li>
+                        <mat-form-field appearance="outline" color="primary">
+                            <mat-label>{{'rollingRetentionOption' | translate}}</mat-label>
+                            <mat-select name="rollingOption" [(ngModel)]="studentMasterSearchModel.rollingOption">
+                                <mat-option></mat-option>
+                                <mat-option *ngFor="let rollingOption of rollingOptions" value="{{rollingOption}}">
+                                    {{rollingOption}}</mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </li>
+                    <li>
+                        <mat-form-field appearance="outline" color="primary">
+                            <mat-label>{{'enrollmentCode' | translate}}</mat-label>
+                            <mat-select name="enrollmentCode" [(ngModel)]="studentMasterSearchModel.enrollmentCode">
+                                <mat-option></mat-option>
+                                <mat-option *ngFor="let enroll of enrollmentList" value="{{enroll.title}}">
+                                    {{enroll.title}}</mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </li>
+                    <li>
+                        <mat-form-field appearance="outline" color="primary">
+                            <mat-label>{{'enrollmentDate' | translate}}</mat-label>
+                            <input matInput [matDatepicker]="enrollmentDate" name="enrollmentDate" [(ngModel)]="studentMasterSearchModel.enrollmentDate">
+                            <mat-datepicker-toggle matSuffix [for]="enrollmentDate"></mat-datepicker-toggle>
+                            <mat-datepicker #enrollmentDate></mat-datepicker>
+                        </mat-form-field>
+                    </li>
+                    <li>
+                        <mat-form-field appearance="outline" color="primary">
+                            <mat-label>{{'gradeLevel' | translate}}</mat-label>
+                            <mat-select name="gradeId" [(ngModel)]="studentMasterSearchModel.gradeId">
+                                <mat-option></mat-option>
+                                <mat-option *ngFor="let gradeLevel of this.getAllGradeLevelsModel.tableGradelevelList" value="{{gradeLevel.gradeId}}">
+                                    {{gradeLevel.title}}</mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </li>
+                </ul>
+                <ul>
+                    <li>
+                        <span class="inline-block mb-2">
+                            <mat-checkbox name="eligibility504" [(ngModel)]="studentMasterSearchModel.eligibility504" color="primary" class="mr-6">
+                            {{'504Eligibility' | translate}}
+                            </mat-checkbox>
+                        </span>
+                        <span class="inline-block mb-2">
+                            <mat-checkbox name="economicDisadvantage" [(ngModel)]="studentMasterSearchModel.economicDisadvantage" color="primary" class="mr-6">
+                            {{'economicDisadvantage' | translate}}
+                            </mat-checkbox>
+                        </span>
+                        <span class="inline-block mb-2">
+                            <mat-checkbox name="freeLunchEligibility" [(ngModel)]="studentMasterSearchModel.freeLunchEligibility" color="primary" class="mr-6">
+                            {{'freeLunchEligibility' | translate}}
+                            </mat-checkbox>
+                        </span>
+                        <span class="inline-block mb-2">
+                            <mat-checkbox name="specialEducationIndicator"  [(ngModel)]="studentMasterSearchModel.specialEducationIndicator" color="primary" class="mr-6">
+                            {{'specialEducationIndicator' | translate}}
+                            </mat-checkbox>
+                        </span>
+                        <span class="inline-block mb-2">
+                            <mat-checkbox name="lepIndicator" [(ngModel)]="studentMasterSearchModel.lepIndicator" color="primary">{{'lepIndicator' | translate}}
+                            </mat-checkbox>
+                        </span>
+                    </li>
+                </ul>
+
+            </mat-expansion-panel>
             
             <mat-expansion-panel *ngIf="advancedSearchExpansion.accessInformation">
                 <mat-expansion-panel-header>
@@ -309,103 +406,6 @@
                         </mat-form-field>
                     </li>
                 </ul>
-            </mat-expansion-panel>
-
-            <mat-expansion-panel *ngIf="advancedSearchExpansion.enrollmentInformation">
-                <mat-expansion-panel-header>
-                    <mat-panel-title class="text-primary font-bold">
-                        {{'enrollmentInformation' | translate}}
-                    </mat-panel-title>
-                </mat-expansion-panel-header>
-
-                <ul class="grid grid-cols-2 col-gap-8">
-                    <li>
-                        <mat-form-field appearance="outline" color="primary">
-                            <mat-label>{{'section' | translate}}</mat-label>
-                            <mat-select name="sectionId" [(ngModel)]="studentMasterSearchModel.sectionId">
-                                <mat-option></mat-option>
-                                <mat-option *ngFor="let section of sectionList"
-                                    [value]='section.sectionId'>
-                                    {{section.name}}</mat-option>
-                            </mat-select>
-                        </mat-form-field>
-                    </li>
-                    <li>
-                        <mat-form-field appearance="outline" color="primary">
-                            <mat-label>{{'estimatedGraduationDate' | translate}}</mat-label>
-                            <input matInput name="estimatedGradDate" [(ngModel)]="studentMasterSearchModel.estimatedGradDate" [matDatepicker]="graduationDate">
-                            <mat-datepicker-toggle matSuffix [for]="graduationDate"></mat-datepicker-toggle>
-                            <mat-datepicker #graduationDate></mat-datepicker>
-                        </mat-form-field> 
-                    </li>
-                    <li>
-                        <mat-form-field appearance="outline" color="primary">
-                            <mat-label>{{'rollingRetentionOption' | translate}}</mat-label>
-                            <mat-select name="rollingOption" [(ngModel)]="studentMasterSearchModel.rollingOption">
-                                <mat-option></mat-option>
-                                <mat-option *ngFor="let rollingOption of rollingOptions" value="{{rollingOption}}">
-                                    {{rollingOption}}</mat-option>
-                            </mat-select>
-                        </mat-form-field>
-                    </li>
-                    <li>
-                        <mat-form-field appearance="outline" color="primary">
-                            <mat-label>{{'enrollmentCode' | translate}}</mat-label>
-                            <mat-select name="enrollmentCode" [(ngModel)]="studentMasterSearchModel.enrollmentCode">
-                                <mat-option></mat-option>
-                                <mat-option *ngFor="let enroll of enrollmentList" value="{{enroll.title}}">
-                                    {{enroll.title}}</mat-option>
-                            </mat-select>
-                        </mat-form-field>
-                    </li>
-                    <li>
-                        <mat-form-field appearance="outline" color="primary">
-                            <mat-label>{{'enrollmentDate' | translate}}</mat-label>
-                            <input matInput [matDatepicker]="enrollmentDate" name="enrollmentDate" [(ngModel)]="studentMasterSearchModel.enrollmentDate">
-                            <mat-datepicker-toggle matSuffix [for]="enrollmentDate"></mat-datepicker-toggle>
-                            <mat-datepicker #enrollmentDate></mat-datepicker>
-                        </mat-form-field>
-                    </li>
-                    <li>
-                        <mat-form-field appearance="outline" color="primary">
-                            <mat-label>{{'gradeLevel' | translate}}</mat-label>
-                            <mat-select name="gradeId" [(ngModel)]="studentMasterSearchModel.gradeId">
-                                <mat-option></mat-option>
-                                <mat-option *ngFor="let gradeLevel of this.getAllGradeLevelsModel.tableGradelevelList" value="{{gradeLevel.gradeId}}">
-                                    {{gradeLevel.title}}</mat-option>
-                            </mat-select>
-                        </mat-form-field>
-                    </li>
-                </ul>
-                <ul>
-                    <li>
-                        <span class="inline-block mb-2">
-                            <mat-checkbox name="eligibility504" [(ngModel)]="studentMasterSearchModel.eligibility504" color="primary" class="mr-6">
-                            {{'504Eligibility' | translate}}
-                            </mat-checkbox>
-                        </span>
-                        <span class="inline-block mb-2">
-                            <mat-checkbox name="economicDisadvantage" [(ngModel)]="studentMasterSearchModel.economicDisadvantage" color="primary" class="mr-6">
-                            {{'economicDisadvantage' | translate}}
-                            </mat-checkbox>
-                        </span>
-                        <span class="inline-block mb-2">
-                            <mat-checkbox name="freeLunchEligibility" [(ngModel)]="studentMasterSearchModel.freeLunchEligibility" color="primary" class="mr-6">
-                            {{'freeLunchEligibility' | translate}}
-                            </mat-checkbox>
-                        </span>
-                        <span class="inline-block mb-2">
-                            <mat-checkbox name="specialEducationIndicator"  [(ngModel)]="studentMasterSearchModel.specialEducationIndicator" color="primary" class="mr-6">
-                            {{'specialEducationIndicator' | translate}}
-                            </mat-checkbox>
-                        </span>
-                        <span class="inline-block mb-2">
-                            <mat-checkbox name="lepIndicator" [(ngModel)]="studentMasterSearchModel.lepIndicator" color="primary">{{'lepIndicator' | translate}}
-                            </mat-checkbox>
-                        </span>
-                    </li>
-                </ul>
-
             </mat-expansion-panel>
 
             <mat-expansion-panel *ngIf="advancedSearchExpansion.addressInformation">

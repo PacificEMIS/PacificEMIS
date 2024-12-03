@@ -4,11 +4,11 @@
             <li [ngClass]="activeLink =='standardGrades' ? 'active' : ''"><a (click)="updateActiveLink('standardGrades')"
                 class="cursor-pointer px-6 py-4 inline-block hover:bg-skyblue-light">{{'standardGrades'|translate}}</a>
             </li>
+            <li [ngClass]="activeLink =='schoolSpecificStandards' ? 'active' : ''"><a (click)="updateActiveLink('schoolSpecificStandards')"
+                class="cursor-pointer px-6 py-4 inline-block hover:bg-skyblue-light">{{'schoolSpecificStandards'|translate}}</a>
+             </li>
             <li [ngClass]="activeLink =='usCommonCoreStandards' ? 'active' : ''"><a (click)="updateActiveLink('usCommonCoreStandards')"
                     class="cursor-pointer px-6 py-4 inline-block hover:bg-skyblue-light">{{'usCommonCoreStandards'|translate}}</a>
-            </li>
-            <li [ngClass]="activeLink =='schoolSpecificStandards' ? 'active' : ''"><a (click)="updateActiveLink('schoolSpecificStandards')"
-                    class="cursor-pointer px-6 py-4 inline-block hover:bg-skyblue-light">{{'schoolSpecificStandards'|translate}}</a>
             </li>
         </ul>
     </div>

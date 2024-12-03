@@ -33,7 +33,7 @@ import { TranslateService } from '@ngx-translate/core';
 })
 export class StandardGradeSetupComponent implements OnInit {
 
-  activeLink = 'usCommonCoreStandards';
+  activeLink = 'standardGrades';
 
   constructor(public translateService:TranslateService) {
     //translateService.use('en');
