@@ -17,7 +17,10 @@ namespace opensis.data.Models
         {
             if (!optionsBuilder.IsConfigured)
             {
-
+                //var tenant = "fedsis_new";
+                //** ML Server **//
+                string connectionString = "server=110.227.203.159;port=3307;database=fedsis_new;user=admin;password=methodolog1c;default command timeout=3000";
+                optionsBuilder.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
             }
 
         }
