@@ -502,7 +502,7 @@ export class GroupDeleteComponent implements OnInit, AfterViewInit, OnDestroy {
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
       maxWidth: '400px',
       data: {
-        title: this.defaultService.translateKey('areYouSure?'),
+        title: this.defaultService.translateKey('areYouSure'),
         message: selectedStudentsStaffsLength > 1 ? this.defaultService.translateKey('areYouSureYouWantToDeleteTheSelectedStudentsFromTheCourseSection?') : this.defaultService.translateKey('areYouSureYouWantToDeleteTheSelectedStudentFromTheCourseSection?')
       }
     });
