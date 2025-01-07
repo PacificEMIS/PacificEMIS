@@ -2136,14 +2136,14 @@ namespace opensis.data.Repository
                         {
                             scheduleStudentListView.scheduleStudentForView = new();
                             scheduleStudentListView._failure = true;
-                            scheduleStudentListView._message = NORECORDFOUND;
+                            scheduleStudentListView._message = "Student deletion is not permitted due to transactional associations";
                         }
                     }
                     else
                     {
                         scheduleStudentListView.scheduleStudentForView = new();
                         scheduleStudentListView._failure = true;
-                        scheduleStudentListView._message = NORECORDFOUND;
+                        scheduleStudentListView._message = "Student deletion is not permitted due to transactional associations";
                     }
                 }
                 else
