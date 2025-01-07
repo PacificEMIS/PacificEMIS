@@ -57,7 +57,7 @@ namespace opensis.data.Models
         public bool? IsActive { get; set; }
         public string? SchoolTransferred { get; set; }
         public string? TransferredGrade { get; set; }
-       
+        public int? EnrollOtherSchoolId { get; set; }
         public string? CreatedBy { get; set; }
         public DateTime? CreatedOn { get; set; }
         public string? UpdatedBy { get; set; }
