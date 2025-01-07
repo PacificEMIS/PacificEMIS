@@ -491,5 +491,33 @@ namespace opensis.core.Staff.Services
             }
             return staffList;
         }
+
+        /// <summary>
+        /// Delete Staff
+        /// </summary>
+        /// <param name="staffDeleteViewModel"></param>
+        /// <returns></returns>
+        public StaffDeleteViewModel DeleteStaff(StaffDeleteViewModel staffDeleteViewModel)
+        {
+            StaffDeleteViewModel staffDelete = new();
+            try
+            {
+                if (tokenManager.CheckToken(staffDeleteViewModel._tenantName + staffDeleteViewModel._userName, staffDeleteViewModel._token))
+                {
+                    staffDelete = this.staffRepository.DeleteStaff(staffDeleteViewModel);
+                }
+                else
+                {
+                    staffDelete._failure = true;
+                    staffDelete._message = TOKENINVALID;
+                }
+            }
+            catch (Exception ex)
+            {
+                staffDelete._message = ex.Message;
+                staffDelete._failure = true;
+            }
+            return staffDelete;
+        }
     }
 }

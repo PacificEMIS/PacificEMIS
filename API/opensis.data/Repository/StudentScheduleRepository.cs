@@ -1926,10 +1926,18 @@ namespace opensis.data.Repository
             {
                 try
                 {
-                    scheduledStudentDelete._message = "All students deleted from the selected course section";
+                    bool studentFailure = false;
+                    bool staffFailure = false;
+                    List<int> studentIds = new List<int>();
+                    List<int> staffIds = new List<int>();
+                    string eventMessage = string.Empty;
+                    List<string> staffName = new();
+                    string? CourseSectionName = string.Empty;
 
                     if (scheduledStudentDeleteViewModel.StudentIds?.Any() == true)
                     {
+                        scheduledStudentDelete._message = "All students deleted from the selected course section";
+
                         foreach (var studentId in scheduledStudentDeleteViewModel.StudentIds)
                         {
                             var gradebookGradeData = this.context?.GradebookGrades.FirstOrDefault(e => e.TenantId == scheduledStudentDeleteViewModel.TenantId && e.SchoolId == scheduledStudentDeleteViewModel.SchoolId && e.CourseSectionId == scheduledStudentDeleteViewModel.CourseSectionId && e.StudentId == studentId);
@@ -1942,28 +1950,113 @@ namespace opensis.data.Repository
 
                             if (gradebookGradeData != null || studentAttendanceData != null || studentFinalGradeData != null || studentEffortGradeData != null)
                             {
-                                scheduledStudentDelete._failure = true;
+                                studentFailure = true;
                                 scheduledStudentDelete._message = "Some students could not be deleted from the selected course section. They have association";
                             }
                             else
                             {
-                                var studentCoursesectionScheduleData = this.context?.StudentCoursesectionSchedule.FirstOrDefault(e => e.TenantId == scheduledStudentDeleteViewModel.TenantId && e.SchoolId == scheduledStudentDeleteViewModel.SchoolId && e.CourseSectionId == scheduledStudentDeleteViewModel.CourseSectionId && e.StudentId == studentId);
+                                var studentCoursesectionScheduleData = this.context?.StudentCoursesectionSchedule.Include(a => a.StudentMaster).Include(a => a.CourseSection).FirstOrDefault(e => e.TenantId == scheduledStudentDeleteViewModel.TenantId && e.SchoolId == scheduledStudentDeleteViewModel.SchoolId && e.CourseSectionId == scheduledStudentDeleteViewModel.CourseSectionId && e.StudentId == studentId);
 
                                 if (studentCoursesectionScheduleData != null)
                                 {
                                     this.context?.StudentCoursesectionSchedule.Remove(studentCoursesectionScheduleData);
+                                    studentIds.Add(studentId);
                                 }
                             }
                         }
                     }
-                    else
+
+                    if (scheduledStudentDeleteViewModel.StaffIds?.Any() == true)
                     {
-                        scheduledStudentDelete._failure = true;
-                        scheduledStudentDelete._message = "Please select students";
+                        scheduledStudentDelete._message = "All staffs deleted from the selected course section";
+
+                        var StaffScheduleCourseSectionMasterData = this.context?.StaffCoursesectionSchedule.Include(a => a.StaffMaster).Include(a => a.CourseSection).Where(x => x.TenantId == scheduledStudentDeleteViewModel.TenantId && x.SchoolId == scheduledStudentDeleteViewModel.SchoolId && x.CourseSectionId == scheduledStudentDeleteViewModel.CourseSectionId);
+
+                        var StudentAttendanceMasterData = this.context?.StudentAttendance.Where(x => x.TenantId == scheduledStudentDeleteViewModel.TenantId && x.SchoolId == scheduledStudentDeleteViewModel.SchoolId && x.CourseSectionId == scheduledStudentDeleteViewModel.CourseSectionId);
+
+                        var AssignmentMasterData = this.context?.Assignment.Where(x => x.TenantId == scheduledStudentDeleteViewModel.TenantId && x.SchoolId == scheduledStudentDeleteViewModel.SchoolId && x.CourseSectionId == scheduledStudentDeleteViewModel.CourseSectionId);
+
+                        foreach (var staffId in scheduledStudentDeleteViewModel.StaffIds)
+                        {
+                            var StaffScheduleCourseSectionData = StaffScheduleCourseSectionMasterData?.Where(x => x.StaffId == staffId).FirstOrDefault();
+
+                            if (StaffScheduleCourseSectionData != null)
+                            {
+                                var StudentAttendanceData = StudentAttendanceMasterData?.Where(x => x.StaffId == staffId).FirstOrDefault();
+                                var AssignmentData = AssignmentMasterData?.Where(x => x.StaffId == staffId).FirstOrDefault();
+
+                                if (StudentAttendanceData != null || AssignmentData != null)
+                                {
+                                    staffFailure = true;
+                                    scheduledStudentDeleteViewModel._message = "Some staff could not be deleted from the selected course section. They have association";
+                                }
+                                else
+                                {
+                                    this.context?.StaffCoursesectionSchedule.Remove(StaffScheduleCourseSectionData);
+                                    staffIds.Add(staffId);
+                                }
+                            }
+                        }
+                    }
+
+                    //remove missing attendance
+                    if (studentIds?.Any() == true || staffIds?.Any() == true)
+                    {
+                        if (studentIds?.Any() == true)
+                        {
+                            var studentExistinCoursesectionSchedule = this.context?.StudentCoursesectionSchedule.FirstOrDefault(e => e.TenantId == scheduledStudentDeleteViewModel.TenantId && e.SchoolId == scheduledStudentDeleteViewModel.SchoolId && e.CourseSectionId == scheduledStudentDeleteViewModel.CourseSectionId && !studentIds.Contains(e.StudentId));
+
+                            if (studentExistinCoursesectionSchedule == null)
+                            {
+                                var studentMissingAttendancesData = this.context?.StudentMissingAttendances.Where(e => e.TenantId == scheduledStudentDeleteViewModel.TenantId && e.SchoolId == scheduledStudentDeleteViewModel.SchoolId && e.CourseSectionId == scheduledStudentDeleteViewModel.CourseSectionId);
+
+                                if (studentMissingAttendancesData?.Any() == true)
+                                {
+                                    this.context?.StudentMissingAttendances.RemoveRange(studentMissingAttendancesData);
+                                }
+                            }
+                        }
+                        if (staffIds?.Any() == true)
+                        {
+                            var staffExistinCoursesectionSchedule = this.context?.StaffCoursesectionSchedule.FirstOrDefault(e => e.TenantId == scheduledStudentDeleteViewModel.TenantId && e.SchoolId == scheduledStudentDeleteViewModel.SchoolId && e.CourseSectionId == scheduledStudentDeleteViewModel.CourseSectionId && !staffIds.Contains(e.StaffId));
+
+                            if (staffExistinCoursesectionSchedule == null)
+                            {
+                                var studentMissingAttendancesData = this.context?.StudentMissingAttendances.Where(e => e.TenantId == scheduledStudentDeleteViewModel.TenantId && e.SchoolId == scheduledStudentDeleteViewModel.SchoolId && e.CourseSectionId == scheduledStudentDeleteViewModel.CourseSectionId);
+
+                                if (studentMissingAttendancesData?.Any() == true)
+                                {
+                                    this.context?.StudentMissingAttendances.RemoveRange(studentMissingAttendancesData);
+                                }
+                            }
+                            else
+                            {
+                                var studentMissingAttendancesData = this.context?.StudentMissingAttendances.Where(e => e.TenantId == scheduledStudentDeleteViewModel.TenantId && e.SchoolId == scheduledStudentDeleteViewModel.SchoolId && e.CourseSectionId == scheduledStudentDeleteViewModel.CourseSectionId && e.StaffId != null && staffIds.Contains((int)e.StaffId!));
+
+                                if (studentMissingAttendancesData?.Any() == true)
+                                {
+                                    studentMissingAttendancesData.ToList().ForEach(s => s.StaffId = staffExistinCoursesectionSchedule.StaffId);
+                                }
+                            }
+                        }
                     }
 
                     this.context?.SaveChanges();
                     transaction?.Commit();
+
+                    if (scheduledStudentDeleteViewModel.StudentIds?.Any() == true && scheduledStudentDeleteViewModel.StaffIds?.Any() == true)
+                    {
+                        if (studentFailure == false && staffFailure == false)
+                        {
+                            scheduledStudentDelete._message = "All staffs & students deleted from the selected course section";
+                            scheduledStudentDeleteViewModel._failure = false;
+                        }
+                        else
+                        {
+                            scheduledStudentDelete._message = "Some students or staffs could not be deleted from the selected course section.They have association";
+                            scheduledStudentDeleteViewModel._failure = true;
+                        }
+                    }
                 }
                 catch (Exception es)
                 {

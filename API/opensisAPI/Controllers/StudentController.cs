@@ -1020,5 +1020,21 @@ namespace opensisAPI.Controllers
             }
             return studentList;
         }
+
+        [HttpPost("deleteStudent")]
+        public ActionResult<StudentDeleteViewModel> DeleteStudent(StudentDeleteViewModel studentDeleteViewModel)
+        {
+            StudentDeleteViewModel studentDelete = new();
+            try
+            {
+                studentDelete = _studentService.DeleteStudent(studentDeleteViewModel);
+            }
+            catch (Exception es)
+            {
+                studentDelete._failure = true;
+                studentDelete._message = es.Message;
+            }
+            return studentDelete;
+        }
     }
 }

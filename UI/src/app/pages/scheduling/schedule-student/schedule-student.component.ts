@@ -359,8 +359,10 @@ export class ScheduleStudentComponent implements OnInit, OnDestroy {
     courseSectionList.map((courseSection: any) => {
       courseSection.courseDurationStartDate=courseSection.durationStartDate=moment(courseSection.durationStartDate).format('YYYY-MM-DD');
 
-      if (moment(new Date()).isBetween(courseSection.courseDurationStartDate, courseSection.durationEndDate))  // for checking current date is in between or not  
-        courseSection.durationStartDate = moment(new Date()).format('YYYY-MM-DD');
+      if (moment(new Date()).isBetween(courseSection.courseDurationStartDate, courseSection.durationEndDate)) {
+        // courseSection.durationStartDate = moment(new Date()).format('YYYY-MM-DD');
+        courseSection.durationStartDate = moment(courseSection.durationStartDate).format('YYYY-MM-DD');
+      } // for checking current date is in between or not  
 
       if (courseSection?.staffName)                                                                            // splitting all staff names 
         courseSection.staffNameList = this.cerateTeacherListArray(courseSection?.staffName.split("|"));

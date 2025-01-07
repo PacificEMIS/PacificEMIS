@@ -40,6 +40,7 @@ namespace opensis.core.Room.Interfaces
         public RoomAddViewModel UpdateRoom(RoomAddViewModel room);
         public RoomListModel GetAllRoom(RoomListModel roomList);
         public RoomAddViewModel DeleteRoom(RoomAddViewModel room);
+        public RoomSortOrderViewModel UpdateRoomSortOrder(RoomSortOrderViewModel roomSortOrderViewModel);
 
     }
 }

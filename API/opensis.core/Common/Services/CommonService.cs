@@ -837,5 +837,27 @@ namespace opensis.core.Common.Services
             }
             return activeDeactiveUser;
         }
+
+        /// <summary>
+        /// Update Dropdown Value Sort Order
+        /// </summary>
+        /// <param name="dpValueSortOrderModel"></param>
+        /// <returns></returns>
+        public DropdownValueSortOrderModel UpdateDropdownValueSortOrder(DropdownValueSortOrderModel dpValueSortOrderModel)
+        {
+            DropdownValueSortOrderModel dpValueSortOrderUpdate = new();
+            if (tokenManager.CheckToken(dpValueSortOrderModel._tenantName + dpValueSortOrderModel._userName, dpValueSortOrderModel._token))
+            {
+                dpValueSortOrderUpdate = this.commonRepository.UpdateDropdownValueSortOrder(dpValueSortOrderModel);
+                return dpValueSortOrderUpdate;
+            }
+            else
+            {
+                dpValueSortOrderUpdate._failure = true;
+                dpValueSortOrderUpdate._message = TOKENINVALID;
+                return dpValueSortOrderUpdate;
+            }
+
+        }
     }
 }

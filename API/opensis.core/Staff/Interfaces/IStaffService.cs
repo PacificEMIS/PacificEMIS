@@ -53,5 +53,6 @@ namespace opensis.core.Staff.Interfaces
         public ScheduledCourseSectionViewModel GetScheduledCourseSectionsForStaff(ScheduledCourseSectionViewModel scheduledCourseSectionViewModel);
 
         public StaffListModel GetAllStaffListByDateRange(PageResult pageResult);
+        public StaffDeleteViewModel DeleteStaff(StaffDeleteViewModel staffDeleteViewModel);
     }
 }

@@ -39,5 +39,6 @@ namespace opensis.data.Interface
         public RoomAddViewModel UpdateRoom(RoomAddViewModel rooms);
         public RoomListModel GetAllRooms(RoomListModel roomList);
         public RoomAddViewModel DeleteRoom(RoomAddViewModel room);
+        public RoomSortOrderViewModel UpdateRoomSortOrder(RoomSortOrderViewModel roomSortOrderViewModel);
     }
 }

@@ -12,6 +12,7 @@ namespace opensis.data.ViewModels.StudentSchedule
         public int? SchoolId { get; set; }
         public int? CourseSectionId { get; set; }
         public List<int>? StudentIds { get; set; }
-
+        public List<int>? StaffIds { get; set; }
+        public string? UpdatedBy { get; set; }
     }
 }

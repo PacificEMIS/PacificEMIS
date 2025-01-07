@@ -31,6 +31,7 @@ using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using opensis.core.GradeLevel.Interfaces;
+using opensis.data.ViewModels.Gradelevel;
 using opensis.data.ViewModels.GradeLevel;
 
 namespace opensisAPI.Controllers
@@ -192,6 +193,22 @@ namespace opensisAPI.Controllers
                 GradeEquivalencyList._message = es.Message;
             }
             return GradeEquivalencyList;
+        }
+
+        [HttpPut("updateGradeLevelSortOrder")]
+        public ActionResult<GradelevelSortOrderViewModel> UpdateGradeLevelSortOrder(GradelevelSortOrderViewModel gradelevelSortOrderViewModel)
+        {
+            GradelevelSortOrderViewModel gradelevelSortOrder = new();
+            try
+            {
+                gradelevelSortOrder = _gradelevelService.UpdateGradeLevelSortOrder(gradelevelSortOrderViewModel);
+            }
+            catch (Exception es)
+            {
+                gradelevelSortOrder._failure = true;
+                gradelevelSortOrder._message = es.Message;
+            }
+            return gradelevelSortOrder;
         }
     }
 }

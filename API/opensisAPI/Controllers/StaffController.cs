@@ -356,5 +356,21 @@ namespace opensisAPI.Controllers
             }
             return staffList;
         }
+
+        [HttpPost("deleteStaff")]
+        public ActionResult<StaffDeleteViewModel> DeleteStaff(StaffDeleteViewModel staffDeleteViewModel)
+        {
+            StaffDeleteViewModel staffDelete = new();
+            try
+            {
+                staffDelete = _staffService.DeleteStaff(staffDeleteViewModel);
+            }
+            catch (Exception es)
+            {
+                staffDelete._failure = true;
+                staffDelete._message = es.Message;
+            }
+            return staffDelete;
+        }
     }
 }

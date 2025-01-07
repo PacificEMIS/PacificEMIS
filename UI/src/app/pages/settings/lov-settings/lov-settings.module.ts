@@ -42,7 +42,7 @@ import { MatSortModule } from '@angular/material/sort';
 import { SharedModuleModule } from '../../../pages/shared-module/shared-module.module';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatTooltipModule } from '@angular/material/tooltip';
-
+import { DragDropModule } from '@angular/cdk/drag-drop';
 
 
 @NgModule({
@@ -92,7 +92,8 @@ import { MatTooltipModule } from '@angular/material/tooltip';
     MatSortModule,
     MatCheckboxModule,
     MatButtonToggleModule,
-    MatTooltipModule
+    MatTooltipModule,
+    DragDropModule
   ]
 })
 export class LovSettingsModule { }

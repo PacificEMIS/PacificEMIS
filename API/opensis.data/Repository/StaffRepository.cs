@@ -85,6 +85,7 @@ namespace opensis.data.Repository
                     }
                     staffAddViewModel.staffMaster.StaffGuid = GuidId;
                     staffAddViewModel.staffMaster.CreatedOn = DateTime.UtcNow;
+                    staffAddViewModel.staffMaster.IsActive = true;
 
                     if (!string.IsNullOrEmpty(staffAddViewModel.staffMaster.StaffInternalId))
                     {
@@ -312,7 +313,7 @@ namespace opensis.data.Repository
                                                                     x.JobTitle != null && x.JobTitle.Contains(Searchvalue) ||
                                                                     x.SchoolEmail != null && x.SchoolEmail.Contains(Searchvalue) ||
                                                                     x.MobilePhone != null && x.MobilePhone.Contains(Searchvalue)
-                                                                    || (x.StaffSchoolInfo.Count > 0 ? (x.StaffSchoolInfo.Any(x => (x.Profile ?? "").ToLower().Contains(Searchvalue.ToLower()) && x.SchoolAttachedId == pageResult.SchoolId)) : string.Empty.Contains(Searchvalue)));
+                                                                    || x.Gender != null && x.Gender.Contains(Searchvalue) || (x.StaffSchoolInfo.Count > 0 ? (x.StaffSchoolInfo.Any(x => (x.Profile ?? "").ToLower().Contains(Searchvalue.ToLower()) && x.SchoolAttachedId == pageResult.SchoolId)) : string.Empty.Contains(Searchvalue)));
 
                         //var ProfileFilter = StaffMasterList.Where(x => x.StaffSchoolInfo.FirstOrDefault() != null ? x.StaffSchoolInfo.FirstOrDefault().Profile.ToLower().Contains(Columnvalue.ToLower()) : string.Empty.Contains(Columnvalue));
 
@@ -418,10 +419,10 @@ namespace opensis.data.Repository
                         FirstGivenName = e.FirstGivenName,
                         MiddleName = e.MiddleName,
                         LastFamilyName = e.LastFamilyName,
-                        //Profile = e.StaffSchoolInfo.Count > 0 ? e.StaffSchoolInfo.Where(x => x.SchoolAttachedId == pageResult.SchoolId && (x.EndDate == null || x.EndDate >= DateTime.UtcNow.Date)).FirstOrDefault().Profile : null,
-                        Profile = e.StaffSchoolInfo.Count > 0 ? e.StaffSchoolInfo.Where(x =>(pageResult.SearchAllSchool !=true)? x.SchoolAttachedId == pageResult.SchoolId && (x.EndDate == null || x.EndDate >= DateTime.UtcNow.Date) : x.EndDate == null || x.EndDate >= DateTime.UtcNow.Date).FirstOrDefault()!.Profile : null,
+                        Profile = e.StaffSchoolInfo.Count > 0 ? e.StaffSchoolInfo.Where(x => (pageResult.SearchAllSchool == true || x.SchoolAttachedId == pageResult.SchoolId) && (pageResult.IncludeInactive == true || x.EndDate == null || x.EndDate >= DateTime.UtcNow.Date)).FirstOrDefault()!.Profile : e.Profile,
                         JobTitle = e.JobTitle,
                         SchoolEmail = e.SchoolEmail,
+                        LoginEmailAddress = e.LoginEmailAddress,
                         MobilePhone = e.MobilePhone,
                         HomeroomTeacher = e.HomeroomTeacher,
                         PrimaryGradeLevelTaught = e.PrimaryGradeLevelTaught,
@@ -431,14 +432,15 @@ namespace opensis.data.Repository
                         FirstLanguage = e.FirstLanguage,
                         SecondLanguage = e.SecondLanguage,
                         ThirdLanguage = e.ThirdLanguage,
-                        //StaffPhoto = pageResult.ProfilePhoto != null ? e.StaffPhoto : null,
                         StaffPhoto = pageResult.ProfilePhoto != null ? e.StaffThumbnailPhoto : null,
+                        Dob = e.Dob,
+                        Gender = e.Gender,
                         CreatedBy = e.CreatedBy,
                         CreatedOn = e.CreatedOn,
                         UpdatedBy = e.UpdatedBy,
                         UpdatedOn = e.UpdatedOn,
                         IsActive = e.IsActive,
-                        StaffSchoolInfo = e.StaffSchoolInfo.Count > 0 ? e.StaffSchoolInfo.Select(s => new StaffSchoolInfo { StartDate = s.StartDate, EndDate = s.EndDate , SchoolAttachedId = s.SchoolAttachedId, SchoolId = s.SchoolId, SchoolAttachedName = s.SchoolAttachedName }).ToList() : new()
+                        StaffSchoolInfo = e.StaffSchoolInfo.Count > 0 ? e.StaffSchoolInfo.Select(s => new StaffSchoolInfo { StartDate = s.StartDate, EndDate = s.EndDate, SchoolAttachedId = s.SchoolAttachedId, SchoolId = s.SchoolId, SchoolAttachedName = s.SchoolAttachedName }).ToList() : new()
                     }).Skip((pageResult.PageNumber - 1) * pageResult.PageSize).Take(pageResult.PageSize);
                 }
                 else
@@ -452,10 +454,10 @@ namespace opensis.data.Repository
                         FirstGivenName = e.FirstGivenName,
                         MiddleName = e.MiddleName,
                         LastFamilyName = e.LastFamilyName,
-                        //Profile = e.StaffSchoolInfo.Count > 0 ? e.StaffSchoolInfo.Where(x => x.SchoolAttachedId == pageResult.SchoolId && (x.EndDate == null || x.EndDate >= DateTime.UtcNow.Date)).FirstOrDefault().Profile : null,
-                        Profile = e.StaffSchoolInfo.Count > 0 ? e.StaffSchoolInfo.Where(x => (pageResult.SearchAllSchool != true) ? x.SchoolAttachedId == pageResult.SchoolId && (x.EndDate == null || x.EndDate >= DateTime.UtcNow.Date) : x.EndDate == null || x.EndDate >= DateTime.UtcNow.Date).FirstOrDefault()!.Profile : null,
+                        Profile = e.StaffSchoolInfo.Count > 0 ? e.StaffSchoolInfo.Where(x => (pageResult.SearchAllSchool == true || x.SchoolAttachedId == pageResult.SchoolId) && (pageResult.IncludeInactive == true || x.EndDate == null || x.EndDate >= DateTime.UtcNow.Date)).FirstOrDefault()!.Profile : e.Profile,
                         JobTitle = e.JobTitle,
                         SchoolEmail = e.SchoolEmail,
+                        LoginEmailAddress = e.LoginEmailAddress,
                         MobilePhone = e.MobilePhone,
                         HomeroomTeacher = e.HomeroomTeacher,
                         PrimaryGradeLevelTaught = e.PrimaryGradeLevelTaught,
@@ -465,14 +467,15 @@ namespace opensis.data.Repository
                         FirstLanguage = e.FirstLanguage,
                         SecondLanguage = e.SecondLanguage,
                         ThirdLanguage = e.ThirdLanguage,
-                        //StaffPhoto = pageResult.ProfilePhoto != null ? e.StaffPhoto : null,
                         StaffPhoto = pageResult.ProfilePhoto != null ? e.StaffThumbnailPhoto : null,
+                        Dob = e.Dob,
+                        Gender = e.Gender,
                         CreatedBy = e.CreatedBy,
                         CreatedOn = e.CreatedOn,
                         UpdatedBy = e.UpdatedBy,
                         UpdatedOn = e.UpdatedOn,
                         IsActive = e.IsActive,
-                        StaffSchoolInfo = e.StaffSchoolInfo.Count > 0 ? e.StaffSchoolInfo.Select(s => new StaffSchoolInfo { StartDate = s.StartDate, EndDate = s.EndDate , SchoolAttachedId = s.SchoolAttachedId, SchoolId = s.SchoolId, SchoolAttachedName = s.SchoolAttachedName }).ToList() : new()
+                        StaffSchoolInfo = e.StaffSchoolInfo.Count > 0 ? e.StaffSchoolInfo.Select(s => new StaffSchoolInfo { StartDate = s.StartDate, EndDate = s.EndDate, SchoolAttachedId = s.SchoolAttachedId, SchoolId = s.SchoolId, SchoolAttachedName = s.SchoolAttachedName }).ToList() : new()
                     });
                 }
                 if(transactionIQ!=null && transactionIQ.Any())
@@ -726,6 +729,8 @@ namespace opensis.data.Repository
                                                 {
                                                     loginInfoData.EmailAddress = staffAddViewModel.staffMaster.LoginEmailAddress;
                                                     loginInfoData.IsActive = staffAddViewModel.staffMaster.PortalAccess;
+                                                    loginInfoData.UpdatedBy = staffAddViewModel.staffMaster.UpdatedBy;
+                                                    loginInfoData.UpdatedOn = DateTime.UtcNow;
                                                     this.context?.UserMaster.Add(loginInfoData);
                                                     this.context?.SaveChanges();
                                                 }
@@ -744,6 +749,8 @@ namespace opensis.data.Repository
                                             if (loginInfo != null)
                                             {
                                                 loginInfo.IsActive = staffAddViewModel.staffMaster.PortalAccess;
+                                                loginInfo.UpdatedBy = staffAddViewModel.staffMaster.UpdatedBy;
+                                                loginInfo.UpdatedOn = DateTime.UtcNow;
                                                 this.context?.SaveChanges();
                                             }
                                                 
@@ -1125,7 +1132,7 @@ namespace opensis.data.Repository
 
                             if (membership != null)
                             {
-                                userMaster.MembershipId = membership.MembershipId;                                
+                                userMaster.MembershipId = membership.MembershipId;
                             }
                             else
                             {
@@ -1133,6 +1140,7 @@ namespace opensis.data.Repository
                             }
 
                             userMaster.UpdatedOn = DateTime.Now;
+                            userMaster.UpdatedBy = staffSchoolInfoAddViewModel.staffSchoolInfoList.FirstOrDefault()!.UpdatedBy;
                         }
 
                         this.context?.SaveChanges();
@@ -1598,6 +1606,7 @@ namespace opensis.data.Repository
                                 staff.staffMaster.StaffId = (int)staffId;
                                 staff.staffMaster.CreatedOn = DateTime.UtcNow;
                                 staff.staffMaster.CreatedBy = staffListAddViewModel.CreatedBy;
+                                staff.staffMaster.IsActive = true;
                                 Guid GuidId = Guid.NewGuid();
                                 var GuidIdExist = this.context?.StaffMaster.FirstOrDefault(x => x.StaffGuid == GuidId);
 
@@ -2067,22 +2076,22 @@ namespace opensis.data.Repository
 
             var membershipData = this.context?.UserMaster.Include(x => x.Membership).FirstOrDefault(x => x.TenantId == pageResult.TenantId && x.EmailAddress == pageResult.EmailAddress);
 
-            var activeSchools = this.context?.SchoolDetail.Where(x => x.Status == true).Select(x => x.SchoolId).ToList();
+            var activeSchools = this.context?.SchoolDetail.Where(x => x.TenantId == pageResult.TenantId && x.Status == true).Select(x => x.SchoolId).ToList();
 
             if (membershipData != null)
             {
                 if (String.Compare(membershipData.Membership.ProfileType, "super administrator", true) == 0)
                 {
-                    var schoolAttachedStaffId = this.context?.StaffSchoolInfo.Where(x => x.TenantId == pageResult.TenantId && (pageResult.SearchAllSchool == false || pageResult.SearchAllSchool == null ? x.SchoolAttachedId == pageResult.SchoolId : activeSchools!.Contains(x.SchoolAttachedId)) && (pageResult.IncludeInactive == false || pageResult.IncludeInactive == null ? x.EndDate == null && ((x.StartDate >= pageResult.MarkingPeriodStartDate && x.StartDate <= pageResult.MarkingPeriodEndDate) || x.StartDate <= pageResult.MarkingPeriodStartDate) : ((x.StartDate >= pageResult.MarkingPeriodStartDate && x.StartDate <= pageResult.MarkingPeriodEndDate) || x.StartDate <= pageResult.MarkingPeriodStartDate))).Select(s => s.StaffId).ToList();
+                    var schoolAttachedStaffId = this.context?.StaffSchoolInfo.Where(x => x.TenantId == pageResult.TenantId && (pageResult.SearchAllSchool == false || pageResult.SearchAllSchool == null ? x.SchoolAttachedId == pageResult.SchoolId : activeSchools!.Contains(x.SchoolAttachedId)) && (pageResult.IncludeInactive == false || pageResult.IncludeInactive == null ? x.EndDate == null || x.EndDate >= DateTime.UtcNow.Date && ((x.StartDate >= pageResult.MarkingPeriodStartDate && x.StartDate <= pageResult.MarkingPeriodEndDate) || x.StartDate <= pageResult.MarkingPeriodStartDate) : /*((x.StartDate >= pageResult.MarkingPeriodStartDate && x.StartDate <= pageResult.MarkingPeriodEndDate) || x.StartDate <= pageResult.MarkingPeriodStartDate)*/ true)).Select(s => s.StaffId).ToList();
 
                     StaffMasterList = this.context?.StaffMaster.Include(x => x.StaffSchoolInfo).Where(x => x.TenantId == pageResult.TenantId && (x.Profile ?? "").ToLower() != "super administrator" && schoolAttachedStaffId!.Contains(x.StaffId) && (pageResult.IncludeInactive == false || pageResult.IncludeInactive == null ? x.IsActive != false : true));
-                   
+
                 }
                 else
                 {
                     var schoolAttachedId = this.context?.StaffSchoolInfo.Where(x => x.TenantId == pageResult.TenantId && x.StaffId == membershipData.UserId && x.EndDate == null && activeSchools!.Contains(x.SchoolAttachedId)).ToList().Select(s => s.SchoolAttachedId);
-                   
-                    var schoolAttachedStaffId = this.context?.StaffSchoolInfo.Where(x => x.TenantId == pageResult.TenantId && (pageResult.SearchAllSchool == false || pageResult.SearchAllSchool == null ? x.SchoolAttachedId == pageResult.SchoolId : schoolAttachedId!.Contains(x.SchoolId)) && (pageResult.IncludeInactive == false || pageResult.IncludeInactive == null ? x.EndDate == null && ((x.StartDate >= pageResult.MarkingPeriodStartDate && x.StartDate <= pageResult.MarkingPeriodEndDate) || x.StartDate <= pageResult.MarkingPeriodStartDate) : ((x.StartDate >= pageResult.MarkingPeriodStartDate && x.StartDate <= pageResult.MarkingPeriodEndDate) || x.StartDate <= pageResult.MarkingPeriodStartDate))).Select(s => s.StaffId).ToList();
+
+                    var schoolAttachedStaffId = this.context?.StaffSchoolInfo.Where(x => x.TenantId == pageResult.TenantId && (pageResult.SearchAllSchool == false || pageResult.SearchAllSchool == null ? x.SchoolAttachedId == pageResult.SchoolId : schoolAttachedId!.Contains(x.SchoolId)) && (pageResult.IncludeInactive == false || pageResult.IncludeInactive == null ? x.EndDate == null || x.EndDate >= DateTime.UtcNow.Date && ((x.StartDate >= pageResult.MarkingPeriodStartDate && x.StartDate <= pageResult.MarkingPeriodEndDate) || x.StartDate <= pageResult.MarkingPeriodStartDate) : /*((x.StartDate >= pageResult.MarkingPeriodStartDate && x.StartDate <= pageResult.MarkingPeriodEndDate) || x.StartDate <= pageResult.MarkingPeriodStartDate)*/ true)).Select(s => s.StaffId).ToList();
 
                     StaffMasterList = this.context?.StaffMaster.Include(x => x.StaffSchoolInfo).Where(x => x.TenantId == pageResult.TenantId && (x.Profile ?? "").ToLower() != "super administrator" && schoolAttachedStaffId!.Contains(x.StaffId) && (pageResult.IncludeInactive == false || pageResult.IncludeInactive == null ? x.IsActive != false : true));
                 }
@@ -2100,35 +2109,27 @@ namespace opensis.data.Repository
                     if (pageResult.FilterParams != null && pageResult.FilterParams.ElementAt(0).ColumnName == null && pageResult.FilterParams.Count == 1)
                     {
                         string Columnvalue = pageResult.FilterParams.ElementAt(0).FilterValue;
+                        var Searchvalue = Columnvalue.Trim();
                         Columnvalue = Regex.Replace(Columnvalue, @"\s+", "");
                         transactionIQ = StaffMasterList?.Where(x => x.FirstGivenName != null && x.FirstGivenName.Contains(Columnvalue) ||
                                                                     x.MiddleName != null && x.MiddleName.Contains(Columnvalue) ||
                                                                     x.LastFamilyName != null && x.LastFamilyName.Contains(Columnvalue) ||
                                                                     (x.FirstGivenName + x.MiddleName + x.LastFamilyName).Contains(Columnvalue) || (x.FirstGivenName + x.MiddleName).Contains(Columnvalue) || (x.FirstGivenName + x.LastFamilyName).Contains(Columnvalue) || (x.MiddleName + x.LastFamilyName).Contains(Columnvalue) ||
-                                                                    x.StaffInternalId != null && x.StaffInternalId.Contains(Columnvalue) ||
-                                                                    x.JobTitle != null && x.JobTitle.Contains(Columnvalue) ||
-                                                                    x.SchoolEmail != null && x.SchoolEmail.Contains(Columnvalue) ||
-                                                                    x.MobilePhone != null && x.MobilePhone.Contains(Columnvalue));
-                        //var ProfileFilter = StaffMasterList.Where(x => x.StaffSchoolInfo.FirstOrDefault() != null ? x.StaffSchoolInfo.FirstOrDefault().Profile.ToLower().Contains(Columnvalue.ToLower()) : string.Empty.Contains(Columnvalue));
+                                                                    x.StaffInternalId != null && x.StaffInternalId.Contains(Searchvalue) ||
+                                                                    x.JobTitle != null && x.JobTitle.Contains(Searchvalue) ||
+                                                                    x.SchoolEmail != null && x.SchoolEmail.Contains(Searchvalue) ||
+                                                                    x.MobilePhone != null && x.MobilePhone.Contains(Searchvalue) || (x.StaffSchoolInfo.Count > 0 ? (x.StaffSchoolInfo.Any(x => (x.Profile ?? "").ToLower().Contains(Searchvalue.ToLower()) && x.SchoolAttachedId == pageResult.SchoolId)) : string.Empty.Contains(Searchvalue)));
 
-                        var ProfileFilter = StaffMasterList?.Where(x => x.StaffSchoolInfo.Count > 0 ? x.StaffSchoolInfo.Any(x => (x.Profile ?? "").ToLower().Contains(Columnvalue.ToLower()) && x.SchoolAttachedId == pageResult.SchoolId) : string.Empty.Contains(Columnvalue));
-
-                        if (ProfileFilter != null && ProfileFilter.Any())
-                        {
-                            transactionIQ = transactionIQ?.Concat(ProfileFilter);
-                        }
                     }
                     else
                     {
                         if (pageResult.FilterParams != null && pageResult.FilterParams.Any(x => x.ColumnName.ToLower() == "profile"))
                         {
                             var filterValue = pageResult.FilterParams.Where(x => x.ColumnName.ToLower() == "profile").Select(x => x.FilterValue).FirstOrDefault();
-                            //var profileFilterData = StaffMasterList.Where(x => x.StaffSchoolInfo.FirstOrDefault().Profile.ToLower() == filterValue.ToLower());
                             var profileFilterData = StaffMasterList?.Where(x => x.StaffSchoolInfo.Any(x => (x.Profile ?? "").ToLower() == (filterValue ?? "").ToLower() && x.SchoolAttachedId == pageResult.SchoolId));
 
                             if (profileFilterData?.Any() == true)
                             {
-                                //transactionIQ = transactionIQ.Concat(a);
                                 StaffMasterList = profileFilterData;
                                 var indexValue = pageResult.FilterParams.FindIndex(x => x.ColumnName.ToLower() == "profile");
                                 pageResult.FilterParams.RemoveAt(indexValue);
@@ -2137,7 +2138,6 @@ namespace opensis.data.Repository
 
                         transactionIQ = Utility.FilteredData(pageResult.FilterParams!, StaffMasterList!).AsQueryable();
                     }
-                    //transactionIQ = transactionIQ.Distinct();
                 }
 
                 if (pageResult.DobStartDate != null && pageResult.DobEndDate != null)
@@ -2157,13 +2157,11 @@ namespace opensis.data.Repository
                     {
                         var firstName = staffName.First();
                         var lastName = staffName.Last();
-                        //pageResult.FullName = null;
 
                         if (pageResult.FullName == null)
                         {
                             var nameSearch = transactionIQ?.Where(x => x.TenantId == pageResult.TenantId && x.SchoolId == pageResult.SchoolId && x.FirstGivenName!.StartsWith(firstName.ToString()) && x.LastFamilyName!.StartsWith(lastName.ToString()));
 
-                            //transactionIQ = transactionIQ.Concat(nameSearch);
                             transactionIQ = nameSearch;
                         }
                     }
@@ -2171,7 +2169,6 @@ namespace opensis.data.Repository
                     {
                         var nameSearch = transactionIQ?.Where(x => x.TenantId == pageResult.TenantId && x.SchoolId == pageResult.SchoolId && (x.FirstGivenName!.StartsWith(pageResult.FullName) || x.LastFamilyName!.StartsWith(pageResult.FullName)));
 
-                        //transactionIQ = transactionIQ.Concat(nameSearch);
                         transactionIQ = nameSearch;
                     }
                 }
@@ -2214,8 +2211,7 @@ namespace opensis.data.Repository
                         FirstGivenName = e.FirstGivenName,
                         MiddleName = e.MiddleName,
                         LastFamilyName = e.LastFamilyName,
-                        //Profile = e.StaffSchoolInfo.Count > 0 ? e.StaffSchoolInfo.Where(x => x.SchoolAttachedId == pageResult.SchoolId && (x.EndDate == null || x.EndDate >= DateTime.UtcNow.Date)).FirstOrDefault().Profile : null,
-                        Profile = e.StaffSchoolInfo.Count > 0 ? e.StaffSchoolInfo.Where(x => (pageResult.SearchAllSchool != true) ? x.SchoolAttachedId == pageResult.SchoolId && (x.EndDate == null || x.EndDate >= DateTime.UtcNow.Date) : x.EndDate == null || x.EndDate >= DateTime.UtcNow.Date).FirstOrDefault()!.Profile : null,
+                        Profile = e.StaffSchoolInfo.Count > 0 ? e.StaffSchoolInfo.Where(x => (pageResult.SearchAllSchool == true || x.SchoolAttachedId == pageResult.SchoolId) && (pageResult.IncludeInactive == true || x.EndDate == null || x.EndDate >= DateTime.UtcNow.Date)).FirstOrDefault()!.Profile : e.Profile,
                         JobTitle = e.JobTitle,
                         SchoolEmail = e.SchoolEmail,
                         MobilePhone = e.MobilePhone,
@@ -2227,8 +2223,7 @@ namespace opensis.data.Repository
                         FirstLanguage = e.FirstLanguage,
                         SecondLanguage = e.SecondLanguage,
                         ThirdLanguage = e.ThirdLanguage,
-                        //StaffPhoto = pageResult.ProfilePhoto != null ? e.StaffPhoto : null,
-                        StaffPhoto = pageResult.ProfilePhoto != null ? e.StaffThumbnailPhoto : null,
+                        StaffThumbnailPhoto = pageResult.ProfilePhoto != null ? e.StaffThumbnailPhoto : null,
                         CreatedBy = e.CreatedBy,
                         CreatedOn = e.CreatedOn,
                         UpdatedBy = e.UpdatedBy,
@@ -2245,12 +2240,11 @@ namespace opensis.data.Repository
                         StaffId = e.StaffId,
                         SchoolId = e.SchoolId,
                         StaffInternalId = e.StaffInternalId,
-                        StaffGuid=e.StaffGuid,
+                        StaffGuid = e.StaffGuid,
                         FirstGivenName = e.FirstGivenName,
                         MiddleName = e.MiddleName,
                         LastFamilyName = e.LastFamilyName,
-                        //Profile = e.StaffSchoolInfo.Count > 0 ? e.StaffSchoolInfo.Where(x => x.SchoolAttachedId == pageResult.SchoolId && (x.EndDate == null || x.EndDate >= DateTime.UtcNow.Date)).FirstOrDefault().Profile : null,
-                        Profile = e.StaffSchoolInfo.Count > 0 ? e.StaffSchoolInfo.Where(x => (pageResult.SearchAllSchool != true) ? x.SchoolAttachedId == pageResult.SchoolId && (x.EndDate == null || x.EndDate >= DateTime.UtcNow.Date) : x.EndDate == null || x.EndDate >= DateTime.UtcNow.Date).FirstOrDefault()!.Profile : null,
+                        Profile = e.StaffSchoolInfo.Count > 0 ? e.StaffSchoolInfo.Where(x => (pageResult.SearchAllSchool == true || x.SchoolAttachedId == pageResult.SchoolId) && (pageResult.IncludeInactive == true || x.EndDate == null || x.EndDate >= DateTime.UtcNow.Date)).FirstOrDefault()!.Profile : e.Profile,
                         JobTitle = e.JobTitle,
                         SchoolEmail = e.SchoolEmail,
                         MobilePhone = e.MobilePhone,
@@ -2262,8 +2256,7 @@ namespace opensis.data.Repository
                         FirstLanguage = e.FirstLanguage,
                         SecondLanguage = e.SecondLanguage,
                         ThirdLanguage = e.ThirdLanguage,
-                        //StaffPhoto = pageResult.ProfilePhoto != null ? e.StaffPhoto : null,
-                        StaffPhoto = pageResult.ProfilePhoto != null ? e.StaffThumbnailPhoto : null,
+                        StaffThumbnailPhoto = pageResult.ProfilePhoto != null ? e.StaffThumbnailPhoto : null,
                         CreatedBy = e.CreatedBy,
                         CreatedOn = e.CreatedOn,
                         UpdatedBy = e.UpdatedBy,
@@ -2276,7 +2269,6 @@ namespace opensis.data.Repository
                 {
                     staffListModel.staffMaster = transactionIQ.ToList();
                 }
-                //staffListModel.staffMaster = transactionIQ.ToList();
 
                 staffListModel.staffMaster.ForEach(e =>
                 {
@@ -2285,8 +2277,6 @@ namespace opensis.data.Repository
                 });
 
                 staffListModel.TenantId = pageResult.TenantId;
-                //staffListModel.getStaffListForView = staffList;
-                //staffListModel.staffMaster = transactionIQ.ToList();
                 staffListModel.TotalCount = totalCount;
                 staffListModel.PageNumber = pageResult.PageNumber;
                 staffListModel._pageSize = pageResult.PageSize;
@@ -2302,6 +2292,170 @@ namespace opensis.data.Repository
                 staffListModel._token = pageResult._token;
             }
             return staffListModel;
+        }
+
+        /// <summary>
+        /// Delete Staff
+        /// </summary>
+        /// <param name="staffDeleteViewModel"></param>
+        /// <returns></returns>
+        public StaffDeleteViewModel DeleteStaff(StaffDeleteViewModel staffDeleteViewModel)
+        {
+            StaffDeleteViewModel staffDelete = new()
+            {
+                TenantId = staffDeleteViewModel.TenantId,
+                SchoolId = staffDeleteViewModel.SchoolId,
+                _userName = staffDeleteViewModel._userName,
+                _tenantName = staffDeleteViewModel._tenantName,
+                _token = staffDeleteViewModel._token
+            };
+
+            bool allSccuss = true;
+            List<string> deletedStaffName = new();
+            string? staffName = string.Empty;
+            List<StaffMaster> staffMasters = new List<StaffMaster>();
+            List<StaffCertificateInfo> staffCertificateInfos = new List<StaffCertificateInfo>();
+            List<StaffSchoolInfo> staffSchoolInfos = new List<StaffSchoolInfo>();
+            List<CustomFieldsValue> customFieldsValues = new List<CustomFieldsValue>();
+            List<UserMaster> userMasters = new List<UserMaster>();
+            List<StaffCoursesectionSchedule> staffCoursesectionSchedules = new List<StaffCoursesectionSchedule>();
+
+            try
+            {
+                if (staffDeleteViewModel.staffMasters?.Any() == true)
+                {
+                    var staffIds = staffDeleteViewModel.staffMasters.Select(s => s.StaffId).ToList();
+
+                    var staffMasterData = this.context?.StaffMaster.Include(s => s.StaffSchoolInfo).Include(s => s.StaffCertificateInfo).Include(s => s.StaffCoursesectionSchedule).Where(x => x.TenantId == staffDeleteViewModel.TenantId /*&& x.SchoolId == staffDeleteViewModel.SchoolId*/ && staffIds.Contains(x.StaffId)).ToList();
+
+                    var customFieldsValueData = this.context?.CustomFieldsValue.Where(x => x.TenantId == staffDeleteViewModel.TenantId /*&& x.SchoolId == staffDeleteViewModel.SchoolId*/ && x.Module == "Staff" && staffIds.Contains(x.TargetId)).ToList();
+
+                    var userMasterData = this.context?.UserMaster.Where(x => x.TenantId == staffDeleteViewModel.TenantId && x.SchoolId == staffDeleteViewModel.SchoolId).ToList();
+                    var schoolMasterData = this.context?.SchoolMaster.Where(x => x.TenantId == staffDeleteViewModel.TenantId).Select(s => new { s.SchoolId, s.SchoolName }).ToList();
+
+                    foreach (var staff in staffDeleteViewModel.staffMasters)
+                    {
+                        var staffData = staffMasterData?.FirstOrDefault(s => s.StaffId == staff.StaffId);
+                        if (staffData != null)
+                        {
+                            var checkCourseSectionSchedule = staffData.StaffCoursesectionSchedule.Where(x => x.IsDropped != true).ToList();
+
+                            if (/*staffData.StaffCoursesectionSchedule.Count == 0 &&*/ checkCourseSectionSchedule.Any() != true)
+                            {
+                                bool hasAssociation = false;
+                                if (staffData.StaffCoursesectionSchedule.Count == 0)
+                                {
+                                    hasAssociation = false;
+                                }
+                                else
+                                {
+                                    var staffDroppedCS = staffData.StaffCoursesectionSchedule.Where(x => x.IsDropped == true).ToList();
+                                    if (staffDroppedCS?.Any() == true)
+                                    {
+                                        var staffDroppedCSIds = staffDroppedCS.Select(s => s.CourseSectionId).ToList();
+
+                                        var StudentAttendanceData = this.context?.StudentAttendance.Where(x => x.TenantId == staffDeleteViewModel.TenantId /*&& x.SchoolId == staffDeleteViewModel.SchoolId*/ && x.StaffId == staff.StaffId && staffDroppedCSIds.Contains(x.CourseSectionId)).FirstOrDefault();
+
+                                        var AssignmentData = this.context?.Assignment.Where(x => x.TenantId == staffDeleteViewModel.TenantId /*&& x.SchoolId == staffDeleteViewModel.SchoolId*/ && x.StaffId == staff.StaffId && x.CourseSectionId != null && staffDroppedCSIds.Contains((int)x.CourseSectionId)).FirstOrDefault();
+
+                                        if (StudentAttendanceData != null || AssignmentData != null)
+                                        {
+                                            hasAssociation = true;
+                                            allSccuss = false;
+                                            if (StudentAttendanceData != null)
+                                            {
+                                                var schoolName = schoolMasterData?.FirstOrDefault(s => s.SchoolId == StudentAttendanceData.SchoolId)?.SchoolName;
+                                                staffDelete._message = "Staff record can not be deleted due to staff has attendance records in " + schoolName;
+                                            }
+                                            else if (AssignmentData != null)
+                                            {
+                                                var schoolName = schoolMasterData?.FirstOrDefault(s => s.SchoolId == AssignmentData.SchoolId)?.SchoolName;
+                                                staffDelete._message = "Staff record can not be deleted due to staff has assignment records in " + schoolName;
+                                            }
+
+                                            staffDelete.staffMasters.Add(staff);
+                                        }
+                                        else
+                                        {
+                                            hasAssociation = false;
+                                            staffCoursesectionSchedules.AddRange(staffDroppedCS);
+                                        }
+                                    }
+                                    //else
+                                    //{
+                                    //    hasAssociation = true;
+                                    //    allSccuss = false;
+                                    //    staffDelete._message = "Staff record can not be deleted due to staff has active course section.";
+                                    //    staffDelete.staffMasters.Add(staff);
+                                    //}
+                                }
+
+                                if (!hasAssociation)
+                                {
+                                    staffMasters.Add(staffData);
+                                    staffCertificateInfos.AddRange(staffData.StaffCertificateInfo);
+                                    staffSchoolInfos.AddRange(staffData.StaffSchoolInfo);
+
+                                    deletedStaffName.Add(staffData.FirstGivenName + " " + staffData.MiddleName + " " + staffData.LastFamilyName);
+
+
+                                    var UserMaster = userMasterData?.FirstOrDefault(x => x.TenantId == staffDeleteViewModel.TenantId /*&& x.SchoolId == staffDeleteViewModel.SchoolId*/ && x.EmailAddress == staffData.LoginEmailAddress);
+                                    if (UserMaster != null)
+                                    {
+                                        userMasters.Add(UserMaster);
+                                    }
+
+                                    var customFieldsValue = customFieldsValueData?.Where(s => s.TargetId == staff.StaffId).ToList();
+                                    if (customFieldsValue?.Any() == true)
+                                    {
+                                        customFieldsValues.AddRange(customFieldsValue);
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                allSccuss = false;
+                                staffDelete.staffMasters.Add(staff);
+                                if (checkCourseSectionSchedule != null && checkCourseSectionSchedule.Any())
+                                {
+                                    var schoolName = schoolMasterData?.FirstOrDefault(s => s.SchoolId == checkCourseSectionSchedule?.FirstOrDefault()?.SchoolId)?.SchoolName;
+                                    staffDelete._message = "Staff record can not be deleted due to staff has course section " + checkCourseSectionSchedule?.FirstOrDefault()?.CourseSectionName + "  asociation in " + schoolName;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            allSccuss = false;
+                            staffDelete._message = "Staff record can not be deleted due to this school not a staff's home school.";
+                            staffDelete.staffMasters.Add(staff);
+                        }
+                    }
+
+                    if (allSccuss)
+                    {
+                        this.context?.UserMaster.RemoveRange(userMasters);
+                        this.context?.CustomFieldsValue.RemoveRange(customFieldsValues);
+                        this.context?.StaffCertificateInfo.RemoveRange(staffCertificateInfos);
+                        this.context?.StaffCoursesectionSchedule.RemoveRange(staffCoursesectionSchedules);
+                        this.context?.StaffSchoolInfo.RemoveRange(staffSchoolInfos);
+                        this.context?.StaffMaster.RemoveRange(staffMasters);
+                        this.context?.SaveChanges();
+
+                        staffDelete._message = "Staff deleted successfully";
+                    }
+                }
+                else
+                {
+                    staffDelete._message = "Please select staff";
+                    staffDelete._failure = false;
+                }
+            }
+            catch (Exception es)
+            {
+                staffDelete._failure = true;
+                staffDelete._message = es.Message;
+            }
+            return staffDelete;
         }
     }
 }

@@ -146,7 +146,9 @@ namespace opensis.data.Repository
                             gradeId = gradeLevel.GradeId;
                         }
 
-                        var StudentEnrollmentData = new StudentEnrollment() { TenantId = student.studentMaster.TenantId, SchoolId = student.studentMaster.SchoolId, StudentId = student.studentMaster.StudentId, EnrollmentId = 1, SchoolName = schoolName, RollingOption = "Next grade at current school", EnrollmentCode = enrollmentCode, CalenderId = calenderId, GradeLevelTitle = (gradeLevel != null) ? gradeLevel.Title : null, EnrollmentDate = DateTime.UtcNow, StudentGuid = GuidId, IsActive = true, GradeId = gradeId, CreatedBy = student.studentMaster.CreatedBy, CreatedOn = DateTime.UtcNow };
+                        var schoolYearStartDate = this.context?.SchoolYears.Where(x => x.TenantId == student.studentMaster.TenantId && x.SchoolId == student.studentMaster.SchoolId && x.AcademicYear.ToString() == student.AcademicYear).Min(s=>s.StartDate);
+
+                        var StudentEnrollmentData = new StudentEnrollment() { TenantId = student.studentMaster.TenantId, SchoolId = student.studentMaster.SchoolId, StudentId = student.studentMaster.StudentId, EnrollmentId = 1, SchoolName = schoolName, RollingOption = "Next grade at current school", EnrollmentCode = enrollmentCode, CalenderId = calenderId, GradeLevelTitle = gradeLevel?.Title, EnrollmentDate = schoolYearStartDate ?? DateTime.UtcNow, StudentGuid = GuidId, IsActive = true, GradeId = gradeId, CreatedBy = student.studentMaster.CreatedBy, CreatedOn = DateTime.UtcNow };
 
                         //Add student portal access
                         if (!string.IsNullOrWhiteSpace(student.PasswordHash) && !string.IsNullOrWhiteSpace(student.LoginEmail))
@@ -200,20 +202,25 @@ namespace opensis.data.Repository
                                 {
                                     if (customFields.CustomFieldsValue != null && customFields.CustomFieldsValue.ToList().Any())
                                     {
-                                        customFields.CustomFieldsValue.FirstOrDefault()!.Module = "Student";
-                                        customFields.CustomFieldsValue.FirstOrDefault()!.CategoryId = customFields.CategoryId;
-                                        customFields.CustomFieldsValue.FirstOrDefault()!.FieldId = customFields.FieldId;
-                                        customFields.CustomFieldsValue.FirstOrDefault()!.CustomFieldTitle = customFields.Title;
-                                        customFields.CustomFieldsValue.FirstOrDefault()!.CustomFieldType = customFields.Type;
-                                        customFields.CustomFieldsValue.FirstOrDefault()!.SchoolId = student.studentMaster.SchoolId;
-                                        customFields.CustomFieldsValue.FirstOrDefault()!.TenantId = student.studentMaster.TenantId;
-                                        customFields.CustomFieldsValue.FirstOrDefault()!.TargetId = student.studentMaster.StudentId;
-                                        customFields.CustomFieldsValue.FirstOrDefault()!.CreatedBy = student.studentMaster.CreatedBy;
-                                        customFields.CustomFieldsValue.FirstOrDefault()!.UpdatedBy = student.studentMaster.CreatedBy;
-                                        customFields.CustomFieldsValue.FirstOrDefault()!.CreatedOn = DateTime.UtcNow;
-                                        customFields.CustomFieldsValue.FirstOrDefault()!.UpdateOn = DateTime.UtcNow;
-                                        this.context?.CustomFieldsValue.AddRange(customFields.CustomFieldsValue);
-                                        this.context?.SaveChanges();
+                                        var dataExits = this.context?.CustomFieldsValue.Any(x => x.TenantId == student.studentMaster.TenantId && x.SchoolId == student.studentMaster.SchoolId && x.CategoryId == customFields.CategoryId && x.FieldId == customFields.FieldId && x.Module == "Student" && x.TargetId == student.studentMaster.StudentId);
+
+                                        if (dataExits != true)
+                                        {
+                                            customFields.CustomFieldsValue.FirstOrDefault()!.Module = "Student";
+                                            customFields.CustomFieldsValue.FirstOrDefault()!.CategoryId = customFields.CategoryId;
+                                            customFields.CustomFieldsValue.FirstOrDefault()!.FieldId = customFields.FieldId;
+                                            customFields.CustomFieldsValue.FirstOrDefault()!.CustomFieldTitle = customFields.Title;
+                                            customFields.CustomFieldsValue.FirstOrDefault()!.CustomFieldType = customFields.Type;
+                                            customFields.CustomFieldsValue.FirstOrDefault()!.SchoolId = student.studentMaster.SchoolId;
+                                            customFields.CustomFieldsValue.FirstOrDefault()!.TenantId = student.studentMaster.TenantId;
+                                            customFields.CustomFieldsValue.FirstOrDefault()!.TargetId = student.studentMaster.StudentId;
+                                            customFields.CustomFieldsValue.FirstOrDefault()!.CreatedBy = student.studentMaster.CreatedBy;
+                                            customFields.CustomFieldsValue.FirstOrDefault()!.UpdatedBy = student.studentMaster.CreatedBy;
+                                            customFields.CustomFieldsValue.FirstOrDefault()!.CreatedOn = DateTime.UtcNow;
+                                            customFields.CustomFieldsValue.FirstOrDefault()!.UpdateOn = DateTime.UtcNow;
+                                            this.context?.CustomFieldsValue.AddRange(customFields.CustomFieldsValue);
+                                            this.context?.SaveChanges();
+                                        }
                                     }
                                 }
 
@@ -518,7 +525,7 @@ namespace opensis.data.Repository
                         var ColumnvalueForName = Regex.Replace(Columnvalue, @"\s+", "");
                         if (pageResult.FilterParams != null && pageResult.FilterParams.ElementAt(0).ColumnName == null && pageResult.FilterParams.Count == 1)
                         {
-                            transactionIQ = studentDataList.Where(x => x.FirstGivenName != null && x.FirstGivenName.ToLower().Contains(ColumnvalueForName.ToLower()) || x.MiddleName != null && x.MiddleName.ToLower().Contains(ColumnvalueForName.ToLower()) || x.LastFamilyName != null && x.LastFamilyName.ToLower().Contains(ColumnvalueForName.ToLower()) || ((x.FirstGivenName ?? "").ToLower() + (x.MiddleName ?? "").ToLower() + (x.LastFamilyName ?? "").ToLower()).Contains(ColumnvalueForName.ToLower()) || ((x.FirstGivenName ?? "").ToLower() + (x.MiddleName ?? "").ToLower()).Contains(ColumnvalueForName.ToLower()) || ((x.FirstGivenName ?? "").ToLower() + (x.LastFamilyName ?? "").ToLower()).Contains(ColumnvalueForName.ToLower()) || ((x.MiddleName ?? "").ToLower() + (x.LastFamilyName ?? "").ToLower()).Contains(ColumnvalueForName.ToLower()) || x.StudentInternalId != null && x.StudentInternalId.ToLower().Contains(Columnvalue.ToLower()) || x.AlternateId != null && x.AlternateId.ToLower().Contains(Columnvalue.ToLower()) || x.HomePhone != null && x.HomePhone.ToLower().Contains(Columnvalue.ToLower()) || x.MobilePhone != null && x.MobilePhone.ToLower().Contains(Columnvalue.ToLower()) || x.PersonalEmail != null && x.PersonalEmail.ToLower().Contains(Columnvalue.ToLower()) || x.SchoolEmail != null && x.SchoolEmail.ToLower().Contains(Columnvalue.ToLower()) || x.GradeLevelTitle != null && x.GradeLevelTitle.ToLower().Contains(Columnvalue.ToLower()) || x.SectionName != null && x.SectionName.ToLower().Contains(Columnvalue.ToLower()));
+                            transactionIQ = studentDataList.Where(x => x.FirstGivenName != null && x.FirstGivenName.ToLower().Contains(ColumnvalueForName.ToLower()) || x.MiddleName != null && x.MiddleName.ToLower().Contains(ColumnvalueForName.ToLower()) || x.LastFamilyName != null && x.LastFamilyName.ToLower().Contains(ColumnvalueForName.ToLower()) || ((x.FirstGivenName ?? "").ToLower() + (x.MiddleName ?? "").ToLower() + (x.LastFamilyName ?? "").ToLower()).Contains(ColumnvalueForName.ToLower()) || ((x.FirstGivenName ?? "").ToLower() + (x.MiddleName ?? "").ToLower()).Contains(ColumnvalueForName.ToLower()) || ((x.FirstGivenName ?? "").ToLower() + (x.LastFamilyName ?? "").ToLower()).Contains(ColumnvalueForName.ToLower()) || ((x.MiddleName ?? "").ToLower() + (x.LastFamilyName ?? "").ToLower()).Contains(ColumnvalueForName.ToLower()) || x.StudentInternalId != null && x.StudentInternalId.ToLower().Contains(Columnvalue.ToLower()) || x.AlternateId != null && x.AlternateId.ToLower().Contains(Columnvalue.ToLower()) || x.HomePhone != null && x.HomePhone.ToLower().Contains(Columnvalue.ToLower()) || x.MobilePhone != null && x.MobilePhone.ToLower().Contains(Columnvalue.ToLower()) || x.PersonalEmail != null && x.PersonalEmail.ToLower().Contains(Columnvalue.ToLower()) || x.SchoolEmail != null && x.SchoolEmail.ToLower().Contains(Columnvalue.ToLower()) || x.GradeLevelTitle != null && x.GradeLevelTitle.ToLower().Contains(Columnvalue.ToLower()) || x.SectionName != null && x.SectionName.ToLower().Contains(Columnvalue.ToLower()) || x.Gender != null && x.Gender.ToLower().Contains(Columnvalue.ToLower()));
                         }
                         else
                         {
@@ -2640,7 +2647,7 @@ namespace opensis.data.Repository
             IQueryable<StudentMaster>? transactionIQ = null;
             try
             {
-                var studentDataList = this.context?.StudentMaster.Include(y => y.SchoolMaster).Where(x => (pageResult.SchoolId > 0) ? x.SchoolId == pageResult.SchoolId && x.TenantId == pageResult.TenantId && x.IsActive == false : x.TenantId == pageResult.TenantId && x.IsActive == false).ToList();
+                var studentDataList = this.context?.StudentMaster.Include(y => y.SchoolMaster).Include(z => z.StudentEnrollment).Where(x => (pageResult.SchoolId > 0) ? x.SchoolId == pageResult.SchoolId && x.TenantId == pageResult.TenantId && x.IsActive == false : x.TenantId == pageResult.TenantId && x.IsActive == false).ToList();
 
                 if (studentDataList?.Any() == true)
                 {
@@ -2650,9 +2657,12 @@ namespace opensis.data.Repository
                     {
                         if (!studentGuids.Contains(studentData.StudentGuid)) //for duplicate checking in search all school time
                         {
-                            var checkEnrolledStudent = this.context?.StudentEnrollment.Where(x => x.TenantId == pageResult.TenantId && x.StudentGuid == studentData.StudentGuid).OrderByDescending(x => x.EnrollmentId).FirstOrDefault();
+                            studentData.StudentEnrollment = studentData.StudentEnrollment.OrderByDescending(x => x.EnrollmentId).Take(1).ToList();
+                            //var checkEnrolledStudent = this.context?.StudentEnrollment?.Where(x => x.TenantId == pageResult.TenantId && x.StudentGuid == studentData.StudentGuid).OrderByDescending(x => x.EnrollmentId).FirstOrDefault();
 
-                            if (checkEnrolledStudent != null && checkEnrolledStudent.ExitCode == "Dropped Out" && checkEnrolledStudent.ExitDate != null && checkEnrolledStudent.ExitDate < DateTime.Today.Date)
+                            var checkEnrolledStudent = studentData.StudentEnrollment.FirstOrDefault();
+
+                            if (checkEnrolledStudent != null && checkEnrolledStudent.ExitCode != null && checkEnrolledStudent.ExitCode == "Dropped Out" && checkEnrolledStudent.ExitDate != null && checkEnrolledStudent.ExitDate < DateTime.Today.Date)
                             {
                                 Student.Add(studentData);
                                 studentGuids.Add(studentData.StudentGuid);
@@ -2697,13 +2707,13 @@ namespace opensis.data.Repository
                     }
                     else
                     {
-                        if (pageResult.FilterParams!.Any(x => x.ColumnName.ToLower() == "enrollmentdate" || x.ColumnName.ToLower() == "exitdate" || x.ColumnName.ToLower() == "exitcode"))
+                        if (pageResult.FilterParams!.Any(x => x.ColumnName.ToLower() == "enrollmentdate" || x.ColumnName.ToLower() == "exitdate" || x.ColumnName.ToLower() == "exitcode" || x.ColumnName.ToLower() == "gradeid"))
                         {
 
                             var enrollmentData = Student.AsQueryable();
                             foreach (var filterParam in pageResult.FilterParams!)
                             {
-                                if (filterParam.ColumnName.ToLower() == "enrollmentdate" || filterParam.ColumnName.ToLower() == "exitdate" || filterParam.ColumnName.ToLower() == "exitcode")
+                                if (filterParam.ColumnName.ToLower() == "enrollmentdate" || filterParam.ColumnName.ToLower() == "exitdate" || filterParam.ColumnName.ToLower() == "exitcode" || filterParam.ColumnName.ToLower() == "gradeid")
                                 {
                                     var columnName = filterParam.ColumnName;
                                     string filterValue = filterParam.FilterValue;
@@ -2724,11 +2734,15 @@ namespace opensis.data.Repository
                                             String.Compare(x.StudentEnrollment.FirstOrDefault()!.ExitCode, filterValue, true) == 0
                                             ).AsQueryable();
                                         }
+                                        if (columnName.ToLower() == "gradeid")
+                                        {
+                                            enrollmentData = enrollmentData.AsQueryable().AsNoTracking().ToList().Where(x => x.StudentEnrollment.FirstOrDefault()!.GradeId == Convert.ToInt32(filterValue)).AsQueryable();
+                                        }
                                     }
                                 }
                             }
 
-                            pageResult.FilterParams.RemoveAll(x => x.ColumnName.ToLower() == "enrollmentdate" || x.ColumnName.ToLower() == "exitdate" || x.ColumnName.ToLower() == "exitcode");
+                            pageResult.FilterParams.RemoveAll(x => x.ColumnName.ToLower() == "enrollmentdate" || x.ColumnName.ToLower() == "exitdate" || x.ColumnName.ToLower() == "exitcode" || x.ColumnName.ToLower() == "gradeid");
 
                             if (pageResult.FilterParams?.Any() == true)
                             {
@@ -2762,6 +2776,8 @@ namespace opensis.data.Repository
                         }
                     }
                 }
+
+                
 
                 if (transactionIQ != null)
                 {
@@ -2861,6 +2877,10 @@ namespace opensis.data.Repository
                                 break;
                         }
                     }
+                    else
+                    {
+                        transactionIQ = transactionIQ.OrderBy(s => s.LastFamilyName).ThenBy(a => (a.PreferredName != null && a.PreferredName != "") ? a.PreferredName : a.FirstGivenName);
+                    }
                 }
 
                 if (transactionIQ != null)
@@ -2871,7 +2891,9 @@ namespace opensis.data.Repository
                         transactionIQ = transactionIQ.Skip((pageResult.PageNumber - 1) * pageResult.PageSize).Take(pageResult.PageSize);
                     }
                     studentListModel.studentMaster = transactionIQ.ToList();
+
                     studentListModel.studentMaster.ForEach(x => x.SchoolMaster.StudentMaster = new HashSet<StudentMaster>());
+
                     studentListModel.TotalCount = totalCount;
                 }
                 else
@@ -3213,7 +3235,9 @@ namespace opensis.data.Repository
                 }
 
                 var academicYear = Utility.GetCurrentAcademicYear(this.context!, studentListAddViewModel.TenantId, studentListAddViewModel.SchoolId);
-                
+
+                var schoolYearStartDate = this.context?.SchoolYears.Where(x => x.TenantId == studentListAddViewModel.TenantId && x.SchoolId == studentListAddViewModel.SchoolId && x.AcademicYear == academicYear).Min(s => s.StartDate);
+
                 int? indexNo = -1;
                 foreach (var student in studentListAddViewModel.studentAddViewModelList)
                 {
@@ -3442,7 +3466,7 @@ namespace opensis.data.Repository
                                             gradeId = gradeLevel.GradeId;
                                         }
 
-                                        StudentEnrollmentData = new StudentEnrollment() { TenantId = student.studentMaster.TenantId, SchoolId = student.studentMaster.SchoolId, StudentId = student.studentMaster.StudentId, EnrollmentId = 1, SchoolName = schoolName, RollingOption = "Next grade at current school", EnrollmentCode = enrollmentCode, CalenderId = calenderId, GradeLevelTitle = (gradeLevel != null) ? gradeLevel.Title : null, EnrollmentDate = DateTime.UtcNow, StudentGuid = GuidId, IsActive = true, GradeId = gradeId, CreatedBy = studentListAddViewModel.CreatedBy, CreatedOn = DateTime.UtcNow };
+                                        StudentEnrollmentData = new StudentEnrollment() { TenantId = student.studentMaster.TenantId, SchoolId = student.studentMaster.SchoolId, StudentId = student.studentMaster.StudentId, EnrollmentId = 1, SchoolName = schoolName, RollingOption = "Next grade at current school", EnrollmentCode = enrollmentCode, CalenderId = calenderId, GradeLevelTitle = gradeLevel?.Title, EnrollmentDate = schoolYearStartDate ?? DateTime.UtcNow, StudentGuid = GuidId, IsActive = true, GradeId = gradeId, CreatedBy = studentListAddViewModel.CreatedBy, CreatedOn = DateTime.UtcNow };
                                     }
                                 }
                                 else
@@ -3455,7 +3479,7 @@ namespace opensis.data.Repository
                                         gradeId = gradeLevel.GradeId;
                                     }
 
-                                    StudentEnrollmentData = new StudentEnrollment() { TenantId = student.studentMaster.TenantId, SchoolId = student.studentMaster.SchoolId, StudentId = student.studentMaster.StudentId, EnrollmentId = 1, SchoolName = schoolName, RollingOption = "Next grade at current school", EnrollmentCode = enrollmentCode, CalenderId = calenderId, GradeLevelTitle = (gradeLevel != null) ? gradeLevel.Title : null, EnrollmentDate = DateTime.UtcNow, StudentGuid = GuidId, IsActive = true, GradeId = gradeId, CreatedBy = studentListAddViewModel.CreatedBy, CreatedOn = DateTime.UtcNow };
+                                    StudentEnrollmentData = new StudentEnrollment() { TenantId = student.studentMaster.TenantId, SchoolId = student.studentMaster.SchoolId, StudentId = student.studentMaster.StudentId, EnrollmentId = 1, SchoolName = schoolName, RollingOption = "Next grade at current school", EnrollmentCode = enrollmentCode, CalenderId = calenderId, GradeLevelTitle = gradeLevel?.Title, EnrollmentDate = schoolYearStartDate ?? DateTime.UtcNow, StudentGuid = GuidId, IsActive = true, GradeId = gradeId, CreatedBy = studentListAddViewModel.CreatedBy, CreatedOn = DateTime.UtcNow };
                                 }
 
                                 if (student.EnrollmentDate != null)
@@ -3536,17 +3560,24 @@ namespace opensis.data.Repository
                                         {
                                             if (customFields.CustomFieldsValue.ToList()?.Any() == true)
                                             {
-                                                customFields.CustomFieldsValue.FirstOrDefault()!.TenantId = studentListAddViewModel.TenantId;
-                                                customFields.CustomFieldsValue.FirstOrDefault()!.Module = "Student";
-                                                customFields.CustomFieldsValue.FirstOrDefault()!.CategoryId = customFields.CategoryId;
-                                                customFields.CustomFieldsValue.FirstOrDefault()!.FieldId = customFields.FieldId;
-                                                customFields.CustomFieldsValue.FirstOrDefault()!.CustomFieldTitle = customFields.Title;
-                                                customFields.CustomFieldsValue.FirstOrDefault()!.CustomFieldType = customFields.Type;
-                                                customFields.CustomFieldsValue.FirstOrDefault()!.SchoolId = student.studentMaster.SchoolId;
-                                                customFields.CustomFieldsValue.FirstOrDefault()!.TenantId = student.studentMaster.TenantId;
-                                                customFields.CustomFieldsValue.FirstOrDefault()!.TargetId = student.studentMaster.StudentId;
-                                                this.context?.CustomFieldsValue.AddRange(customFields.CustomFieldsValue);
-                                                this.context?.SaveChanges();
+                                                var dataExits = this.context?.CustomFieldsValue.Any(x => x.TenantId == studentListAddViewModel.TenantId && x.SchoolId == student.studentMaster.SchoolId && x.CategoryId == customFields.CategoryId && x.FieldId == customFields.FieldId && x.Module == "Student" && x.TargetId == student.studentMaster.StudentId);
+
+                                                if (dataExits != true)
+                                                {
+                                                    customFields.CustomFieldsValue.FirstOrDefault()!.TenantId = studentListAddViewModel.TenantId;
+                                                    customFields.CustomFieldsValue.FirstOrDefault()!.Module = "Student";
+                                                    customFields.CustomFieldsValue.FirstOrDefault()!.CategoryId = customFields.CategoryId;
+                                                    customFields.CustomFieldsValue.FirstOrDefault()!.FieldId = customFields.FieldId;
+                                                    customFields.CustomFieldsValue.FirstOrDefault()!.CustomFieldTitle = customFields.Title;
+                                                    customFields.CustomFieldsValue.FirstOrDefault()!.CustomFieldType = customFields.Type;
+                                                    customFields.CustomFieldsValue.FirstOrDefault()!.SchoolId = student.studentMaster.SchoolId;
+                                                    customFields.CustomFieldsValue.FirstOrDefault()!.TenantId = student.studentMaster.TenantId;
+                                                    customFields.CustomFieldsValue.FirstOrDefault()!.TargetId = student.studentMaster.StudentId;
+                                                    customFields.CustomFieldsValue.FirstOrDefault()!.CreatedBy = studentListAddViewModel.CreatedBy;
+                                                    customFields.CustomFieldsValue.FirstOrDefault()!.CreatedOn = DateTime.UtcNow;
+                                                    this.context?.CustomFieldsValue.AddRange(customFields.CustomFieldsValue);
+                                                    this.context?.SaveChanges();
+                                                }
                                             }
 
                                         }
@@ -5677,7 +5708,7 @@ namespace opensis.data.Repository
         {
             try
             {
-                if (studentEnrollmentAssignModel.studentIds?.Any()==true)
+                if (studentEnrollmentAssignModel.studentIds?.Any() == true)
                 {
                     foreach (var studentId in studentEnrollmentAssignModel.studentIds)
                     {
@@ -5951,6 +5982,185 @@ namespace opensis.data.Repository
             return studentListModel;
         }
 
+        public StudentDeleteViewModel DeleteStudent(StudentDeleteViewModel studentDeleteViewModel)
+        {
+            StudentDeleteViewModel studentDelete = new();
+            studentDelete.TenantId = studentDeleteViewModel.TenantId;
+            studentDelete.SchoolId = studentDeleteViewModel.SchoolId;
+            studentDelete._tenantName = studentDeleteViewModel._tenantName;
+            studentDelete._token = studentDeleteViewModel._token;
+            studentDelete._userName = studentDeleteViewModel._userName;
+
+            bool allSccuss = true;
+            List<string> studentName = new();
+            string? staffName = string.Empty;
+            List<StudentMaster> studentMasters = new List<StudentMaster>();
+            List<StudentComments> studentComments = new List<StudentComments>();
+            List<StudentMedicalAlert> studentMedicalAlerts = new List<StudentMedicalAlert>();
+            List<StudentMedicalNurseVisit> studentMedicalNurseVisits = new List<StudentMedicalNurseVisit>();
+            List<StudentMedicalImmunization> studentMedicalImmunizations = new List<StudentMedicalImmunization>();
+            List<StudentMedicalNote> studentMedicalNotes = new List<StudentMedicalNote>();
+            List<StudentMedicalProvider> studentMedicalProviders = new List<StudentMedicalProvider>();
+            List<StudentDocuments> studentDocuments = new List<StudentDocuments>();
+            List<CustomFieldsValue> customFieldsValues = new List<CustomFieldsValue>();
+            List<UserMaster> userMasters = new List<UserMaster>();
+            List<ParentAssociationship> parentAssociationships = new List<ParentAssociationship>();
+            List<ParentInfo> parentInfos = new List<ParentInfo>();
+            List<ParentAddress> parentAddresses = new List<ParentAddress>();
+            List<StudentCoursesectionSchedule> studentCoursesectionSchedules = new List<StudentCoursesectionSchedule>();
+            try
+            {
+                if (studentDeleteViewModel.studentListViews?.Any() == true)
+                {
+                    var studentIds = studentDeleteViewModel.studentListViews.Select(s => s.StudentId).ToList();
+
+                    var studentMasterData = this.context?.StudentMaster.Include(s => s.StudentEnrollment).Include(s => s.StudentComments).Include(s => s.StudentDocuments).Include(s => s.StudentMedicalAlert).Include(s => s.StudentMedicalImmunization).Include(s => s.StudentMedicalNote).Include(s => s.StudentMedicalNurseVisit).Include(s => s.StudentMedicalProvider).Include(s => s.StudentCoursesectionSchedule).Where(x => x.TenantId == studentDeleteViewModel.TenantId && x.SchoolId == studentDeleteViewModel.SchoolId && studentIds.Contains(x.StudentId)).ToList();
+
+                    var customFieldsValueData = this.context?.CustomFieldsValue.Where(x => x.TenantId == studentDeleteViewModel.TenantId && x.SchoolId == studentDeleteViewModel.SchoolId && x.Module == "Student" && studentIds.Contains(x.TargetId)).ToList();
+
+                    var userMasterData = this.context?.UserMaster.Where(x => x.TenantId == studentDeleteViewModel.TenantId && x.SchoolId == studentDeleteViewModel.SchoolId).ToList();
+
+                    var parentAssociationshipAllData = this.context?.ParentAssociationship.Where(x => x.TenantId == studentDeleteViewModel.TenantId && x.SchoolId == studentDeleteViewModel.SchoolId).ToList();
+                    var parentAssociationshipData = parentAssociationshipAllData?.Where(x => x.TenantId == studentDeleteViewModel.TenantId && x.SchoolId == studentDeleteViewModel.SchoolId && studentIds.Contains(x.StudentId)).ToList();
+                    var parentIds = parentAssociationshipData?.Select(s => s.ParentId).ToList();
+                    var parentInfoData = this.context?.ParentInfo.Include(s => s.ParentAddress).Where(x => x.TenantId == studentDeleteViewModel.TenantId && /*x.SchoolId == studentDeleteViewModel.SchoolId &&*/ parentIds != null && parentIds.Contains(x.ParentId)).ToList();
+
+                    foreach (var student in studentDeleteViewModel.studentListViews)
+                    {
+                        var studentData = studentMasterData?.FirstOrDefault(s => s.StudentId == student.StudentId);
+                        if (studentData != null)
+                        {
+                            bool hasAssociation = false;
+
+                            if (studentData.StudentCoursesectionSchedule.Count == 0)
+                            {
+                                hasAssociation = false;
+                            }
+                            else
+                            {
+                                var studentDroppedCS = studentData.StudentCoursesectionSchedule.Where(x => x.IsDropped == true).ToList();
+                                if (studentDroppedCS?.Any() == true)
+                                {
+                                    var studentDroppedCSIds = studentDroppedCS.Select(s => s.CourseSectionId).ToList();
+                                    var StudentAttendanceData = this.context?.StudentAttendance.Where(x => x.TenantId == studentDeleteViewModel.TenantId && x.SchoolId == studentDeleteViewModel.SchoolId && x.StudentId == student.StudentId && studentDroppedCSIds.Contains(x.CourseSectionId)).FirstOrDefault();
+                                    var FinalGradeData = this.context?.StudentFinalGrade.Where(x => x.TenantId == studentDeleteViewModel.TenantId && x.SchoolId == studentDeleteViewModel.SchoolId && x.StudentId == student.StudentId && studentDroppedCSIds.Contains((int)x.CourseSectionId)).FirstOrDefault();
+                                    var GradebookGradeData = this.context?.GradebookGrades.Where(x => x.TenantId == studentDeleteViewModel.TenantId && x.SchoolId == studentDeleteViewModel.SchoolId && x.StudentId == student.StudentId && studentDroppedCSIds.Contains((int)x.CourseSectionId)).FirstOrDefault();
+                                    if (StudentAttendanceData != null || FinalGradeData != null || GradebookGradeData != null)
+                                    {
+                                        hasAssociation = true;
+                                        allSccuss = false;
+                                        student.MailingAddressLineTwo = "Student has course section transactional association.";
+                                        studentDelete.studentListViews.Add(student);
+                                    }
+                                    else
+                                    {
+                                        hasAssociation = false;
+                                        studentCoursesectionSchedules.AddRange(studentDroppedCS);
+                                    }
+
+                                }
+                                else
+                                {
+                                    hasAssociation = true;
+                                    allSccuss = false;
+                                    student.MailingAddressLineTwo = "Student has active course section.";
+                                    studentDelete.studentListViews.Add(student);
+                                }
+                            }
+
+                            if (!hasAssociation)
+                            {
+                                studentMasters.Add(studentData);
+                                studentComments.AddRange(studentData.StudentComments);
+                                studentDocuments.AddRange(studentData.StudentDocuments);
+                                studentMedicalNurseVisits.AddRange(studentData.StudentMedicalNurseVisit);
+                                studentMedicalAlerts.AddRange(studentData.StudentMedicalAlert);
+                                studentMedicalProviders.AddRange(studentData.StudentMedicalProvider);
+                                studentMedicalNotes.AddRange(studentData.StudentMedicalNote);
+                                studentMedicalImmunizations.AddRange(studentData.StudentMedicalImmunization);
+
+                                studentName.Add(studentData.FirstGivenName + " " + studentData.MiddleName + " " + studentData.LastFamilyName);
+
+                                var UserMaster = userMasterData?.FirstOrDefault(x => x.TenantId == studentDeleteViewModel.TenantId && x.SchoolId == studentDeleteViewModel.SchoolId && x.EmailAddress == studentData.StudentPortalId);
+                                if (UserMaster != null)
+                                {
+                                    userMasters.Add(UserMaster);
+                                }
+
+                                var customFieldsValue = customFieldsValueData?.Where(s => s.TargetId == student.StudentId).ToList();
+                                if (customFieldsValue?.Any() == true)
+                                {
+                                    customFieldsValues.AddRange(customFieldsValue);
+                                }
+
+                                var parentAssociationship = parentAssociationshipData?.FirstOrDefault(s => s.StudentId == student.StudentId);
+                                if (parentAssociationship != null)
+                                {
+                                    var parentOtherAssociationship = parentAssociationshipAllData?.FirstOrDefault(s => s.ParentId == parentAssociationship.ParentId && s.StudentId != student.StudentId);
+                                    if (parentOtherAssociationship != null)
+                                    {
+                                        parentAssociationships.Add(parentAssociationship);
+                                    }
+                                    else
+                                    {
+                                        parentAssociationships.Add(parentAssociationship);
+                                        var parentInfo = parentInfoData?.FirstOrDefault(s => s.ParentId == parentAssociationship.ParentId);
+                                        if (parentInfo != null)
+                                        {
+                                            parentAddresses.AddRange(parentInfo.ParentAddress);
+                                            parentInfos.Add(parentInfo);
+
+                                            var userMaster = userMasterData?.FirstOrDefault(x => x.TenantId == studentDeleteViewModel.TenantId && x.SchoolId == studentDeleteViewModel.SchoolId && x.EmailAddress == parentInfo.LoginEmail);
+                                            if (userMaster != null)
+                                            {
+                                                userMasters.Add(userMaster);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    this.context?.UserMaster.RemoveRange(userMasters);
+                    this.context?.CustomFieldsValue.RemoveRange(customFieldsValues);
+                    this.context?.ParentAssociationship.RemoveRange(parentAssociationships);
+                    this.context?.ParentAddress.RemoveRange(parentAddresses);
+                    this.context?.ParentInfo.RemoveRange(parentInfos);
+                    this.context?.StudentComments.RemoveRange(studentComments);
+                    this.context?.StudentMedicalAlert.RemoveRange(studentMedicalAlerts);
+                    this.context?.StudentMedicalNurseVisit.RemoveRange(studentMedicalNurseVisits);
+                    this.context?.StudentMedicalImmunization.RemoveRange(studentMedicalImmunizations);
+                    this.context?.StudentMedicalNote.RemoveRange(studentMedicalNotes);
+                    this.context?.StudentMedicalProvider.RemoveRange(studentMedicalProviders);
+                    this.context?.StudentDocuments.RemoveRange(studentDocuments);
+                    this.context?.StudentCoursesectionSchedule.RemoveRange(studentCoursesectionSchedules);
+                    this.context?.StudentMaster.RemoveRange(studentMasters);
+
+                    this.context?.SaveChanges();
+
+                    if (allSccuss)
+                    {
+                        studentDelete._message = "Students deleted successfully";
+                    }
+                    else
+                    {
+                        studentDelete._message = "Students can not be deleted due to transactional associations";
+                    }
+                }
+                else
+                {
+                    studentDelete._message = "Please select student";
+                    studentDelete._failure = false;
+                }
+            }
+            catch (Exception es)
+            {
+                studentDelete._message = es.Message;
+                studentDelete._failure = false;
+            }
+            return studentDelete;
+        }
     }
 }
 

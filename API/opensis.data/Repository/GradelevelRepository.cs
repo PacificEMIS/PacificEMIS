@@ -27,6 +27,7 @@ using Microsoft.EntityFrameworkCore;
 using opensis.data.Helper;
 using opensis.data.Interface;
 using opensis.data.Models;
+using opensis.data.ViewModels.Gradelevel;
 using opensis.data.ViewModels.GradeLevel;
 using opensis.data.ViewModels.School;
 using System;
@@ -370,6 +371,51 @@ namespace opensis.data.Repository
             }
             return gradeEquivalencyListModel;
 
+        }
+
+        /// <summary>
+        /// UpdateGradeLevelSortOrder
+        /// </summary>
+        /// <param name="gradelevelSortOrderViewModel"></param>
+        /// <returns></returns>
+        public GradelevelSortOrderViewModel UpdateGradeLevelSortOrder(GradelevelSortOrderViewModel gradelevelSortOrderViewModel)
+        {
+            try
+            {
+                var gradelevelList = this.context?.Gradelevels.Where(a => a.TenantId == gradelevelSortOrderViewModel.TenantId && a.SchoolId == gradelevelSortOrderViewModel.SchoolId);
+
+                if (gradelevelList?.Any() == true)
+                {
+                    var sortOrderValues = gradelevelSortOrderViewModel.SortOrderValues.OrderBy(c => c.Id);
+                    foreach (var sortOrderValue in sortOrderValues)
+                    {
+                        var gradelevelData = gradelevelList.FirstOrDefault(d => d.TenantId == gradelevelSortOrderViewModel.TenantId && d.SchoolId == gradelevelSortOrderViewModel.SchoolId && d.GradeId == sortOrderValue.Id);
+
+                        if (gradelevelData != null)
+                        {
+                            var oldGradelevelData = gradelevelData;
+                            gradelevelData.SortOrder = sortOrderValue.SortOrder;
+                            gradelevelData.UpdatedOn = DateTime.UtcNow;
+                            gradelevelData.UpdatedBy = gradelevelSortOrderViewModel.UpdatedBy;
+                            this.context?.Entry(oldGradelevelData).CurrentValues.SetValues(gradelevelData);
+                        }
+                    }
+                    this.context?.SaveChanges();
+                    gradelevelSortOrderViewModel._failure = false;
+                    gradelevelSortOrderViewModel._message = "Sort order updated successfully";
+                }
+                else
+                {
+                    gradelevelSortOrderViewModel._failure = true;
+                    gradelevelSortOrderViewModel._message = NORECORDFOUND;
+                }
+            }
+            catch (Exception es)
+            {
+                gradelevelSortOrderViewModel._message = es.Message;
+                gradelevelSortOrderViewModel._failure = true;
+            }
+            return gradelevelSortOrderViewModel;
         }
     }
 }

@@ -244,7 +244,7 @@ namespace opensis.data.Repository
             try
             {
 
-                var StudentEnrollmentCodeAll = this.context?.StudentEnrollmentCode.Where(x => x.TenantId == studentEnrollmentCodeListView.TenantId && x.SchoolId == studentEnrollmentCodeListView.SchoolId && x.AcademicYear == studentEnrollmentCodeListView.AcademicYear).ToList();
+                var StudentEnrollmentCodeAll = this.context?.StudentEnrollmentCode.Where(x => x.TenantId == studentEnrollmentCodeListView.TenantId && x.SchoolId == studentEnrollmentCodeListView.SchoolId && x.AcademicYear == studentEnrollmentCodeListView.AcademicYear).OrderBy(x => x.SortOrder).ToList();
 
                 if (StudentEnrollmentCodeAll!=null && StudentEnrollmentCodeAll.Any())
                 {
@@ -281,6 +281,51 @@ namespace opensis.data.Repository
             }
             return studentEnrollmentCodeList;
 
+        }
+
+        /// <summary>
+        /// UpdateStudentEnrollmentCodeSortOrder
+        /// </summary>
+        /// <param name="studentEnrollmentCodeSortOrderViewModel"></param>
+        /// <returns></returns>
+        public StudentEnrollmentCodeSortOrderViewModel UpdateStudentEnrollmentCodeSortOrder(StudentEnrollmentCodeSortOrderViewModel studentEnrollmentCodeSortOrderViewModel)
+        {
+            try
+            {
+                var studentEnrollmentCodeList = this.context?.StudentEnrollmentCode.Where(a => a.TenantId == studentEnrollmentCodeSortOrderViewModel.TenantId && a.SchoolId == studentEnrollmentCodeSortOrderViewModel.SchoolId && a.AcademicYear == studentEnrollmentCodeSortOrderViewModel._academicYear);
+
+                if (studentEnrollmentCodeList?.Any() == true)
+                {
+                    var sortOrderValues = studentEnrollmentCodeSortOrderViewModel.SortOrderValues.OrderBy(c => c.Id);
+                    foreach (var sortOrderValue in sortOrderValues)
+                    {
+                        var studentEnrollmentCodeData = studentEnrollmentCodeList.FirstOrDefault(d => d.TenantId == studentEnrollmentCodeSortOrderViewModel.TenantId && d.SchoolId == studentEnrollmentCodeSortOrderViewModel.SchoolId && d.EnrollmentCode == sortOrderValue.Id);
+
+                        if (studentEnrollmentCodeData != null)
+                        {
+                            var oldStudentEnrollmentCodeData = studentEnrollmentCodeData;
+                            studentEnrollmentCodeData.SortOrder = sortOrderValue.SortOrder;
+                            studentEnrollmentCodeData.UpdatedOn = DateTime.UtcNow;
+                            studentEnrollmentCodeData.UpdatedBy = studentEnrollmentCodeSortOrderViewModel.UpdatedBy;
+                            this.context?.Entry(oldStudentEnrollmentCodeData).CurrentValues.SetValues(studentEnrollmentCodeData);
+                        }
+                    }
+                    this.context?.SaveChanges();
+                    studentEnrollmentCodeSortOrderViewModel._failure = false;
+                    studentEnrollmentCodeSortOrderViewModel._message = "Sort order updated successfully";
+                }
+                else
+                {
+                    studentEnrollmentCodeSortOrderViewModel._failure = true;
+                    studentEnrollmentCodeSortOrderViewModel._message = NORECORDFOUND;
+                }
+            }
+            catch (Exception es)
+            {
+                studentEnrollmentCodeSortOrderViewModel._message = es.Message;
+                studentEnrollmentCodeSortOrderViewModel._failure = true;
+            }
+            return studentEnrollmentCodeSortOrderViewModel;
         }
     }
 }

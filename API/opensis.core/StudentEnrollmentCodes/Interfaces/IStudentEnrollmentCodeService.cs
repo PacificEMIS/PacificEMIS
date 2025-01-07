@@ -37,5 +37,6 @@ namespace opensis.core.StudentEnrollmentCodes.Interfaces
         public StudentEnrollmentCodeAddViewModel DeleteStudentEnrollmentCode(StudentEnrollmentCodeAddViewModel studentEnrollmentCodeAddViewModel);
         public StudentEnrollmentCodeAddViewModel UpdateStudentEnrollmentCode(StudentEnrollmentCodeAddViewModel studentEnrollmentCodeAddViewModel);
         public StudentEnrollmentCodeListViewModel GetAllStudentEnrollmentCode(StudentEnrollmentCodeListViewModel studentEnrollmentCodeListView);
+        public StudentEnrollmentCodeSortOrderViewModel UpdateStudentEnrollmentCodeSortOrder(StudentEnrollmentCodeSortOrderViewModel studentEnrollmentCodeSortOrderViewModel);
     }
 }

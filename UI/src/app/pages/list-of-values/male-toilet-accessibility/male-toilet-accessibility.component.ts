@@ -38,7 +38,7 @@ import { fadeInUp400ms } from '../../../../@vex/animations/fade-in-up.animation'
 import { stagger40ms } from '../../../../@vex/animations/stagger.animation';
 import { TranslateService } from '@ngx-translate/core';
 import { EditMaleToiletAccessibilityComponent } from './edit-male-toilet-accessibility/edit-male-toilet-accessibility.component';
-import { LovAddView, LovList } from '../../../models/lov.model';
+import { LovAddView, LovList, LoVSortOrderValuesModel, UpdateLovSortingModel } from '../../../models/lov.model';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatSort } from '@angular/material/sort';
 import { MatPaginator, MatPaginatorIntl } from '@angular/material/paginator';
@@ -52,6 +52,7 @@ import { CryptoService } from '../../../services/Crypto.service';
 import { PageRolesPermission } from '../../../common/page-roles-permissions.service';
 import { Permissions } from '../../../models/roll-based-access.model';
 import { DefaultValuesService } from 'src/app/common/default-values.service';
+import { CdkDragDrop } from '@angular/cdk/drag-drop';
 
 @Component({
   selector: 'vex-male-toilet-accessibility',
@@ -64,6 +65,7 @@ import { DefaultValuesService } from 'src/app/common/default-values.service';
 })
 export class MaleToiletAccessibilityComponent implements OnInit {
   columns = [
+    { label: 'sort', property: 'lovId', type: 'text', visible: true },
     { label: 'accessibilityName', property: 'lovColumnValue', type: 'text', visible: true },
     { label: 'createdBy', property: 'createdBy', type: 'text', visible: true },
     { label: 'createdDate', property: 'createdOn', type: 'text', visible: true },
@@ -95,6 +97,7 @@ export class MaleToiletAccessibilityComponent implements OnInit {
   addPermission = false;
   permissionListViewModel: RolePermissionListViewModel = new RolePermissionListViewModel();
   permissionGroup: RolePermissionViewModel = new RolePermissionViewModel();
+  updateLovSortingModel: UpdateLovSortingModel = new UpdateLovSortingModel();
   permissions: Permissions;
   constructor(
     private router: Router,
@@ -266,4 +269,52 @@ export class MaleToiletAccessibilityComponent implements OnInit {
     }
   }
 
+  sortLovList(event: CdkDragDrop<string[]>) {
+    if (event.currentIndex > event.previousIndex) {
+      this.maleToiletAccessibilityList.filteredData[event.currentIndex].sortOrder = Number(this.maleToiletAccessibilityList.filteredData[event.currentIndex].sortOrder) - 1;
+    }
+    else if (event.currentIndex < event.previousIndex) {
+      this.maleToiletAccessibilityList.filteredData[event.currentIndex].sortOrder = Number(this.maleToiletAccessibilityList.filteredData[event.currentIndex].sortOrder) + 1;
+    }
+    this.maleToiletAccessibilityList.filteredData[event.previousIndex].sortOrder = Number(event.currentIndex) + 1;
+
+    let dropdownListMod = this.maleToiletAccessibilityList.filteredData?.sort((a, b) => a.sortOrder < b.sortOrder ? -1 : 1);
+
+    let sortOrderValues = [];
+
+    dropdownListMod.forEach((oneLov, idxLov) => {
+      let thisItemSort = new LoVSortOrderValuesModel();
+      thisItemSort.id = oneLov.id;
+      thisItemSort.sortOrder = Number(idxLov) + 1;
+
+      sortOrderValues.push(thisItemSort);
+    })
+
+    this.updateLovSortingModel.sortOrderValues = sortOrderValues;
+    this.updateLovSortingModel.tenantId = this.defaultValuesService.getTenantID();
+    this.updateLovSortingModel.schoolId = this.defaultValuesService.getSchoolID();
+    this.updateLovSortingModel.updatedBy = this.defaultValuesService.getUserGuidId();
+    this.updateLovSortingModel.lovName = this.lovName
+
+    this.commonService.updateDropdownValueSortOrder(this.updateLovSortingModel).subscribe((res) => {
+      if (res) {
+        if (res._failure) {
+          this.snackbar.open(res._message, '', {
+            duration: 3000
+          });
+        }
+        else {
+          this.snackbar.open(res._message, '', {
+            duration: 3000
+          });
+          this.getAllDropdownValues();
+        }
+      }
+      else {
+        this.snackbar.open(this.defaultValuesService.getHttpError(), '', {
+          duration: 3000
+        });
+      }
+    })
+  }
 }

@@ -1,4 +1,4 @@
-import { LovList, LovAddView } from '../models/lov.model';
+import { LovList, LovAddView, UpdateLovSortingModel } from '../models/lov.model';
 import { CountryModel, CountryAddModel, LOVCountryModel } from '../models/country.model';
 import { StateModel } from '../models/state.model';
 import { CityModel } from '../models/city.model';
@@ -372,6 +372,12 @@ export class CommonService {
         //   sub.next(navigator.onLine);
         //   sub.complete();
         // });
+    }
+
+    updateDropdownValueSortOrder(obj: UpdateLovSortingModel){
+      obj = this.defaultValuesService.getAllMandatoryVariable(obj);
+      let apiurl = this.apiUrl + obj._tenantName+ "/Common/updateDropdownValueSortOrder";
+      return this.http.put<UpdateLovSortingModel>(apiurl,obj,this.httpOptions)
     }
 }
 

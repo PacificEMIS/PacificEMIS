@@ -95,22 +95,46 @@ export class MyClassesComponent implements OnInit {
             }
           }
         })
-        item.text=classColor[random].text;
-        item.borderColor=classColor[random].borderColor;
+        // item.text=classColor[random].text;
+        // item.borderColor=classColor[random].borderColor;
+        if (item.attendanceTaken) {
+          item.text='text-green';
+          item.borderColor='border-green';  
+        }
+        else {
+          item.text='text-red';
+          item.borderColor='border-red';
+        }
       } else if (item.scheduleType === 'Calendar Schedule') {
         item.attendanceDays = [];
         item.courseCalendarSchedule.map((calendarSchedule) => {
           item.attendanceDays.push(calendarSchedule.date);
         });
-        item.text = classColor[random].text;
-        item.borderColor = classColor[random].borderColor;
+        // item.text = classColor[random].text;
+        // item.borderColor = classColor[random].borderColor;
+        if (item.attendanceTaken) {
+          item.text='text-green';
+          item.borderColor='border-green';  
+        }
+        else {
+          item.text='text-red';
+          item.borderColor='border-red';
+        }
       } else if (item.scheduleType === 'Block Schedule') {
         item.attendanceDays = [];
         item.bellScheduleList.map((blockSchedule) => {
           item.attendanceDays.push(blockSchedule.bellScheduleDate);
         });
-        item.text = classColor[random].text;
-        item.borderColor = classColor[random].borderColor;
+        // item.text = classColor[random].text;
+        // item.borderColor = classColor[random].borderColor;
+        if (item.attendanceTaken) {
+          item.text='text-green';
+          item.borderColor='border-green';  
+        }
+        else {
+          item.text='text-red';
+          item.borderColor='border-red';
+        }
       }
       return item;
 
