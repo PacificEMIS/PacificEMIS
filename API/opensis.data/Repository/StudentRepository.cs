@@ -1400,21 +1400,26 @@ namespace opensis.data.Repository
                                             this.context?.SaveChanges();
                                         }
 
-                                        //update student's existing enrollment details 
-                                        studentEnrollmentUpdate.ExitCode = studentExitCode.Title;
-                                        studentEnrollmentUpdate.ExitDate = studentEnrollmentList.ExitDate;
-                                        studentEnrollmentUpdate.TransferredGrade = studentEnrollmentList.TransferredGrade;
-                                        studentEnrollmentUpdate.TransferredSchoolId = studentEnrollmentList.TransferredSchoolId;
-                                        studentEnrollmentUpdate.SchoolTransferred = studentEnrollmentList.SchoolTransferred;
-                                        studentEnrollmentUpdate.UpdatedOn = DateTime.UtcNow;
-                                        studentEnrollmentUpdate.UpdatedBy = studentEnrollmentList.UpdatedBy;
-                                        studentEnrollmentUpdate.IsActive = studentEnrollmentList.ExitDate != null && studentEnrollmentList.ExitDate.Value.Date < DateTime.UtcNow.Date ? false : true;
-
                                         //fetching enrollment code where student enroll(transfer).
                                         var studentTransferIn = this.context?.StudentEnrollmentCode.FirstOrDefault(x => x.TenantId == studentEnrollmentList.TenantId && x.SchoolId == studentEnrollmentList.TransferredSchoolId && x.Type.ToLower() == "Enroll (Transfer)".ToLower());
 
                                         if (studentTransferIn != null)
                                         {
+                                            //update student's existing enrollment details 
+                                            var studentEnrollmentCode = this.context?.StudentEnrollmentCode.FirstOrDefault(x => x.TenantId == studentEnrollmentList.TenantId && x.SchoolId == studentEnrollmentList.SchoolId && x.EnrollmentCode.ToString() == studentEnrollmentList.EnrollmentCode);
+
+                                            studentEnrollmentUpdate.EnrollmentCode = studentEnrollmentCode?.Title;
+                                            studentEnrollmentUpdate.EnrollmentDate = studentEnrollmentList.EnrollmentDate;
+                                            studentEnrollmentUpdate.ExitCode = studentExitCode.Title;
+                                            studentEnrollmentUpdate.ExitDate = studentEnrollmentList.ExitDate;
+                                            studentEnrollmentUpdate.TransferredGrade = studentEnrollmentList.TransferredGrade;
+                                            studentEnrollmentUpdate.TransferredSchoolId = studentEnrollmentList.TransferredSchoolId;
+                                            studentEnrollmentUpdate.SchoolTransferred = studentEnrollmentList.SchoolTransferred;
+                                            studentEnrollmentUpdate.UpdatedOn = DateTime.UtcNow;
+                                            studentEnrollmentUpdate.UpdatedBy = studentEnrollmentList.UpdatedBy;
+                                            //studentEnrollmentUpdate.IsActive = studentEnrollmentList.ExitDate != null && studentEnrollmentList.ExitDate.Value.Date < DateTime.UtcNow.Date ? false : true;
+                                            studentEnrollmentUpdate.IsActive = false;
+
                                             //fetching student details from studentMaster table for the new school if exist previously
                                             var checkStudentAlreadyExistInTransferredSchool = this.context?.StudentMaster.FirstOrDefault(x => x.TenantId == studentEnrollmentList.TenantId && x.SchoolId == studentEnrollmentList.TransferredSchoolId && x.StudentGuid == studentEnrollmentListModel.StudentGuid);
 
@@ -1582,7 +1587,7 @@ namespace opensis.data.Repository
                                                     studentEnrollmentList.GradeLevelTitle = null;
                                                     studentEnrollmentList.TransferredGrade = studentEnrollmentList.TransferredGrade;
                                                     studentEnrollmentList.CalenderId = studentEnrollmentUpdate.CalenderId;
-                                                    studentEnrollmentList.RollingOption = studentEnrollmentListModel.RollingOption;
+                                                    studentEnrollmentList.RollingOption = "Next grade at current school";
                                                     studentEnrollmentList.UpdatedOn = DateTime.UtcNow;
                                                     studentEnrollmentList.IsActive = false;
                                                     this.context?.StudentEnrollment.AddRange(studentEnrollmentList);
@@ -1620,7 +1625,7 @@ namespace opensis.data.Repository
                                             studentEnrollmentList.GradeId = transferredGradeId != null ? transferredGradeId.GradeId : null;
                                             studentEnrollmentList.TransferredGrade = null;
                                             studentEnrollmentList.CalenderId = calenderId;
-                                            studentEnrollmentList.RollingOption = studentEnrollmentListModel.RollingOption;
+                                            studentEnrollmentList.RollingOption = "Next grade at current school";
                                             studentEnrollmentList.UpdatedOn = DateTime.UtcNow;
                                             studentEnrollmentList.UpdatedBy = studentEnrollmentList.UpdatedBy;
                                             studentEnrollmentList.IsActive = true;
@@ -1663,7 +1668,7 @@ namespace opensis.data.Repository
                                             studentEnrollmentUpdate.ExitCode = studentExitCode.Title;
                                             studentEnrollmentUpdate.ExitDate = studentEnrollmentList.ExitDate;
                                             studentEnrollmentUpdate.TransferredGrade = studentEnrollmentList.GradeLevelTitle;
-                                            studentEnrollmentUpdate.RollingOption = studentEnrollmentListModel.RollingOption;
+                                            studentEnrollmentUpdate.RollingOption = "Do not enroll after this school year";
                                             studentEnrollmentUpdate.UpdatedOn = DateTime.UtcNow;
                                             studentEnrollmentUpdate.UpdatedBy = studentEnrollmentList.UpdatedBy;
                                             studentEnrollmentUpdate.IsActive = true;
@@ -1772,6 +1777,7 @@ namespace opensis.data.Repository
                                     studentEnrollmentUpdate.GradeLevelTitle = studentEnrollmentList.GradeLevelTitle;
                                     studentEnrollmentUpdate.GradeId = studentEnrollmentList.GradeId;
                                     studentEnrollmentUpdate.RollingOption = studentEnrollmentListModel.RollingOption;
+                                    studentEnrollmentUpdate.EnrollOtherSchoolId = studentEnrollmentListModel.EnrollOtherSchoolId;
                                     studentEnrollmentUpdate.CalenderId = studentEnrollmentListModel.CalenderId;
                                     studentEnrollmentUpdate.UpdatedOn = DateTime.UtcNow;
                                     studentEnrollmentUpdate.UpdatedBy = studentEnrollmentList.UpdatedBy;
@@ -1858,6 +1864,7 @@ namespace opensis.data.Repository
                             studentEnrollmentList.EnrollmentCode = studentEnrollmentCode!.Title;
                             studentEnrollmentList.CalenderId = calenderId;
                             studentEnrollmentList.RollingOption = studentEnrollmentListModel.RollingOption;
+                            studentEnrollmentList.EnrollOtherSchoolId = studentEnrollmentListModel.EnrollOtherSchoolId;
                             studentEnrollmentList.UpdatedOn = DateTime.UtcNow;
                             studentEnrollmentList.IsActive = true;
                             this.context?.StudentEnrollment.AddRange(studentEnrollmentList);
@@ -1913,6 +1920,7 @@ namespace opensis.data.Repository
                         StudentId = y.StudentId,
                         GradeLevelTitle = y.GradeLevelTitle,
                         RollingOption = y.RollingOption,
+                        EnrollOtherSchoolId = y.EnrollOtherSchoolId,
                         SchoolName = y.SchoolName,
                         UpdatedOn = y.UpdatedOn,
                         SchoolTransferred = y.SchoolTransferred,
@@ -1942,6 +1950,7 @@ namespace opensis.data.Repository
                     }).ToList();
                     studentEnrollmentListView.studentEnrollmentListForView = studentEnrollment;
                     studentEnrollmentListView.RollingOption = studentEnrollmentList.FirstOrDefault(x => x.SchoolId == studentEnrollmentListViewModel.SchoolId)?.RollingOption;
+                    studentEnrollmentListView.EnrollOtherSchoolId = studentEnrollmentList.FirstOrDefault(x => x.SchoolId == studentEnrollmentListViewModel.SchoolId)?.EnrollOtherSchoolId;
 
                     var studentMasterData = this.context?.StudentMaster.FirstOrDefault(x => x.TenantId == studentEnrollmentListViewModel.TenantId && x.SchoolId == studentEnrollmentListViewModel.SchoolId && x.StudentGuid == studentEnrollmentListViewModel.StudentGuid);
 
