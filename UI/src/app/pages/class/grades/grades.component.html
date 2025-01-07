@@ -2,14 +2,14 @@
     <div class="custom-tab">
         <div class="flex md:justify-center items-center mb-5">
             <ul class="flex flex-row">
-                <li class="px-4 py-2 cursor-pointer font-medium" (click)="changeTab('gradebook')"
-                    [class.active]="currentTab === 'gradebook'"
-                    [ngClass]="currentTab === 'gradebook' ? 'text-white bg-green rounded-full' : 'text-gray'">{{'gradebookGrades'| translate }}
-                </li>
                 <li class="px-4 py-2 cursor-pointer font-medium" (click)="changeTab('inputFinalGrades')"
                     [class.active]="currentTab === 'inputFinalGrades'"
                     [ngClass]="currentTab === 'inputFinalGrades' ? 'text-white bg-green rounded-full' : 'text-gray'">{{
                     'inputFinalGrades' | translate }}
+                </li>
+                <li class="px-4 py-2 cursor-pointer font-medium" (click)="changeTab('gradebook')"
+                    [class.active]="currentTab === 'gradebook'"
+                    [ngClass]="currentTab === 'gradebook' ? 'text-white bg-green rounded-full' : 'text-gray'">{{'gradebookGrades'| translate }}
                 </li>
             </ul>
         </div>
