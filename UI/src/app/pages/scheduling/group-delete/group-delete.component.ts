@@ -174,7 +174,7 @@ export class GroupDeleteComponent implements OnInit, AfterViewInit, OnDestroy {
 
   // For open select Course Section dialog
   selectCourseSection() {
-    if (this.defaultService.checkAcademicYear()) {
+    if (this.defaultService.checkAcademicYear() && (this?.subjectList?.length > 0 && this.courseList?.length > 0 )) {
       this.studentDetails = new MatTableDataSource([]);
       this.scheduleStudentListViewModel = new GetUnassociatedStudentListByCourseSectionModel();
       this.searchCtrl = new FormControl();

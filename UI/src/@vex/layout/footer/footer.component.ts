@@ -48,26 +48,27 @@ export class FooterComponent implements OnInit, OnDestroy {
   getReleaseNumber() {
     this.releaseNumberAddViewModel.releaseNumber.schoolId = this.defaultValuesService.getSchoolID();
     this.releaseNumberAddViewModel.releaseNumber.tenantId =this.defaultValuesService.getTenantID();
-    this.commonService
-      .getReleaseNumber(this.releaseNumberAddViewModel)
-      .subscribe((data) => {
-        if (typeof data == "undefined") {
-          this.snackbar.open(
-            "Release Number failed. " + this.defaultValuesService.getHttpError(),
-            "",
-            {
-              duration: 10000,
-            }
-          );
-        } else {
-         if(data._failure){
-        this.commonService.checkTokenValidOrNot(data._message);
-          } else {
-            this.releaseNumberAddViewModel.releaseNumber.releaseNumber1 =
-              data.releaseNumber.releaseNumber1;
-          }
-        }
-      });
+    this.releaseNumberAddViewModel.releaseNumber.releaseNumber1 = '1.0.2' ;
+    // this.commonService
+    //   .getReleaseNumber(this.releaseNumberAddViewModel)
+    //   .subscribe((data) => {
+    //     if (typeof data == "undefined") {
+    //       this.snackbar.open(
+    //         "Release Number failed. " + this.defaultValuesService.getHttpError(),
+    //         "",
+    //         {
+    //           duration: 10000,
+    //         }
+    //       );
+    //     } else {
+    //      if(data._failure){
+    //     this.commonService.checkTokenValidOrNot(data._message);
+    //       } else {
+    //         this.releaseNumberAddViewModel.releaseNumber.releaseNumber1 =
+    //           data.releaseNumber.releaseNumber1;
+    //       }
+    //     }
+    //   });
   }
 
 
