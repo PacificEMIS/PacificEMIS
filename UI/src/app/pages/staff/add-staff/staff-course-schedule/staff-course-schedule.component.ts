@@ -705,4 +705,11 @@ export class StaffCourseScheduleComponent implements OnInit {
       });
       this.excelService.exportAsExcelFile(scheduledCoursesSectionList, 'Scheduled_Course_Secion_List_');
   }
+  getSlicedCourseSection(item: string): string {
+    if(item?.length >= 10){
+      return item.slice(0, 10) + '....';
+    }else{
+      return item;
+    }
+  }
 }
