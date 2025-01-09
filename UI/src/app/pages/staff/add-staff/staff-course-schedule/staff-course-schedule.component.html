@@ -46,13 +46,18 @@
                     <!-- course Column -->
                     <ng-container matColumnDef="courseSection">
                         <mat-header-cell *matHeaderCellDef> {{'courseSection' | translate }} </mat-header-cell>
-                        <mat-cell *matCellDef="let element"> {{element.courseSection}} </mat-cell>
+                        <mat-cell *matCellDef="let element" class="text-center"
+                            matTooltip="{{element?.courseSection?.length > 10 ? element?.courseSection : ''}}" [matTooltipPosition]="'above'">
+                              {{getSlicedCourseSection(element?.courseSection)}}
+                        </mat-cell>
                     </ng-container>
 
                     <!-- period Column -->
                     <ng-container matColumnDef="period">
                         <mat-header-cell *matHeaderCellDef> {{ "period" | translate }} </mat-header-cell>
-                        <mat-cell *matCellDef="let element"> {{element.period}} </mat-cell>
+                        <mat-cell *matCellDef="let element" class="text-center" matTooltip="{{element.period?.length > 10 ? element.period : ''}}" [matTooltipPosition]="'above'">
+                              {{getSlicedCourseSection(element?.period)}}
+                          </mat-cell>
                     </ng-container>
 
                     <!-- markingPeriod Column -->
