@@ -52,7 +52,8 @@ export class GradesComponent implements OnInit, AfterViewInit {
   ngOnInit(): void {
     if (this.selectedCourseSection?.gradeScaleType !== 'Ungraded') {
       this.isNotGraded = false;
-      this.currentTab = "gradebook";
+      // this.currentTab = "gradebook";
+      this.currentTab = "inputFinalGrades";
     } else {
       this.isNotGraded = true;
     }
