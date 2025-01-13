@@ -277,12 +277,16 @@ export class CourseCatelogViewModel extends CommonField {
     markingPeriodId: string;
     gradeLevel: string;
     courseSubject: string;
+    period?:string;
+    room?:string;
     constructor(){
         super();
         this.markingPeriodId = '';
         this.courseSubject = '';
         this.courseId = '';
         this.gradeLevel = '';
+        this.period = '';
+        this.room = '';
     }
 }
 

@@ -57,6 +57,28 @@
                                 </mat-select>
                             </mat-form-field>
                         </li>
+                        <li>
+                            <mat-form-field class="w-full m-0" appearance="outline" color="primary">
+                                <mat-label>{{ "periods" | translate }}</mat-label>
+                                <mat-select name="period" (selectionChange)="getCourseCatelog()"
+                                    [(ngModel)]="courseCatelogViewModel.period">
+                                    <mat-option value="">{{'all'|translate}}</mat-option>
+                                    <mat-option *ngFor="let period of periodList" [value]='period?.periodId'>
+                                        {{period?.periodTitle}}</mat-option>
+                                </mat-select>
+                            </mat-form-field>
+                        </li>
+                        <li>
+                            <mat-form-field class="w-full m-0" appearance="outline" color="primary">
+                                <mat-label>{{ "room" | translate }}</mat-label>
+                                <mat-select name="room" (selectionChange)="getCourseCatelog()"
+                                    [(ngModel)]="courseCatelogViewModel.room">
+                                    <mat-option value="">{{'all'|translate}}</mat-option>
+                                    <mat-option *ngFor="let room of roomList" [value]='room.roomId'>
+                                        {{room.title}}</mat-option>
+                                </mat-select>
+                            </mat-form-field>
+                        </li>
                     </ul>
                     <div class="flex justify-end ml-0 md:ml-2 mt-4 md:mt-0">
                         <a [matMenuTriggerFor]="addNewMenu" class="cursor-pointer">

@@ -15,6 +15,11 @@ import { weeks } from "../../../common/static-data";
 import { scheduleType } from 'src/app/enums/takeAttendanceList.enum';
 import { CourseSectionViewModel, ScheduleDetailsModel } from 'src/app/models/staff.model';
 import { Transform24to12Pipe } from '../../shared-module/user-define-pipe/transform-24to12.pipe';
+import { BlockListViewModel } from '../../../models/school-period.model';
+import { SchoolPeriodService } from '../../../services/school-period.service';
+import { FixedSchedulingCourseSectionAddModel, OutputEmitDataFormat } from '../../../models/course-section.model';
+import { RoomService } from '../../../services/room.service';
+import { RoomListViewModel } from '../../../models/room.model';
 @Component({
   selector: 'vex-course-catalog',
   templateUrl: './course-catalog.component.html',
@@ -29,6 +34,7 @@ export class CourseCatalogComponent implements OnInit {
   getMarkingPeriodTitleListModel: GetMarkingPeriodTitleListModel = new GetMarkingPeriodTitleListModel();
   courseWithCourseSectionDetailsViewModel: CourseWithCourseSectionDetailsViewModel = new CourseWithCourseSectionDetailsViewModel();
   courseCatelogViewModel: CourseCatelogViewModel = new CourseCatelogViewModel();
+  roomListViewModel:RoomListViewModel=new RoomListViewModel();
   courseList = [];
   subjectList = [];
   periodStartTime;
@@ -47,6 +53,8 @@ export class CourseCatalogComponent implements OnInit {
   weekArray = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
   mDays: any;
   newCourseDataSet:any=[];
+  periodList:any = [];
+  roomList:any = [];
 
   constructor(
     private gradesService: GradesService,
@@ -58,6 +66,8 @@ export class CourseCatalogComponent implements OnInit {
     private pageRolePermissions: PageRolesPermission,
     private loaderService: LoaderService,
     private commonService: CommonService,
+    private schoolPeriodService:SchoolPeriodService,
+    private roomService:RoomService,
   ) {
     this.loaderService.isLoading.subscribe((val) => {
       this.loading = val;
@@ -70,7 +80,10 @@ export class CourseCatalogComponent implements OnInit {
     this.getAllGradeLevelList();
     this.getAllMarkingPeriodList();
     this.getCourseCatelog();
+    this.getAllBlockList();
+    this.getAllRooms();
   }
+  
   getAllCourse() {
     this.courseManager.GetAllCourseList(this.getAllCourseListModel).subscribe(data => {
       if (data._failure) {
@@ -82,6 +95,7 @@ export class CourseCatalogComponent implements OnInit {
       } else {
         this.courseList = data.courseViewModelList;
       }
+      console.log('courseList',this.courseList);
     });
   }
 
@@ -534,6 +548,65 @@ export class CourseCatalogComponent implements OnInit {
     }
     return null;
   }
+
+    getAllBlockList() {
+      let blockListViewModel:BlockListViewModel= new BlockListViewModel();
+      blockListViewModel.tenantId = this.defaultValuesService.getTenantID();
+      blockListViewModel.schoolId = this.defaultValuesService.getSchoolID();
+      blockListViewModel.isListView = true;
+      this.schoolPeriodService.getAllBlockList(blockListViewModel).subscribe(
+        (res: BlockListViewModel) => {
+          if(typeof(res)=='undefined'){
+            this.snackbar.open('' + this.defaultValuesService.getHttpError(), '', {
+              duration: 10000
+            });
+          }
+          else{
+          if(res._failure){
+            this.periodList = [];
+          this.commonService.checkTokenValidOrNot(res._message);    
+              this.snackbar.open(res._message, '', {
+                duration: 10000
+              }); 
+            } 
+            else{
+              this.periodList = res.getBlockListForView[0]?.blockPeriod;
+            }
+          }
+          
+        }
+      );
+    }
+
+    getAllRooms(){
+      this.roomListViewModel.isListView = true;
+        this.roomService.getAllRoom(this.roomListViewModel).subscribe(
+          (res:RoomListViewModel)=>{
+            if(typeof(res)=='undefined'){
+              this.snackbar.open('' + this.defaultValuesService.getHttpError(), '', {
+                duration: 10000
+              });
+            }
+            else{
+            if(res._failure){
+            this.roomList= [];
+            this.commonService.checkTokenValidOrNot(res._message);    
+                if(!res.tableroomList){
+                  this.snackbar.open(res._message, '', {
+                    duration: 10000
+                  });
+                }
+              } 
+              else{
+                this.roomListViewModel=res;
+                this.roomList = res?.tableroomList;
+              }
+            }
+          }
+        )
+      }
+    
+  
 
   
 }
