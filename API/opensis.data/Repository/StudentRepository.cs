@@ -5793,6 +5793,11 @@ namespace opensis.data.Repository
                                 }
                             }
 
+                            if (studentEnrollmentAssignModel.studentEnrollments?.EnrollmentDate != null)
+                            {
+                                studentEnrollmentData.EnrollmentDate = studentEnrollmentAssignModel.studentEnrollments.EnrollmentDate;
+                            }
+
                             studentEnrollmentData.UpdatedBy = studentEnrollmentAssignModel.studentEnrollments?.UpdatedBy;
                             studentEnrollmentData.UpdatedOn = DateTime.UtcNow;
                         }
