@@ -42,6 +42,8 @@ namespace opensis.data.ViewModels.CourseManager
         public int? CourseId { get; set; }
         public string? MarkingPeriodId { get; set; }
         public string? GradeLevel { get; set; }
+        public int? RoomId { get; set; }
+        public int? PeriodId { get; set; }
         public decimal? AcademicYear { get; set; }
 
         public string? SchoolName { get; set; }
