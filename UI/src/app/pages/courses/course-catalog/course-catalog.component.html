@@ -60,8 +60,8 @@
                         <li>
                             <mat-form-field class="w-full m-0" appearance="outline" color="primary">
                                 <mat-label>{{ "period" | translate }}</mat-label>
-                                <mat-select name="period" (selectionChange)="getCourseCatelog()"
-                                    [(ngModel)]="courseCatelogViewModel.period">
+                                <mat-select name="periodId" (selectionChange)="getCourseCatelog()"
+                                    [(ngModel)]="courseCatelogViewModel.periodId">
                                     <mat-option value="">{{'all'|translate}}</mat-option>
                                     <mat-option *ngFor="let period of periodList" [value]='period?.periodId'>
                                         {{period?.periodTitle}}</mat-option>
@@ -71,8 +71,8 @@
                         <li>
                             <mat-form-field class="w-full m-0" appearance="outline" color="primary">
                                 <mat-label>{{ "room" | translate }}</mat-label>
-                                <mat-select name="room" (selectionChange)="getCourseCatelog()"
-                                    [(ngModel)]="courseCatelogViewModel.room">
+                                <mat-select name="roomId" (selectionChange)="getCourseCatelog()"
+                                    [(ngModel)]="courseCatelogViewModel.roomId">
                                     <mat-option value="">{{'all'|translate}}</mat-option>
                                     <mat-option *ngFor="let room of roomList" [value]='room.roomId'>
                                         {{room.title}}</mat-option>

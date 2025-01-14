@@ -95,7 +95,6 @@ export class CourseCatalogComponent implements OnInit {
       } else {
         this.courseList = data.courseViewModelList;
       }
-      console.log('courseList',this.courseList);
     });
   }
 
