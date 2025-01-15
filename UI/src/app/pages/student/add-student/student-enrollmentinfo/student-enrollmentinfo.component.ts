@@ -128,6 +128,8 @@ export class StudentEnrollmentinfoComponent implements OnInit, OnDestroy {
   categoryId = 1;
   customValid=false;
   getAllCalendarHoliday: GetCalendarAndHolidayListModel = new GetCalendarAndHolidayListModel();
+  schoolList = [];
+  schoolId;
   constructor(
     private dialog: MatDialog,
     private calendarService: CalendarService,
@@ -173,6 +175,7 @@ export class StudentEnrollmentinfoComponent implements OnInit, OnDestroy {
       // this.studentService.changePageMode(this.studentCreateMode);
     }
     this.membershipType = this.defaultValueService.getUserMembershipType();
+    this.schoolId = this.defaultValuesService.getSchoolID()
   }
 
   cmpare(index) {
@@ -308,6 +311,12 @@ export class StudentEnrollmentinfoComponent implements OnInit, OnDestroy {
               return x.schoolId === +this.cloneStudentEnrollment.studentEnrollments[i].transferredSchoolId;
             });
           }
+          this.schoolList = this.schoolListWithGradeLevelsAndEnrollCodes;
+          setTimeout(() => {
+            const transferredSchoolId = (this.studentEnrollmentViewModel.studentEnrollmentListForView.filter(item => (item.schoolId == this.defaultValuesService.getSchoolID() && item.rollingOption == RollingOptionsEnum['Enrol to another school'])))?.[0]?.transferredSchoolId;
+            this.studentEnrollmentModel.transferredSchoolId = +transferredSchoolId;
+            this.studentEnrollmentModel.transferredSchoolName = (this.schoolListWithGradeLevelsAndEnrollCodes.filter(item => item?.schoolId == this.studentEnrollmentModel.enrollOtherSchoolId))?.[0]?.schoolName	;
+          });
           this.findEnrollmentCodeIdByName();
           this.findExitCodeIdByName();
         }
@@ -462,14 +471,16 @@ export class StudentEnrollmentinfoComponent implements OnInit, OnDestroy {
           this.cloneStudentEnrollment.studentEnrollments = res.studentEnrollmentListForView.filter((item) => item.isActive === true);
           this.cloneStudentModel = JSON.stringify(this.cloneStudentEnrollment);
           this.studentCloneModel = JSON.parse(this.cloneStudentModel);
+          this.studentEnrollmentModel.enrollOtherSchoolId = res?.enrollOtherSchoolId;
           // this.cloneEnrollmentForCancel = JSON.stringify(this.studentEnrollmentModel);
           // this.cloneOfCloneEnrollmentForCancel = JSON.stringify(this.cloneStudentEnrollment);
           // for (let i = 0; i < this.cloneStudentEnrollment.studentEnrollments?.length; i++) {
           //   this.divCount[i] = i;
           // }
-          if (this.studentCreateMode === this.studentCreate.ADD) {
-            this.getAllSchoolListWithGradeLevelsAndEnrollCodes();
-          }
+          // if (this.studentCreateMode === this.studentCreate.ADD) {
+          //   this.getAllSchoolListWithGradeLevelsAndEnrollCodes();
+          // }
+          this.getAllSchoolListWithGradeLevelsAndEnrollCodes();
           this.getAllCalendar();
         }
       }
@@ -511,7 +522,7 @@ export class StudentEnrollmentinfoComponent implements OnInit, OnDestroy {
       const index = this.schoolListWithGradeLevelsAndEnrollCodes.findIndex((x) => {
         return x.schoolId == +this.studentEnrollmentModel.studentEnrollmentListForView[i].schoolId;
       });
-      for (let j = 0; j < this.schoolListWithGradeLevelsAndEnrollCodes[index].studentEnrollmentCode?.length; j++) {
+      for (let j = 0; j < this.schoolListWithGradeLevelsAndEnrollCodes?.[index]?.studentEnrollmentCode?.length; j++) {
         if (this.studentEnrollmentModel.studentEnrollmentListForView[i].enrollmentCode == this.schoolListWithGradeLevelsAndEnrollCodes[index].studentEnrollmentCode[j].title) {
           this.studentEnrollmentModel.studentEnrollmentListForView[i].enrollmentCode = this.schoolListWithGradeLevelsAndEnrollCodes[index].studentEnrollmentCode[j].enrollmentCode.toString();
           break;
@@ -604,6 +615,10 @@ export class StudentEnrollmentinfoComponent implements OnInit, OnDestroy {
     this.studentEnrollmentModel._userName = this.defaultValueService.getUserName();
 
     this.studentEnrollmentModel.studentEnrollments.map(item => item.updatedBy = this.defaultValuesService.getUserGuidId());
+    this.studentEnrollmentModel.transferredSchoolName = null;
+    if (this.studentEnrollmentModel.rollingOption	!= RollingOptionsEnum['Enrol to another school']){
+      this.studentEnrollmentModel.enrollOtherSchoolId = null;
+    }
 
     this.studentService.updateStudentEnrollment(this.studentEnrollmentModel).subscribe((res) => {
       if (res) {
