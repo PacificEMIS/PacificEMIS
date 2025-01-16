@@ -621,7 +621,10 @@ export class StudentEnrollmentModel extends CommonField {
     lepIndicator: boolean;
     fieldsCategoryList;
     selectedCategoryId;
-    
+    transferredSchoolId;
+    transferredSchoolName;
+    enrollOtherSchoolId;
+    statusCode;
     constructor() {
         super();
         this.studentEnrollments = [new StudentEnrollmentDetails];

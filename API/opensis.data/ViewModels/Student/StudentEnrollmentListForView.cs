@@ -38,6 +38,7 @@ namespace opensis.data.ViewModels.Student
         public int? CalenderId { get; set; }
         public decimal? AcademicYear { get; set; }
         public string? RollingOption { get; set; }
+        public int? EnrollOtherSchoolId { get; set; }
         public string? SchoolName { get; set; }
         public string? GradeLevelTitle { get; set; }
         public DateTime? EnrollmentDate { get; set; }
