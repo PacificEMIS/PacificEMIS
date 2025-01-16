@@ -6496,6 +6496,10 @@ namespace opensis.data.Models
                     .HasColumnType("date")
                     .HasColumnName("exit_date");
 
+                entity.Property(e => e.ExitReason)
+                    .HasMaxLength(100)
+                    .HasColumnName("exit_reason");
+
                 entity.Property(e => e.GradeId).HasColumnName("grade_id");
 
                 entity.Property(e => e.GradeLevelTitle)

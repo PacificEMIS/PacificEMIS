@@ -62,6 +62,7 @@ namespace opensis.data.Models
         public DateTime? CreatedOn { get; set; }
         public string? UpdatedBy { get; set; }
         public DateTime? UpdatedOn { get; set; }
+        public string? ExitReason { get; set; }
 
         [NotMapped] 
         public decimal? AcademicYear { get; set; }
