@@ -61,5 +61,6 @@ namespace opensis.data.ViewModels.Student
         public string? StartYear { get; set; }
         public string? EndYear { get; set; }
         public bool? IsActive { get; set; }
+        public string? ExitReason { get; set; }
     }
 }

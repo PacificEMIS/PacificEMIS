@@ -1936,6 +1936,7 @@ namespace opensis.data.Repository
                         EnrollmentDate = y.EnrollmentDate,
                         ExitCode = y.ExitCode,
                         ExitDate = y.ExitDate,
+                        ExitReason=y.ExitReason,
                         StudentGuid = y.StudentGuid,
                         EnrollmentType = this.context?.StudentEnrollmentCode.FirstOrDefault(s => s.TenantId == y.TenantId && s.SchoolId == y.SchoolId && s.Title == y.EnrollmentCode)?.Type,
                         ExitType = this.context?.StudentEnrollmentCode.FirstOrDefault(s => s.TenantId == y.TenantId && s.SchoolId == y.SchoolId && s.Title == y.ExitCode)?.Type,
