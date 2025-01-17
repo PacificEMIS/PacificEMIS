@@ -1412,6 +1412,7 @@ namespace opensis.data.Repository
                                             studentEnrollmentUpdate.EnrollmentDate = studentEnrollmentList.EnrollmentDate;
                                             studentEnrollmentUpdate.ExitCode = studentExitCode.Title;
                                             studentEnrollmentUpdate.ExitDate = studentEnrollmentList.ExitDate;
+                                            studentEnrollmentUpdate.ExitReason = studentEnrollmentList.ExitReason;
                                             studentEnrollmentUpdate.TransferredGrade = studentEnrollmentList.TransferredGrade;
                                             studentEnrollmentUpdate.TransferredSchoolId = studentEnrollmentList.TransferredSchoolId;
                                             studentEnrollmentUpdate.SchoolTransferred = studentEnrollmentList.SchoolTransferred;
@@ -1667,6 +1668,7 @@ namespace opensis.data.Repository
                                             //This block update data for student's drop out from school
                                             studentEnrollmentUpdate.ExitCode = studentExitCode.Title;
                                             studentEnrollmentUpdate.ExitDate = studentEnrollmentList.ExitDate;
+                                            studentEnrollmentUpdate.ExitReason = studentEnrollmentList.ExitReason;
                                             studentEnrollmentUpdate.TransferredGrade = studentEnrollmentList.GradeLevelTitle;
                                             studentEnrollmentUpdate.RollingOption = "Do not enroll after this school year";
                                             studentEnrollmentUpdate.UpdatedOn = DateTime.UtcNow;
@@ -1936,7 +1938,7 @@ namespace opensis.data.Repository
                         EnrollmentDate = y.EnrollmentDate,
                         ExitCode = y.ExitCode,
                         ExitDate = y.ExitDate,
-                        ExitReason=y.ExitReason,
+                        ExitReason = y.ExitReason,
                         StudentGuid = y.StudentGuid,
                         EnrollmentType = this.context?.StudentEnrollmentCode.FirstOrDefault(s => s.TenantId == y.TenantId && s.SchoolId == y.SchoolId && s.Title == y.EnrollmentCode)?.Type,
                         ExitType = this.context?.StudentEnrollmentCode.FirstOrDefault(s => s.TenantId == y.TenantId && s.SchoolId == y.SchoolId && s.Title == y.ExitCode)?.Type,
