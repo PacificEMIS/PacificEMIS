@@ -601,6 +601,7 @@ export class StudentEnrollmentDetails {
     endYear: string;
     isActive: boolean;
     showDrop:boolean;
+    exitReason : string;
 }
 export class StudentEnrollmentModel extends CommonField {
     studentEnrollments: Array<StudentEnrollmentDetails>;
