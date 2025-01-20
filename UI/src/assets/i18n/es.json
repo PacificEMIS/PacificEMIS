@@ -1961,5 +1961,7 @@
     "deleteSelected": "Eliminar seleccionados",
     "youWantToDeleteSelectedStudents": "¿Quieres eliminar a los estudiantes seleccionados?",
     "deleteStaff": "Eliminar personal",
-    "youWantToDeleteStaff": "¿Quieres eliminar al personal?"
+    "youWantToDeleteStaff": "¿Quieres eliminar al personal?",
+    "exitReason":"Motivo de salida",
+    "exitReasonRequired":"El motivo de salida es obligatorio"
 }

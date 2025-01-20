@@ -281,6 +281,16 @@
                                                 </mat-error>
                                             </mat-form-field>
                                         </li>
+                                        <li>
+                                            <mat-form-field fxFlex="auto" class="w-full" appearance="outline" color="primary">
+                                                <mat-label>{{'exitReason'|translate}}</mat-label>
+                                                <input [(ngModel)]="this.cloneStudentEnrollment.studentEnrollments[index].exitReason"
+                                                [required]="this.cloneStudentEnrollment.studentEnrollments[index].exitCode"
+                                                    name="{{'exitReason'+index}}" #exitReason="ngModel" matInput maxlength="100">
+                                                <mat-error class="text-red" *ngIf="exitReason.errors?.required">
+                                                    {{'exitReasonRequired'|translate}}</mat-error>
+                                            </mat-form-field>
+                                        </li>
                                     </ul>
                                 </div>
                             </div>
@@ -626,9 +636,13 @@
                                         {{enrollment.exitDate|date}}
                                         <mat-icon [icIcon]="icDrop" class="text-warn align-middle mx-2"
                                             *ngIf="enrollment.exitType==='Drop' && enrollment.rolloverId !== null && enrollment.showDrop"></mat-icon>
-                                        Not enrolled</span>
+                                        Not enrolled
+                                        </span>
+                                        <span *ngIf="enrollment.showDrop && enrollment?.exitReason">
+                                            <mat-icon [icIcon]="icInfo" class="text-black align-middle mx-2" matTooltip="{{enrollment?.exitReason}}" [matTooltipPosition]="'above'">
+                                            </mat-icon>
+                                        </span>
                             </td>
-
                             <td>{{enrollment.schoolName}}</td>
                         </tr>
                     </tbody>

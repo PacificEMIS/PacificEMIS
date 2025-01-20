@@ -64,6 +64,7 @@ import { CommonService } from 'src/app/services/common.service';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmDialogComponent } from 'src/app/pages/shared-module/confirm-dialog/confirm-dialog.component';
 import { Module } from 'src/app/enums/module.enum';
+import icInfo from '@iconify/icons-ic/info';
 @Component({
   selector: 'vex-student-enrollmentinfo',
   templateUrl: './student-enrollmentinfo.component.html',
@@ -89,6 +90,7 @@ export class StudentEnrollmentinfoComponent implements OnInit, OnDestroy {
   icTrasnferIn = icTrasnferIn;
   icTrasnferOut = icTrasnferOut;
   icDrop = icDrop;
+  icInfo = icInfo;
   membershipType;
   studentCreate = SchoolCreate;
   studentCreateMode: SchoolCreate;
@@ -266,7 +268,8 @@ export class StudentEnrollmentinfoComponent implements OnInit, OnDestroy {
       startYear: null,
       endYear: null,
       isActive: null,
-      showDrop: null
+      showDrop: null,
+      exitReason:null
 
     })
     this.divCount.push(2); // Why 2? We have to fill up the divCount, It could be anything.
