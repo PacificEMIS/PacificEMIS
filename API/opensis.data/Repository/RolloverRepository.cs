@@ -835,6 +835,7 @@ namespace opensis.data.Repository
                                     if (studentEnrollmentData != null)
                                     {
                                         var studentData = this.context?.StudentMaster.FirstOrDefault(x => x.TenantId == rolloverViewModel.SchoolRollover.TenantId && x.SchoolId == studentEnrollmentData.SchoolId && x.StudentId == studentEnrollmentData.StudentId);
+
                                         if (studentData != null)
                                         {
                                             if (studentEnrollmentData.RollingOption?.ToLower() == "Next grade at current school".ToLower())
@@ -848,21 +849,6 @@ namespace opensis.data.Repository
                                                 studentEnrollmentData.UpdatedBy = rolloverViewModel.SchoolRollover.CreatedBy;
                                                 studentEnrollmentData.IsActive = false;
 
-                                                StudentEnrollment studentEnrollment = new();
-                                                studentEnrollment.SchoolId = rolloverViewModel.SchoolRollover.SchoolId;
-                                                studentEnrollment.TenantId = rolloverViewModel.SchoolRollover.TenantId;
-                                                studentEnrollment.StudentId = studentMaster.StudentId;
-                                                studentEnrollment.StudentGuid = studentMaster.StudentGuid;
-                                                studentEnrollment.EnrollmentId = (int)EnrollmentId;
-                                                studentEnrollment.EnrollmentDate = rolloverViewModel.SchoolRollover.ReenrollmentDate;
-                                                studentEnrollment.EnrollmentCode = studentRollOver?.Title;
-                                                studentEnrollment.SchoolName = studentEnrollmentData.SchoolName;
-                                                studentEnrollment.CalenderId = schoolSessionCalendar.CalenderId;
-                                                studentEnrollment.RollingOption = studentEnrollmentData.RollingOption;
-                                                studentEnrollment.UpdatedOn = DateTime.UtcNow;
-                                                studentEnrollment.UpdatedBy = rolloverViewModel.SchoolRollover.CreatedBy;
-                                                studentEnrollment.IsActive = true;
-
                                                 //Fetching all GradeLevel of school.
                                                 var gradeLevelData = this.context?.Gradelevels.Where(x => x.TenantId == rolloverViewModel.SchoolRollover.TenantId && x.SchoolId == rolloverViewModel.SchoolRollover.SchoolId).ToList();
 
@@ -872,19 +858,73 @@ namespace opensis.data.Repository
                                                 //Fetching next GradeLevel for student.
                                                 if (enrolledGradeLevelData?.NextGradeId != null)
                                                 {
+                                                    StudentEnrollment studentEnrollment = new();
+                                                    studentEnrollment.SchoolId = rolloverViewModel.SchoolRollover.SchoolId;
+                                                    studentEnrollment.TenantId = rolloverViewModel.SchoolRollover.TenantId;
+                                                    studentEnrollment.StudentId = studentMaster.StudentId;
+                                                    studentEnrollment.StudentGuid = studentMaster.StudentGuid;
+                                                    studentEnrollment.EnrollmentId = (int)EnrollmentId;
+                                                    studentEnrollment.EnrollmentDate = rolloverViewModel.SchoolRollover.ReenrollmentDate;
+                                                    studentEnrollment.EnrollmentCode = studentRollOver?.Title;
+                                                    studentEnrollment.SchoolName = studentEnrollmentData.SchoolName;
+                                                    studentEnrollment.RolloverId = rolloverId;
+                                                    //studentEnrollment.CalenderId = calenderId;
+                                                    studentEnrollment.CalenderId = schoolSessionCalendar.CalenderId;
+                                                    studentEnrollment.RollingOption = studentEnrollmentData.RollingOption;
+                                                    studentEnrollment.UpdatedOn = DateTime.UtcNow;
+                                                    studentEnrollment.UpdatedBy = rolloverViewModel.SchoolRollover.CreatedBy;
+                                                    studentEnrollment.IsActive = true;
+
                                                     var nextGradeLevelData = gradeLevelData?.FirstOrDefault(x => x.GradeId == enrolledGradeLevelData.NextGradeId);
 
                                                     studentEnrollmentData.TransferredGrade = nextGradeLevelData?.Title;
 
                                                     studentEnrollment.GradeLevelTitle = nextGradeLevelData?.Title;
                                                     studentEnrollment.GradeId = nextGradeLevelData?.GradeId;
+                                                    this.context?.StudentEnrollment.Add(studentEnrollment);
                                                 }
                                                 else
                                                 {
-                                                    studentEnrollment.RollingOption = "Do not enroll after this school year";
+                                                    var dropCode = this.context?.StudentEnrollmentCode.FirstOrDefault(x => x.TenantId == rolloverViewModel.SchoolRollover.TenantId && x.SchoolId == rolloverViewModel.SchoolRollover.SchoolId && x.Type == "Drop");
+                                                    studentEnrollmentData.IsActive = true;
+                                                    studentEnrollmentData.ExitCode = dropCode?.Title;
+                                                    studentEnrollmentData.RollingOption = "Do not enroll after this school year";
+                                                    studentEnrollmentData.RolloverId = rolloverId;
+
+                                                    if (rolloverViewModel.SchoolRollover.ReenrollmentDate != null
+                                               && rolloverViewModel.SchoolRollover.ReenrollmentDate.Value.Date <= DateTime.UtcNow.Date) //drop student in previous date
+                                                    {
+                                                        //Deactive student from student master
+                                                        this.context?.StudentMaster.Where(x => x.StudentGuid == studentEnrollmentData.StudentGuid && x.SchoolId == rolloverViewModel.SchoolRollover.SchoolId && x.TenantId == rolloverViewModel.SchoolRollover.TenantId).ToList().ForEach(x => x.IsActive = false);
+
+                                                    }
+                                                    else
+                                                    {
+                                                        var studentEnrollmentListModel = new StudentEnrollmentListModel { _tenantName = rolloverViewModel._tenantName, TenantId = rolloverViewModel.SchoolRollover.TenantId, SchoolId = rolloverViewModel.SchoolRollover.SchoolId, StudentGuid = studentData.StudentGuid, studentEnrollments = new List<StudentEnrollment>() { new StudentEnrollment { TenantId = rolloverViewModel.SchoolRollover.TenantId, SchoolId = rolloverViewModel.SchoolRollover.SchoolId, StudentId = studentMaster.StudentId, ExitCode = dropCode?.EnrollmentCode.ToString(), ExitDate = rolloverViewModel.SchoolRollover.ReenrollmentDate, StudentGuid = studentEnrollmentData.StudentGuid, EnrollmentId = studentEnrollmentData.EnrollmentId, UpdatedBy = rolloverViewModel.SchoolRollover.UpdatedBy } } };
+
+                                                        //insert job if date today or in future
+                                                        var scheduledJob = new ScheduledJob
+                                                        {
+                                                            TenantId = rolloverViewModel.SchoolRollover.TenantId,
+                                                            SchoolId = rolloverViewModel.SchoolRollover.SchoolId,
+                                                            JobId = (long)Id,
+                                                            AcademicYear = rolloverViewModel._academicYear,
+                                                            JobTitle = "StudentEnrollmentDropTransferStudent",
+                                                            JobScheduleDate = rolloverViewModel.SchoolRollover.ReenrollmentDate!.Value.AddDays(1),
+                                                            ApiTitle = "UpdateStudentEnrollment",
+                                                            ControllerPath = studentEnrollmentListModel._tenantName + "/Rollover",
+                                                            TaskJson = JsonConvert.SerializeObject(studentEnrollmentListModel),
+                                                            LastRunStatus = null,
+                                                            LastRunTime = null,
+                                                            IsActive = true,
+                                                            CreatedBy = rolloverViewModel.SchoolRollover.UpdatedBy,
+                                                            CreatedOn = DateTime.UtcNow
+                                                        };
+                                                        this.context?.ScheduledJobs.Add(scheduledJob);
+                                                        Id++;
+                                                    }
                                                 }
 
-                                                this.context?.StudentEnrollment.Add(studentEnrollment);
                                                 //this.context?.SaveChanges();
                                             }
                                             else if (studentEnrollmentData.RollingOption?.ToLower() == "Retain".ToLower())
@@ -911,6 +951,7 @@ namespace opensis.data.Repository
                                                 studentEnrollment.SchoolName = studentEnrollmentData.SchoolName;
                                                 studentEnrollment.GradeLevelTitle = studentEnrollmentData.GradeLevelTitle;
                                                 studentEnrollment.GradeId = studentEnrollmentData.GradeId;
+                                                //studentEnrollment.CalenderId = calenderId;
                                                 studentEnrollment.CalenderId = schoolSessionCalendar.CalenderId;
                                                 studentEnrollment.RollingOption = "Next grade at current school";
                                                 studentEnrollment.UpdatedOn = DateTime.UtcNow;
@@ -934,7 +975,7 @@ namespace opensis.data.Repository
                                                 studentEnrollmentData.RolloverId = rolloverId;
 
                                                 if (rolloverViewModel.SchoolRollover.ReenrollmentDate != null
-                                                && rolloverViewModel.SchoolRollover.ReenrollmentDate.Value.Date < DateTime.UtcNow.Date) //drop student in previous date
+                                                && rolloverViewModel.SchoolRollover.ReenrollmentDate.Value.Date <= DateTime.UtcNow.Date) //drop student in previous date
                                                 {
                                                     //Deactive student from student master
                                                     this.context?.StudentMaster.Where(x => x.StudentGuid == studentEnrollmentData.StudentGuid && x.SchoolId == rolloverViewModel.SchoolRollover.SchoolId).ToList().ForEach(x => x.IsActive = false);
@@ -1009,7 +1050,7 @@ namespace opensis.data.Repository
                                                     if (studentTransferIn != null)
                                                     {
                                                         if (rolloverViewModel.SchoolRollover.ReenrollmentDate != null
-                                                       && rolloverViewModel.SchoolRollover.ReenrollmentDate.Value.Date >= DateTime.UtcNow.Date)
+                                                       && rolloverViewModel.SchoolRollover.ReenrollmentDate.Value.Date > DateTime.UtcNow.Date)
                                                         {
                                                             var studentEnrollmentListModel = new StudentEnrollmentListModel { _tenantName = rolloverViewModel._tenantName, TenantId = rolloverViewModel.SchoolRollover.TenantId, SchoolId = rolloverViewModel.SchoolRollover.SchoolId, StudentGuid = studentData.StudentGuid, studentEnrollments = new List<StudentEnrollment>() { new StudentEnrollment { TenantId = rolloverViewModel.SchoolRollover.TenantId, SchoolId = rolloverViewModel.SchoolRollover.SchoolId, StudentId = studentMaster.StudentId, ExitCode = studentTransferCode?.EnrollmentCode.ToString(), ExitDate = rolloverViewModel.SchoolRollover.ReenrollmentDate, StudentGuid = studentEnrollmentData.StudentGuid, TransferredSchoolId = studentEnrollmentData.EnrollOtherSchoolId, EnrollmentId = studentEnrollmentData.EnrollmentId, UpdatedBy = rolloverViewModel.SchoolRollover.UpdatedBy } } };
 
@@ -1041,7 +1082,7 @@ namespace opensis.data.Repository
                                                         if (checkStudentAlreadyExistInTransferredSchool != null)
                                                         {
                                                             if (rolloverViewModel.SchoolRollover.ReenrollmentDate != null
-                                                           && rolloverViewModel.SchoolRollover.ReenrollmentDate.Value.Date < DateTime.UtcNow.Date) //drop student in previous date
+                                                           && rolloverViewModel.SchoolRollover.ReenrollmentDate.Value.Date <= DateTime.UtcNow.Date) //drop student in previous date
                                                             {
                                                                 var studentOldSchool = this.context?.StudentMaster.Where(x => x.TenantId == rolloverViewModel.SchoolRollover.TenantId && x.SchoolId != studentEnrollmentData.EnrollOtherSchoolId && x.StudentGuid == studentEnrollmentData.StudentGuid).ToList();
                                                                 if (studentOldSchool?.Any() == true)
@@ -1059,7 +1100,7 @@ namespace opensis.data.Repository
                                                             if (studentData != null)
                                                             {
                                                                 if (rolloverViewModel.SchoolRollover.ReenrollmentDate != null
-                                                            && rolloverViewModel.SchoolRollover.ReenrollmentDate.Value.Date < DateTime.UtcNow.Date) //drop student in previous date
+                                                            && rolloverViewModel.SchoolRollover.ReenrollmentDate.Value.Date <= DateTime.UtcNow.Date) //drop student in previous date
                                                                 {
                                                                     var studentOldSchool = this.context?.StudentMaster.Where(x => x.TenantId == rolloverViewModel.SchoolRollover.TenantId && x.StudentGuid == studentEnrollmentData.StudentGuid).ToList();
                                                                     if (studentOldSchool?.Any() == true)
@@ -1108,7 +1149,7 @@ namespace opensis.data.Repository
                                                                 }
 
                                                                 if (rolloverViewModel.SchoolRollover.ReenrollmentDate != null
-                                                         && rolloverViewModel.SchoolRollover.ReenrollmentDate.Value.Date < DateTime.UtcNow.Date)
+                                                         && rolloverViewModel.SchoolRollover.ReenrollmentDate.Value.Date <= DateTime.UtcNow.Date)
                                                                 {
                                                                     //Student Protal Access
                                                                     if (studentData.StudentPortalId != null)
