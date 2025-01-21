@@ -100,9 +100,9 @@
                     <ng-container matColumnDef="action">
                         <th mat-header-cell *matHeaderCellDef>{{'actions'|translate}}</th>
                         <td mat-cell *matCellDef="let element">
-                            <a matTooltip="{{'ImpersonateAsParent' | translate}}" class="mr-3 cursor-pointer">
+                            <!-- <a matTooltip="{{'ImpersonateAsParent' | translate}}" class="mr-3 cursor-pointer">
                                 <mat-icon [icIcon]="icImpersonate"></mat-icon>
-                            </a>
+                            </a> -->
                             <a matTooltip="{{ 'dataEditInfo' | translate }}" class="mr-3 cursor-pointer" (click)="openDataEdit(element)">
                                 <mat-icon [icIcon]="icRestore"></mat-icon>
                             </a>
