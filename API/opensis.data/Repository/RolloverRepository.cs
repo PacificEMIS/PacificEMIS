@@ -951,7 +951,6 @@ namespace opensis.data.Repository
                                                 studentEnrollment.SchoolName = studentEnrollmentData.SchoolName;
                                                 studentEnrollment.GradeLevelTitle = studentEnrollmentData.GradeLevelTitle;
                                                 studentEnrollment.GradeId = studentEnrollmentData.GradeId;
-                                                //studentEnrollment.CalenderId = calenderId;
                                                 studentEnrollment.CalenderId = schoolSessionCalendar.CalenderId;
                                                 studentEnrollment.RollingOption = "Next grade at current school";
                                                 studentEnrollment.UpdatedOn = DateTime.UtcNow;
