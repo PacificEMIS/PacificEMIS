@@ -166,7 +166,7 @@
                         <th mat-header-cell *matHeaderCellDef>{{ column==='studentInternalId'?'Student ID': (column |translate | titlecase)}}</th>
                         <td mat-cell mat *matCellDef="let element">
                             <ng-container *ngIf="column!=='studentId' && column!=='studentName' && column!=='studentInternalId' && column!=='courseSection';else commonData">
-                                <button *ngIf="element.status == 'False';else trueBlock" [matTooltip]="element.description.trim()"
+                                <button *ngIf="element.status == 'False';else trueBlock"
                                        [matTooltipPosition]="'above'">
                                         <!-- <i class="text-lg text-warn icon icon-notification2">{{element.description.trim()}}</i> -->
                                         {{element.description.trim()}}

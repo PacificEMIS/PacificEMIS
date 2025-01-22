@@ -307,7 +307,6 @@ export class ScheduleStudentComponent implements OnInit, OnDestroy {
             }
           }
         });
-        this.displayedColumns = Object.keys(data.scheduleReport[0]);
         this.scheduleReport = new MatTableDataSource(data.scheduleReport);
         this.displayedColumns = ['studentName','studentInternalId','courseSection','error'];
         const result = [];
@@ -326,7 +325,6 @@ export class ScheduleStudentComponent implements OnInit, OnDestroy {
           });
         });
         this.scheduleReport = new MatTableDataSource(result);
-        console.log('result',result);
       }
 
     });
