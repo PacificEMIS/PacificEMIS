@@ -1963,5 +1963,6 @@
     "deleteStaff": "Supprimer le personnel",
     "youWantToDeleteStaff": "Voulez-vous supprimer le personnel ?",
     "exitReason":"Raison de sortie",
-    "exitReasonRequired":"La raison de la sortie est Requard"
+    "exitReasonRequired":"La raison de la sortie est Requard",
+    "error":"Erreur"
 }

@@ -1963,5 +1963,6 @@
     "deleteStaff": "Eliminar personal",
     "youWantToDeleteStaff": "¿Quieres eliminar al personal?",
     "exitReason":"Motivo de salida",
-    "exitReasonRequired":"El motivo de salida es obligatorio"
+    "exitReasonRequired":"El motivo de salida es obligatorio",
+    "error":"Error"
 }
