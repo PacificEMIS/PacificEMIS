@@ -1964,5 +1964,6 @@
     "deleteStaff": "Delete Staff",
     "youWantToDeleteStaff": "You want to delete staff",
     "exitReason":"Exit Reason",
-    "exitReasonRequired":"Exit Reason is Requard"
+    "exitReasonRequired":"Exit Reason is Requard",
+    "error":"Error"
 }

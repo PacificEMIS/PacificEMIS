@@ -116,6 +116,7 @@ export class ScheduleStudentComponent implements OnInit, OnDestroy {
   permissions: Permissions;
   date = new FormControl(moment());
   weekArray = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+  tableData: string[];
   constructor(private dialog: MatDialog, public translateService: TranslateService,
     private studentScheduleService: StudentScheduleService,
     private loaderService: LoaderService,
@@ -306,8 +307,24 @@ export class ScheduleStudentComponent implements OnInit, OnDestroy {
             }
           }
         });
-        this.displayedColumns = Object.keys(data.scheduleReport[0]);
         this.scheduleReport = new MatTableDataSource(data.scheduleReport);
+        this.displayedColumns = ['studentName','studentInternalId','courseSection','error'];
+        const result = [];
+        data.scheduleReport.forEach(student => {
+          Object.keys(student).forEach(subject => {
+            if (subject !== 'studentName' && subject !== 'studentInternalId') {
+              const [status, description] = student[subject].split(' | ');
+              result.push({
+                studentName: student.studentName,
+                studentInternalId: student.studentInternalId,
+                courseSection: subject,
+                status: status,
+                description: description
+              });
+            }
+          });
+        });
+        this.scheduleReport = new MatTableDataSource(result);
       }
 
     });
