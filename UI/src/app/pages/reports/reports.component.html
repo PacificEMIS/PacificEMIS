@@ -17,7 +17,7 @@
                     <ul class="md:grid md:grid-cols-2 lg:grid-cols-3 md:col-gap-8 mt-4">
                         <ng-container *ngIf="submenu.permissionSubcategory?.length>0 && submenu.rolePermission[0].canView">
                             <ng-container *ngFor="let option of submenu.permissionSubcategory;let index=index">
-                                <li *ngIf="option.title.trim() !== 'Attendance Chart'.trim()">
+                                <li *ngIf="option.title.trim() !== 'Attendance Chart'.trim() && option.title.trim() !== 'GPA / Class Rank List'.trim()">
                                     <div class="flex items-center py-1">
                                         <mat-icon class="mr-2">navigate_next</mat-icon>
                                         <a *ngIf="option.rolePermission[0].canView"
