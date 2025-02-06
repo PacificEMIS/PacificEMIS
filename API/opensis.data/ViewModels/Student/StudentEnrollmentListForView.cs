@@ -43,8 +43,10 @@ namespace opensis.data.ViewModels.Student
         public string? GradeLevelTitle { get; set; }
         public DateTime? EnrollmentDate { get; set; }
         public string? EnrollmentCode { get; set; }
+        public int? EnrollmentCodeId { get; set; }
         public DateTime? ExitDate { get; set; }
         public string? ExitCode { get; set; }
+        public int? ExitCodeId { get; set; }
         public int? TransferredSchoolId { get; set; }
         public string? SchoolTransferred { get; set; }
         public string? TransferredGrade { get; set; }
