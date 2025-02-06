@@ -1896,7 +1896,7 @@ namespace opensis.data.Repository
         /// </summary>
         /// <param name="studentEnrollmentListViewModel"></param>
         /// <returns></returns>
-        public StudentEnrollmentListViewModel GetAllStudentEnrollment(StudentEnrollmentListViewModel studentEnrollmentListViewModel)
+        public StudentEnrollmentListViewModel GetAllStudentEnrollment_old(StudentEnrollmentListViewModel studentEnrollmentListViewModel)
         {
             StudentEnrollmentListViewModel studentEnrollmentListView = new StudentEnrollmentListViewModel();
             try
@@ -2035,6 +2035,162 @@ namespace opensis.data.Repository
                 studentEnrollmentListView._failure = true;
                 studentEnrollmentListView._tenantName = studentEnrollmentListViewModel._tenantName;
                 studentEnrollmentListView._token = studentEnrollmentListViewModel._token;
+            }
+            return studentEnrollmentListView;
+        }
+
+        public StudentEnrollmentListViewModel GetAllStudentEnrollment(StudentEnrollmentListViewModel studentEnrollmentListViewModel)
+        {
+            StudentEnrollmentListViewModel studentEnrollmentListView = new StudentEnrollmentListViewModel();
+
+            studentEnrollmentListView._tenantName = studentEnrollmentListViewModel._tenantName;
+            studentEnrollmentListView._token = studentEnrollmentListViewModel._token;
+            studentEnrollmentListView.StudentId = studentEnrollmentListViewModel.StudentId;
+            studentEnrollmentListView._tenantName = studentEnrollmentListViewModel._tenantName;
+            studentEnrollmentListView._userName = studentEnrollmentListViewModel._userName;
+            studentEnrollmentListView._token = studentEnrollmentListViewModel._token;
+            studentEnrollmentListView.TenantId = studentEnrollmentListViewModel.TenantId;
+            studentEnrollmentListView.AcademicYear = studentEnrollmentListViewModel.AcademicYear;
+            try
+            {
+                studentEnrollmentListView.CalenderId = this.context?.SchoolCalendars.FirstOrDefault(x => x.TenantId == studentEnrollmentListViewModel.TenantId && x.SchoolId == studentEnrollmentListViewModel.SchoolId && x.AcademicYear.ToString() == studentEnrollmentListViewModel.AcademicYear && x.DefaultCalender == true)?.CalenderId;
+
+                var studentEnrollmentList = this.context?.StudentEnrollment.Where(x => x.TenantId == studentEnrollmentListViewModel.TenantId && x.StudentGuid == studentEnrollmentListViewModel.StudentGuid).Select(y => new StudentEnrollmentListForView
+                {
+                    TenantId = y.TenantId,
+                    SchoolId = y.SchoolId,
+                    StudentId = y.StudentId,
+                    RollingOption = y.RollingOption,
+                    EnrollOtherSchoolId = y.EnrollOtherSchoolId,
+                    SchoolName = y.SchoolName,
+                    UpdatedOn = y.UpdatedOn,
+                    SchoolTransferred = y.SchoolTransferred,
+                    TransferredGrade = y.TransferredGrade,
+                    TransferredSchoolId = y.TransferredSchoolId,
+                    UpdatedBy = y.UpdatedBy,
+                    CreatedOn = y.CreatedOn,
+                    CreatedBy = y.CreatedBy,
+                    CalenderId = y.CalenderId,
+                    EnrollmentCode = y.EnrollmentCode,
+                    EnrollmentId = y.EnrollmentId,
+                    EnrollmentDate = y.EnrollmentDate,
+                    ExitCode = y.ExitCode,
+                    ExitDate = y.ExitDate,
+                    StudentGuid = y.StudentGuid,
+                    GradeId = y.GradeId,
+                    RolloverId = y.RolloverId,
+                    IsActive = y.IsActive
+                }).OrderByDescending(x => x.EnrollmentId).ToList();
+
+                if (studentEnrollmentList?.Any() == true)
+                {
+                    var studentMasterData = this.context?.StudentMaster.Where(x => x.TenantId == studentEnrollmentListViewModel.TenantId && x.SchoolId == studentEnrollmentListViewModel.SchoolId && x.StudentGuid == studentEnrollmentListViewModel.StudentGuid);
+
+                    if (studentMasterData?.Any() == true)
+                    {
+                        var studentMaster = studentMasterData.FirstOrDefault()!;
+                        studentEnrollmentListView.SectionId = studentMaster.SectionId;
+                        studentEnrollmentListView.EstimatedGradDate = studentMaster.EstimatedGradDate;
+                        studentEnrollmentListView.Eligibility504 = studentMaster.Eligibility504;
+                        studentEnrollmentListView.EconomicDisadvantage = studentMaster.EconomicDisadvantage;
+                        studentEnrollmentListView.FreeLunchEligibility = studentMaster.FreeLunchEligibility;
+                        studentEnrollmentListView.SpecialEducationIndicator = studentMaster.SpecialEducationIndicator;
+                        studentEnrollmentListView.LepIndicator = studentMaster.LepIndicator;
+                    }
+
+                    var studentEnrollmentCodeData = this.context?.StudentEnrollmentCode.Where(x => x.TenantId == studentEnrollmentListViewModel.TenantId).ToList();
+                    var gradeLevelData = this.context?.Gradelevels.Where(x => x.TenantId == studentEnrollmentListViewModel.TenantId).ToList();
+                    var schoolCalendarData = this.context?.SchoolCalendars.Where(x => x.TenantId == studentEnrollmentListViewModel.TenantId).ToList();
+
+                    foreach (var studentEnrollment in studentEnrollmentList)
+                    {
+                        studentEnrollment.GradeLevelTitle = gradeLevelData?.FirstOrDefault(s => s.SchoolId == studentEnrollment.SchoolId && s.GradeId == studentEnrollment.GradeId)?.Title;
+                        if (studentEnrollment.EnrollmentDate != null)
+                        {
+                            var calData = schoolCalendarData?.FirstOrDefault(z => z.SchoolId == studentEnrollment.SchoolId && z.SessionCalendar == true && z.StartDate <= studentEnrollment.EnrollmentDate && z.EndDate >= studentEnrollment.EnrollmentDate);
+                            studentEnrollment.AcademicYear = calData?.AcademicYear;
+                            studentEnrollment.StartYear = calData?.StartDate!.Value.Year.ToString();
+                            studentEnrollment.EndYear = calData?.EndDate!.Value.Year.ToString();
+                        }
+                        else
+                        {
+                            var calData = schoolCalendarData?.FirstOrDefault(z => z.SchoolId == studentEnrollment.SchoolId && z.SessionCalendar == true && z.StartDate <= studentEnrollment.ExitDate && z.EndDate >= studentEnrollment.ExitDate);
+                            studentEnrollment.AcademicYear = calData?.AcademicYear;
+                            studentEnrollment.StartYear = calData?.StartDate!.Value.Year.ToString();
+                            studentEnrollment.EndYear = calData?.EndDate!.Value.Year.ToString();
+                        }
+
+                        studentEnrollment.EnrollmentCodeId = studentEnrollmentCodeData?.FirstOrDefault(s => s.SchoolId == studentEnrollment.SchoolId && s.AcademicYear == studentEnrollment.AcademicYear && s.Title == studentEnrollment.EnrollmentCode)?.EnrollmentCode;
+                        studentEnrollment.EnrollmentType = studentEnrollmentCodeData?.FirstOrDefault(s => s.SchoolId == studentEnrollment.SchoolId && s.AcademicYear == studentEnrollment.AcademicYear && s.Title == studentEnrollment.EnrollmentCode)?.Type;
+                        studentEnrollment.ExitType = studentEnrollmentCodeData?.FirstOrDefault(s => s.SchoolId == studentEnrollment.SchoolId && s.Title == studentEnrollment.ExitCode && s.AcademicYear == studentEnrollment.AcademicYear && s.Type != "Add" && s.Type != "Enroll (Transfer)")?.Type;
+                        studentEnrollment.ExitCodeId = studentEnrollmentCodeData?.FirstOrDefault(s => s.SchoolId == studentEnrollment.SchoolId && s.Title == studentEnrollment.ExitCode && s.AcademicYear == studentEnrollment.AcademicYear && s.Type != "Add" && s.Type != "Enroll (Transfer)")?.EnrollmentCode;
+                        studentEnrollment.Type = studentMasterData?.FirstOrDefault(s => s.TenantId == studentEnrollment.TenantId && s.SchoolId == studentEnrollment.SchoolId && s.StudentId == studentEnrollment.StudentId)?.EnrollmentType;
+                    }
+
+                    studentEnrollmentListView.studentEnrollmentListForView = studentEnrollmentList;
+
+                    studentEnrollmentListView.RollingOption = studentEnrollmentList.FirstOrDefault(x => x.SchoolId == studentEnrollmentListViewModel.SchoolId)?.RollingOption;
+                    studentEnrollmentListView.EnrollOtherSchoolId = studentEnrollmentList.FirstOrDefault(x => x.SchoolId == studentEnrollmentListViewModel.SchoolId)?.EnrollOtherSchoolId;
+
+                    var fieldsCategory = this.context?.FieldsCategory.Where(x => x.TenantId == studentEnrollmentListViewModel.TenantId && x.SchoolId == studentEnrollmentListViewModel.SchoolId && x.Module == "Student").OrderByDescending(x => x.IsSystemCategory).ThenBy(x => x.SortOrder)
+                   .Select(y => new FieldsCategory
+                   {
+                       TenantId = y.TenantId,
+                       SchoolId = y.SchoolId,
+                       CategoryId = y.CategoryId,
+                       IsSystemCategory = y.IsSystemCategory,
+                       Search = y.Search,
+                       Title = y.Title,
+                       Module = y.Module,
+                       SortOrder = y.SortOrder,
+                       Required = y.Required,
+                       Hide = y.Hide,
+                       UpdatedOn = y.UpdatedOn,
+                       UpdatedBy = y.UpdatedBy,
+                       CreatedBy = y.CreatedBy,
+                       CreatedOn = y.CreatedOn,
+                       CustomFields = y.CustomFields.Select(z => new CustomFields
+                       {
+                           TenantId = z.TenantId,
+                           SchoolId = z.SchoolId,
+                           CategoryId = z.CategoryId,
+                           FieldName = z.FieldName,
+                           FieldId = z.FieldId,
+                           Module = z.Module,
+                           Type = z.Type,
+                           Search = z.Search,
+                           Title = z.Title,
+                           SortOrder = z.SortOrder,
+                           SelectOptions = z.SelectOptions,
+                           SystemField = z.SystemField,
+                           Required = z.Required,
+                           Hide = z.Hide,
+                           DefaultSelection = z.DefaultSelection,
+                           UpdatedOn = z.UpdatedOn,
+                           UpdatedBy = z.UpdatedBy,
+                           CreatedBy = z.CreatedBy,
+                           CreatedOn = z.CreatedOn,
+                           CustomFieldsValue = z.CustomFieldsValue.Where(w => w.TargetId == studentEnrollmentListViewModel.StudentId).ToList()
+                       }).OrderByDescending(x => x.SystemField).ThenBy(x => x.SortOrder).ToList()
+                   }).ToList();
+
+                    if (fieldsCategory?.Any() == true)
+                    {
+                        studentEnrollmentListView.fieldsCategoryList = fieldsCategory;
+                    }
+
+                    studentEnrollmentListView._failure = false;
+                }
+                else
+                {
+                    studentEnrollmentListView._failure = true;
+                    studentEnrollmentListView._message = NORECORDFOUND;
+                }
+            }
+            catch (Exception es)
+            {
+                studentEnrollmentListView._message = es.Message;
+                studentEnrollmentListView._failure = true;
             }
             return studentEnrollmentListView;
         }
@@ -5768,6 +5924,10 @@ namespace opensis.data.Repository
                             if (studentEnrollmentAssignModel.studentEnrollments?.RollingOption != null)
                             {
                                 studentEnrollmentData.RollingOption = studentEnrollmentAssignModel.studentEnrollments.RollingOption;
+                            }
+                            if (studentEnrollmentAssignModel.studentEnrollments?.EnrollOtherSchoolId != null)
+                            {
+                                studentEnrollmentData.EnrollOtherSchoolId = studentEnrollmentAssignModel.studentEnrollments.EnrollOtherSchoolId;
                             }
                             if (studentEnrollmentAssignModel.studentEnrollments?.CalenderId != null)
                             {
