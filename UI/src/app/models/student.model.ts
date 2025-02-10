@@ -583,6 +583,8 @@ export class StudentEnrollmentDetails {
     gradeLevelTitle: string;
     enrollmentDate: string;
     enrollmentCode: string;
+    enrollmentCodeId?: number|string;
+    exitCodeId?: number|string;
     exitDate: string;
     exitCode: string;
     exitType: string;
@@ -600,6 +602,10 @@ export class StudentEnrollmentDetails {
     endYear: string;
     isActive: boolean;
     showDrop:boolean;
+    enrollmentCodeName? : string;
+    exitCodeName? : string;
+    programId? : number | string;
+    transferredProgramId? : number | string;
 }
 export class StudentEnrollmentModel extends CommonField {
     studentEnrollments: Array<StudentEnrollmentDetails>;
