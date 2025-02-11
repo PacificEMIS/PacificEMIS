@@ -2,7 +2,7 @@ import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild } from '@angular
 import { TranslateService } from '@ngx-translate/core';
 import icRemoveCircle from '@iconify/icons-ic/twotone-remove-circle';
 import { ControlContainer, FormBuilder, FormControl, FormGroup, NgForm, Validators } from '@angular/forms';
-import { AddEditStudentMedicalProviderForGroupAssignModel, StudentAddForGroupAssignModel, StudentDocumentAddForGroupAssignModel, StudentEnrollmentForGroupAssignModel, StudentListModel } from 'src/app/models/student.model';
+import { AddEditStudentMedicalProviderForGroupAssignModel, StudentAddForGroupAssignModel, StudentDocumentAddForGroupAssignModel, StudentEnrollmentForGroupAssignModel, StudentEnrollmentSchoolListModel, StudentListModel } from 'src/app/models/student.model';
 import { StudentService } from '../../../services/student.service';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -118,6 +118,7 @@ export class GroupAssignStudentInfoComponent implements OnInit, OnDestroy{
   toggleValues: any = null;
   studentDocument = [];
   fieldsCategoryListView = new FieldsCategoryListView();
+  schoolListWithGrades: StudentEnrollmentSchoolListModel = new StudentEnrollmentSchoolListModel();
   // @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
   @ViewChild('studentsPaginator') paginator: MatPaginator;
 
@@ -184,7 +185,8 @@ export class GroupAssignStudentInfoComponent implements OnInit, OnDestroy{
   studentMultiSelectValue;
   isFromAdvancedSearch: boolean = false
   filterParameters = [];
-
+  schoolList = [];
+  schoolId;
   constructor(
     public translateService: TranslateService,
     private studentService: StudentService,
@@ -252,9 +254,10 @@ export class GroupAssignStudentInfoComponent implements OnInit, OnDestroy{
     // })
 
     this.getAllSearchFilter();
+    this.getAllSchoolListWithGradeLevelsAndEnrollCodes();
+    this.schoolId = this.defaultValuesService.getSchoolID();
     
   }
-
 
   ngAfterViewInit() {
 
@@ -693,7 +696,6 @@ export class GroupAssignStudentInfoComponent implements OnInit, OnDestroy{
     });
   }
 
-
   changeTab(status) {
     this.currentTab = status;
   }
@@ -1025,9 +1027,12 @@ export class GroupAssignStudentInfoComponent implements OnInit, OnDestroy{
   finalSubmit() {
       this.studentAddForGroupAssignModel.fieldsCategoryList[0].customFields = this.studentCustomFields;
       this.AddEditStudentMedicalProviderForGroupAssignModel.fieldsCategoryList[4].customFields = this.studentMedicalCustomFields;
-
       this.addStudentGeneralInfo();
-      this.submitEnrollment();
+      if(this?.studentEnrollmentForGroupAssignModel?.studentEnrollments?.rollingOption == 'Enrol to another school' && this?.studentEnrollmentForGroupAssignModel?.studentEnrollments?.enrollOtherSchoolId){
+        this.submitEnrollment();
+      }else if(this?.studentEnrollmentForGroupAssignModel?.studentEnrollments?.rollingOption == '' || this?.studentEnrollmentForGroupAssignModel?.studentEnrollments?.rollingOption != 'Enrol to another school'){
+        this.submitEnrollment();
+      }
       this.submitComment();
       this.uploadFile();
       this.submitMedicalInfo();
@@ -1338,7 +1343,17 @@ export class GroupAssignStudentInfoComponent implements OnInit, OnDestroy{
     }
   }
 
-  
+  getAllSchoolListWithGradeLevelsAndEnrollCodes() {
+    this.studentService.studentEnrollmentSchoolList(this.schoolListWithGrades).subscribe(res => {
+      if (res) {
+        if (res._failure) {
+          this.commonService.checkTokenValidOrNot(res._message);
+        } else {
+          this.schoolList = res?.schoolMaster;
+        }
+      }
+    });
+  }
 
   ngOnDestroy() {
     this.destroySubject$.next();

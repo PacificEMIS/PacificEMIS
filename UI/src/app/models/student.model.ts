@@ -212,6 +212,7 @@ export class StudentEnrollmentDetailsForGroupAssignModel {
     gradeLevelTitle: string;
     updatedBy: string;
     enrollmentDate?: string;
+    enrollOtherSchoolId? : string | number;
 }
 
 
