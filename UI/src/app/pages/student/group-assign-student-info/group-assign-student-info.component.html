@@ -1,439 +1,463 @@
-<vex-page-layout>
-    <vex-mat-spinner-overlay *ngIf="loading" color="accent"></vex-mat-spinner-overlay>
+<form #form="ngForm">
+    <vex-page-layout>
+        <vex-mat-spinner-overlay *ngIf="loading" color="accent"></vex-mat-spinner-overlay>
 
-    <vex-page-layout-header class="pb-16" fxLayout="column" fxLayoutAlign="center start">
-        <vex-secondary-toolbar current="{{ 'groupAssignStudentInfo'}}" class="w-full">
-            <vex-breadcrumbs [crumbs]="['student']" class="flex-auto"></vex-breadcrumbs>
-        </vex-secondary-toolbar>
-    </vex-page-layout-header>
-    <vex-page-layout-content class="-mt-6">
-        <div class="card -mt-16 mb-6" *ngIf="groupAssignStudents">
-            <div class="sm:flex p-4 items-center justify-between">
-                <div class="sm:flex items-center pr-0 sm:pr-4">
-                    <img src="assets/img/groupAssignStudentInfo.png" alt="Search a group of students icon" class="w-40 md:w-auto mr-4">
-                    <div>
-                        <h4 class="font-bold text-xl">{{ 'searchAndSelectStudents' | translate }}</h4>
-                        <p class="text-gray">{{ 'selectaGroupOfStudentsWhichYouWantToAddTheSameInfo' | translate }}</p>
-                    </div>
-                </div>
-                <div class="flex justify-end w-full sm:w-auto pt-4 sm:pt-0">
-                    <button mat-raised-button color="primary" (click)="goToselectedStudent()">{{ 'next' | translate
-                        }}</button>
-                </div>
-            </div>
-            <mat-divider></mat-divider>
-            <div class="bg-white px-5 border-b sticky left-0" fxLayout="row" fxLayoutAlign="start center">
-                <div class="md:flex w-full justify-between pb-4 md:pb-0 items-center">
-                    <div class="py-2 md:py-3" fxFlex="300px" fxFlex.lt-md="auto" fxHide.xs fxLayout="row"
-                        fxLayoutAlign="start center">
-                        <div class="flex items-center">
-                            <input [formControl]="searchCtrl" class="pr-4 py-3 border-0 outline-none w-full bg-transparent" placeholder="Search..."
-                                type="search">
-                                <img *ngIf="loading" src="assets/img/icons/loading-process.svg"
-                                    class="animate-spin w-5" alt="Loader icon">
-                            <button *ngIf="!loading" class="ml-4" fxFlex="none" fxHide.gt-xs mat-icon-button type="button">
-                                <mat-icon>search</mat-icon>
-                            </button>
-                            <a (click)="showAdvanceSearch()" class="text-primary cursor-pointer ml-3 md:w-full">
-                                <mat-icon aria-hidden="false" class="align-middle">tune</mat-icon><span
-                                    class="ml-2 hidden lg:inline-block">{{'advanceSearch' | translate}}</span>
-                            </a>
-                        </div>
-                    </div>
-                    <hr class="block md:hidden -mx-4 my-2" />
-                    <div class="flex items-center justify-end w-full sm:w-auto">
-                        
-                        <button mat-stroked-button [matMenuTriggerFor]="loadFilter"
-                        *ngIf="searchFilterListViewModel?.searchFilterList?.length > 0">
-                            <span>{{ 'loadFilter' | translate }}</span>
-                            <mat-icon>arrow_drop_down</mat-icon>
-                        </button>
+        <vex-page-layout-header class="pb-16" fxLayout="column" fxLayoutAlign="center start">
+            <vex-secondary-toolbar current="{{ 'groupAssignStudentInfo'}}" class="w-full">
+                <vex-breadcrumbs [crumbs]="['student']" class="flex-auto"></vex-breadcrumbs>
+            </vex-secondary-toolbar>
+        </vex-page-layout-header>
+        <vex-page-layout-content class="-mt-6">
+            <div class="card -mt-16 mb-6" *ngIf="groupAssignStudents">
 
-                        <mat-menu #loadFilter="matMenu" xPosition="before">
-                            <button *ngFor="let filter of searchFilterListViewModel?.searchFilterList"
-                            (click)="searchByFilterName(filter)" mat-menu-item>{{filter?.filterName}}</button>
-                        </mat-menu>
-
-                    </div>
-                </div>
-            </div>
-            <div class="overflow-x-auto overflow-y-hidden">
-                <table mat-table [dataSource]="StudentModelList" class="mat-elevation-z8" matSort>
-
-                    <ng-container matColumnDef="selectStudent">
-
-                        <th mat-header-cell *matHeaderCellDef>
-                            <mat-checkbox color="primary" [class.hidden]="!totalCount" #masterCheckBox
-                            [indeterminate]="someComplete()" (change)="setAll($event.checked)"></mat-checkbox>
-                        </th>
-                        <td mat-cell *matCellDef="let element">
-                            <mat-checkbox color="primary" (change)="setSelectedStudentList($event, element)"
-                                [(ngModel)]="element.selectStudent"></mat-checkbox>
-                        </td>
-                    </ng-container>
-
-                    <ng-container matColumnDef="firstGivenName">
-                        <th mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'firstGivenName' | translate }} </th>
-                        <td mat-cell *matCellDef="let element">
-                            {{element.lastFamilyName+", "+element.firstGivenName}}{{element.middleName!=null?"
-                            "+element.middleName:''}}
-                        </td>
-                    </ng-container>
-
-                    <ng-container matColumnDef="studentInternalId">
-                        <th mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'studentID' | translate }} </th>
-                        <td mat-cell *matCellDef="let element"> {{element.studentInternalId}} </td>
-                    </ng-container>
-
-                    <ng-container matColumnDef="alternateId">
-                        <th mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'alternateID' | translate }} </th>
-                        <td mat-cell *matCellDef="let element"> {{element.alternateId | EmtyValueCheckPipe}} </td>
-                    </ng-container>
-
-                    <ng-container matColumnDef="gradeLevelTitle">
-                        <th mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'grade' | translate }} </th>
-                        <td mat-cell *matCellDef="let element"> {{element.gradeLevelTitle | EmtyValueCheckPipe}} </td>
-                    </ng-container>
-
-                    <ng-container matColumnDef="section">
-                        <th mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'section' | translate }} </th>
-                        <td mat-cell *matCellDef="let element"> {{element?.sectionName | EmtyValueCheckPipe}} </td>
-                    </ng-container>
-
-                    <ng-container matColumnDef="schoolEmail">
-                        <th mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'email' | translate }} </th>
-                        <td mat-cell *matCellDef="let element"> {{element.schoolEmail | EmtyValueCheckPipe}} </td>
-                    </ng-container>
-
-                    <ng-container matColumnDef="loading">
-                        <mat-footer-cell *matFooterCellDef colspan="7">
-                            <!-- <vex-mat-spinner-overlay *ngIf="loading" color="accent"></vex-mat-spinner-overlay> -->
-                        </mat-footer-cell>
-                    </ng-container>
-                    <ng-container matColumnDef="invalidsearct">
-                        <td mat-footer-cell *matFooterCellDef colspan="7">
-                            {{'noRecordFoundAsPerYourSearchCriteriaDotPlease' | translate}} <a
-                                class="cursor-pointer text-blue underline" (click)="resetStudentList()">{{'clickHere' | translate}}</a>
-                            {{'toReset' | translate}}
-                        </td>
-                    </ng-container>
-                    <ng-container matColumnDef="noData">
-                        <td mat-footer-cell *matFooterCellDef colspan="7">
-                            {{loading?('fetchingData' | translate):('noData' | translate) }}
-                        </td>
-                    </ng-container>
-
-                    <tr mat-header-row *matHeaderRowDef="visibleColumns"></tr>
-                    <tr mat-row *matRowDef="let row; columns: visibleColumns" @fadeInUp></tr>
-                    <tr mat-footer-row *matFooterRowDef="['loading']" [class.hide]="!loading"></tr>
-                    <tr mat-footer-row *matFooterRowDef="['invalidsearct']"
-                        [class.hide]="(searchCount !== 0)|| searchCount == null"></tr>
-                    <tr mat-footer-row *matFooterRowDef="['noData']" [class.hide]="totalCount != null"></tr>
-                </table>
-            </div>
-            <mat-paginator #studentsPaginator [length]="totalCount" [class.hide]="totalCount==0" [pageSize]="pageSize"
-                [pageSizeOptions]="[10, 20, 30, 40]" showFirstLastButtons (page)='getPageEvent($event)'></mat-paginator>
-        </div>
-
-        <!-- start Assign Info - General Info -->
-        <div [ngStyle]="{'display':showSelectedStudent?'block':'none'}">
-        <!-- <div *ngIf="showSelectedStudent"> -->
-            <div class="card -mt-16 mb-6">
                 <div class="sm:flex p-4 items-center justify-between">
-                    <div class="flex items-center">
-                        <img src="assets/img/groupAssignStudentInfo.png" alt="Search a group of students icon" class="w-40 md:w-auto mr-4">
+                    <div class="sm:flex items-center pr-0 sm:pr-4">
+                        <img src="assets/img/groupAssignStudentInfo.png" alt="Search a group of students icon"
+                            class="w-40 md:w-auto mr-4">
                         <div>
-                            <h4 class="font-bold text-xl">{{selectedStudentListModel.length}} {{ 'studentsSelected' | translate }}</h4>
-                            <p class="text-gray">{{ 'clickHereToChangeTheSelection' | translate }}</p>
+                            <h4 class="font-bold text-xl">{{ 'searchAndSelectStudents' | translate }}</h4>
+                            <p class="text-gray">{{ 'selectaGroupOfStudentsWhichYouWantToAddTheSameInfo' | translate }}
+                            </p>
                         </div>
                     </div>
-                    <hr class="block sm:hidden -mx-4 my-4" />
-                    <div class="flex items-center justify-end w-full sm:w-auto">
-                        <span class="flex cursor-pointer" (click)="toggleStudentList()">
-                            <mat-icon class="text-primary h-auto w-auto text-3xl">list_alt</mat-icon>
-                        </span>
-                        <span class="text-center w-12 h-12 rounded-full bg-primary inline-block ml-4 cursor-pointer"
-                            (click)="backToselectedStudent()">
-                            <mat-icon class="mt-3 text-white">replay</mat-icon>
-                        </span>
+                    <div class="flex justify-end w-full sm:w-auto pt-4 sm:pt-0">
+                        <button mat-raised-button color="primary" (click)="goToselectedStudent()">{{ 'next' | translate
+                            }}</button>
                     </div>
                 </div>
                 <mat-divider></mat-divider>
-                <div [ngStyle]="{'display': isShow ? 'none' : 'block'}">
-                    <h4 class="font-bold text-lg p-4">{{ 'selectedStudents' | translate }}</h4>
-                    <div class="overflow-x-auto overflow-y-hidden border-t">
-                        <table mat-table [dataSource]="selectedStudentList" class="mat-elevation-z8">
+                <div class="bg-white px-5 border-b sticky left-0" fxLayout="row" fxLayoutAlign="start center">
+                    <div class="md:flex w-full justify-between pb-4 md:pb-0 items-center">
+                        <div class="py-2 md:py-3" fxFlex="300px" fxFlex.lt-md="auto" fxHide.xs fxLayout="row"
+                            fxLayoutAlign="start center">
+                            <div class="flex items-center">
+                                <input [formControl]="searchCtrl"
+                                    class="pr-4 py-3 border-0 outline-none w-full bg-transparent"
+                                    placeholder="Search..." type="search">
+                                <img *ngIf="loading" src="assets/img/icons/loading-process.svg" class="animate-spin w-5"
+                                    alt="Loader icon">
+                                <button *ngIf="!loading" class="ml-4" fxFlex="none" fxHide.gt-xs mat-icon-button
+                                    type="button">
+                                    <mat-icon>search</mat-icon>
+                                </button>
+                                <a (click)="showAdvanceSearch()" class="text-primary cursor-pointer ml-3 md:w-full">
+                                    <mat-icon aria-hidden="false" class="align-middle">tune</mat-icon><span
+                                        class="ml-2 hidden lg:inline-block">{{'advanceSearch' | translate}}</span>
+                                </a>
+                            </div>
+                        </div>
+                        <hr class="block md:hidden -mx-4 my-2" />
+                        <div class="flex items-center justify-end w-full sm:w-auto">
 
-                            <ng-container matColumnDef="remove">
-                                <th mat-header-cell *matHeaderCellDef> {{ 'remove' | translate }} </th>
-                                <td mat-cell *matCellDef="let element">
-                                    <mat-icon (click)="setSelectedStudentList({checked: false}, element)" [icIcon]="icRemoveCircle" class="cursor-pointer"></mat-icon>
-                                </td>
-                            </ng-container>
+                            <button mat-stroked-button [matMenuTriggerFor]="loadFilter"
+                                *ngIf="searchFilterListViewModel?.searchFilterList?.length > 0">
+                                <span>{{ 'loadFilter' | translate }}</span>
+                                <mat-icon>arrow_drop_down</mat-icon>
+                            </button>
 
-                            <ng-container matColumnDef="firstGivenName">
-                                <th mat-header-cell *matHeaderCellDef> {{ 'firstGivenName' | translate }} </th>
-                                <td mat-cell *matCellDef="let element"> {{element.lastFamilyName+","
-                                    +element.firstGivenName}}{{element.middleName!=null?"
-                                    "+element.middleName:''}} </td>
-                            </ng-container>
+                            <mat-menu #loadFilter="matMenu" xPosition="before">
+                                <button *ngFor="let filter of searchFilterListViewModel?.searchFilterList"
+                                    (click)="searchByFilterName(filter)" mat-menu-item>{{filter?.filterName}}</button>
+                            </mat-menu>
 
-                            <ng-container matColumnDef="studentInternalId">
-                                <th mat-header-cell *matHeaderCellDef> {{ 'studentID' | translate }} </th>
-                                <td mat-cell *matCellDef="let element"> {{element.studentInternalId}} </td>
-                            </ng-container>
-
-                            <ng-container matColumnDef="alternateId">
-                                <th mat-header-cell *matHeaderCellDef> {{ 'alternateID' | translate }} </th>
-                                <td mat-cell *matCellDef="let element"> {{element.alternateId | EmtyValueCheckPipe}}
-                                </td>
-                            </ng-container>
-
-                            <ng-container matColumnDef="gradeLevelTitle">
-                                <th mat-header-cell *matHeaderCellDef> {{ 'grade' | translate }} </th>
-                                <td mat-cell *matCellDef="let element"> {{element.gradeLevelTitle | EmtyValueCheckPipe}}
-                                </td>
-                            </ng-container>
-
-                            <ng-container matColumnDef="section">
-                                <th mat-header-cell *matHeaderCellDef> {{ 'section' | translate }} </th>
-                                <td mat-cell *matCellDef="let element"> {{element.sectionName | EmtyValueCheckPipe}} </td>
-                            </ng-container>
-
-                            <ng-container matColumnDef="schoolEmail">
-                                <th mat-header-cell *matHeaderCellDef> {{ 'email' | translate }} </th>
-                                <td mat-cell *matCellDef="let element"> {{element.schoolEmail | EmtyValueCheckPipe}}
-                                </td>
-                            </ng-container>
-
-
-                            <tr mat-header-row *matHeaderRowDef="displayedColumnsStudents"></tr>
-                            <tr mat-row *matRowDef="let row; columns: displayedColumnsStudents;"></tr>
-                        </table>
+                        </div>
                     </div>
-                    <mat-paginator #selectedStudentsPaginator [length]="selectedStudentList?.data.length" showFirstLastButtons
-                        [class.hide]="selectedStudentList?.data.length===0" [pageSize]="pageSize" [pageSizeOptions]="[10, 20, 30, 40]">
-                    </mat-paginator>
                 </div>
+                <div class="overflow-x-auto overflow-y-hidden">
+                    <table mat-table [dataSource]="StudentModelList" class="mat-elevation-z8" matSort>
+
+                        <ng-container matColumnDef="selectStudent">
+
+                            <th mat-header-cell *matHeaderCellDef>
+                                <mat-checkbox color="primary" [class.hidden]="!totalCount" #masterCheckBox
+                                    [indeterminate]="someComplete()" (change)="setAll($event.checked)"></mat-checkbox>
+                            </th>
+                            <td mat-cell *matCellDef="let element">
+                                <mat-checkbox color="primary" (change)="setSelectedStudentList($event, element)"
+                                    [(ngModel)]="element.selectStudent"></mat-checkbox>
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="firstGivenName">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'firstGivenName' | translate }}
+                            </th>
+                            <td mat-cell *matCellDef="let element">
+                                {{element.lastFamilyName+", "+element.firstGivenName}}{{element.middleName!=null?"
+                                "+element.middleName:''}}
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="studentInternalId">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'studentID' | translate }} </th>
+                            <td mat-cell *matCellDef="let element"> {{element.studentInternalId}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="alternateId">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'alternateID' | translate }} </th>
+                            <td mat-cell *matCellDef="let element"> {{element.alternateId | EmtyValueCheckPipe}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="gradeLevelTitle">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'grade' | translate }} </th>
+                            <td mat-cell *matCellDef="let element"> {{element.gradeLevelTitle | EmtyValueCheckPipe}}
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="section">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'section' | translate }} </th>
+                            <td mat-cell *matCellDef="let element"> {{element?.sectionName | EmtyValueCheckPipe}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="schoolEmail">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'email' | translate }} </th>
+                            <td mat-cell *matCellDef="let element"> {{element.schoolEmail | EmtyValueCheckPipe}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="loading">
+                            <mat-footer-cell *matFooterCellDef colspan="7">
+                                <!-- <vex-mat-spinner-overlay *ngIf="loading" color="accent"></vex-mat-spinner-overlay> -->
+                            </mat-footer-cell>
+                        </ng-container>
+                        <ng-container matColumnDef="invalidsearct">
+                            <td mat-footer-cell *matFooterCellDef colspan="7">
+                                {{'noRecordFoundAsPerYourSearchCriteriaDotPlease' | translate}} <a
+                                    class="cursor-pointer text-blue underline"
+                                    (click)="resetStudentList()">{{'clickHere' | translate}}</a>
+                                {{'toReset' | translate}}
+                            </td>
+                        </ng-container>
+                        <ng-container matColumnDef="noData">
+                            <td mat-footer-cell *matFooterCellDef colspan="7">
+                                {{loading?('fetchingData' | translate):('noData' | translate) }}
+                            </td>
+                        </ng-container>
+
+                        <tr mat-header-row *matHeaderRowDef="visibleColumns"></tr>
+                        <tr mat-row *matRowDef="let row; columns: visibleColumns" @fadeInUp></tr>
+                        <tr mat-footer-row *matFooterRowDef="['loading']" [class.hide]="!loading"></tr>
+                        <tr mat-footer-row *matFooterRowDef="['invalidsearct']"
+                            [class.hide]="(searchCount !== 0)|| searchCount == null"></tr>
+                        <tr mat-footer-row *matFooterRowDef="['noData']" [class.hide]="totalCount != null"></tr>
+                    </table>
+                </div>
+                <mat-paginator #studentsPaginator [length]="totalCount" [class.hide]="totalCount==0"
+                    [pageSize]="pageSize" [pageSizeOptions]="[10, 20, 30, 40]" showFirstLastButtons
+                    (page)='getPageEvent($event)'></mat-paginator>
             </div>
 
-            <h4 class="text-primary font-semibold text-lg">{{'enterDataIntoFieldsToGroupUpdateStudentRecords' |
-                translate}}</h4>
-            <p class="text-gray mb-4">{{'noteDataEnteredHereWillReplaceSelectedStudentsExistingRecords' | translate}}
-            </p>
+            <!-- start Assign Info - General Info -->
+            <div [ngStyle]="{'display':showSelectedStudent?'block':'none'}">
+                <!-- <div *ngIf="showSelectedStudent"> -->
+                <div class="card -mt-16 mb-6">
+                    <div class="sm:flex p-4 items-center justify-between">
+                        <div class="flex items-center">
+                            <img src="assets/img/groupAssignStudentInfo.png" alt="Search a group of students icon"
+                                class="w-40 md:w-auto mr-4">
+                            <div>
+                                <h4 class="font-bold text-xl">{{selectedStudentListModel.length}} {{ 'studentsSelected'
+                                    | translate }}</h4>
+                                <p class="text-gray">{{ 'clickHereToChangeTheSelection' | translate }}</p>
+                            </div>
+                        </div>
+                        <hr class="block sm:hidden -mx-4 my-4" />
+                        <div class="flex items-center justify-end w-full sm:w-auto">
+                            <span class="flex cursor-pointer" (click)="toggleStudentList()">
+                                <mat-icon class="text-primary h-auto w-auto text-3xl">list_alt</mat-icon>
+                            </span>
+                            <span class="text-center w-12 h-12 rounded-full bg-primary inline-block ml-4 cursor-pointer"
+                                (click)="backToselectedStudent()">
+                                <mat-icon class="mt-3 text-white">replay</mat-icon>
+                            </span>
+                        </div>
+                    </div>
+                    <mat-divider></mat-divider>
+                    <div [ngStyle]="{'display': isShow ? 'none' : 'block'}">
+                        <h4 class="font-bold text-lg p-4">{{ 'selectedStudents' | translate }}</h4>
+                        <div class="overflow-x-auto overflow-y-hidden border-t">
+                            <table mat-table [dataSource]="selectedStudentList" class="mat-elevation-z8">
 
-            <div class="card mb-6">
-                <div class="custom-tab">
-                    <ul class="flex flex-row text-gray font-semibold">
-                        <li class="px-6 py-4 cursor-pointer" (click)="changeTab('generalInfo')"
-                            [class.active]="currentTab === 'generalInfo'"
-                            [ngClass]="currentTab === 'generalInfo' ? 'text-black border-b-2 border-primary' : ''">
-                            {{'generalInfo' | translate}}
-                        </li>
-                        <li class="px-6 py-4 cursor-pointer" (click)="changeTab('enrollmentInfo')"
-                            [class.active]="currentTab === 'enrollmentInfo'"
-                            [ngClass]="currentTab === 'enrollmentInfo' ? 'text-black border-b-2 border-primary' : ''">
-                            {{'enrollmentInfo' | translate}}
-                        </li>
-                        <li class="px-6 py-4 cursor-pointer" (click)="changeTab('medicalInfo')"
-                            [class.active]="currentTab === 'medicalInfo'"
-                            [ngClass]="currentTab === 'medicalInfo' ? 'text-black border-b-2 border-primary' : ''">
-                            {{'medicalInfo' | translate}}
-                        </li>
-                        <li class="px-6 py-4 cursor-pointer" (click)="changeTab('comment')"
-                            [class.active]="currentTab === 'comment'"
-                            [ngClass]="currentTab === 'comment' ? 'text-black border-b-2 border-primary' : ''">
-                            {{'comment' |
-                            translate}}
-                        </li>
-                        <li class="px-6 py-4 cursor-pointer" (click)="changeTab('documents')"
-                            [class.active]="currentTab === 'documents'"
-                            [ngClass]="currentTab === 'documents' ? 'text-black border-b-2 border-primary' : ''">
-                            {{'documents' |
-                            translate}}
-                        </li>
-                    </ul>
+                                <ng-container matColumnDef="remove">
+                                    <th mat-header-cell *matHeaderCellDef> {{ 'remove' | translate }} </th>
+                                    <td mat-cell *matCellDef="let element">
+                                        <mat-icon (click)="setSelectedStudentList({checked: false}, element)"
+                                            [icIcon]="icRemoveCircle" class="cursor-pointer"></mat-icon>
+                                    </td>
+                                </ng-container>
+
+                                <ng-container matColumnDef="firstGivenName">
+                                    <th mat-header-cell *matHeaderCellDef> {{ 'firstGivenName' | translate }} </th>
+                                    <td mat-cell *matCellDef="let element"> {{element.lastFamilyName+","
+                                        +element.firstGivenName}}{{element.middleName!=null?"
+                                        "+element.middleName:''}} </td>
+                                </ng-container>
+
+                                <ng-container matColumnDef="studentInternalId">
+                                    <th mat-header-cell *matHeaderCellDef> {{ 'studentID' | translate }} </th>
+                                    <td mat-cell *matCellDef="let element"> {{element.studentInternalId}} </td>
+                                </ng-container>
+
+                                <ng-container matColumnDef="alternateId">
+                                    <th mat-header-cell *matHeaderCellDef> {{ 'alternateID' | translate }} </th>
+                                    <td mat-cell *matCellDef="let element"> {{element.alternateId | EmtyValueCheckPipe}}
+                                    </td>
+                                </ng-container>
+
+                                <ng-container matColumnDef="gradeLevelTitle">
+                                    <th mat-header-cell *matHeaderCellDef> {{ 'grade' | translate }} </th>
+                                    <td mat-cell *matCellDef="let element"> {{element.gradeLevelTitle |
+                                        EmtyValueCheckPipe}}
+                                    </td>
+                                </ng-container>
+
+                                <ng-container matColumnDef="section">
+                                    <th mat-header-cell *matHeaderCellDef> {{ 'section' | translate }} </th>
+                                    <td mat-cell *matCellDef="let element"> {{element.sectionName | EmtyValueCheckPipe}}
+                                    </td>
+                                </ng-container>
+
+                                <ng-container matColumnDef="schoolEmail">
+                                    <th mat-header-cell *matHeaderCellDef> {{ 'email' | translate }} </th>
+                                    <td mat-cell *matCellDef="let element"> {{element.schoolEmail | EmtyValueCheckPipe}}
+                                    </td>
+                                </ng-container>
+
+
+                                <tr mat-header-row *matHeaderRowDef="displayedColumnsStudents"></tr>
+                                <tr mat-row *matRowDef="let row; columns: displayedColumnsStudents;"></tr>
+                            </table>
+                        </div>
+                        <mat-paginator #selectedStudentsPaginator [length]="selectedStudentList?.data.length"
+                            showFirstLastButtons [class.hide]="selectedStudentList?.data.length===0"
+                            [pageSize]="pageSize" [pageSizeOptions]="[10, 20, 30, 40]">
+                        </mat-paginator>
+                    </div>
                 </div>
-                <mat-divider></mat-divider>
-                <div [ngSwitch]="currentTab">
-                    <div *ngSwitchCase="'generalInfo'" class="px-4">
-                        <h4 class="text-primary pt-4 pb-2">{{'identificationInformation'|translate}}</h4>
-                        <ul class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 col-gap-8 row-gap-0">
-                            <li>
-                                <mat-form-field class="w-full" appearance="outline" color="primary">
-                                    <mat-label>{{'districtId'|translate}}</mat-label>
-                                    <input type="number" name="districtId"
-                                        [(ngModel)]="studentAddForGroupAssignModel.studentMaster.districtId" matInput>
-                                </mat-form-field>
+
+                <h4 class="text-primary font-semibold text-lg">{{'enterDataIntoFieldsToGroupUpdateStudentRecords' |
+                    translate}}</h4>
+                <p class="text-gray mb-4">{{'noteDataEnteredHereWillReplaceSelectedStudentsExistingRecords' |
+                    translate}}
+                </p>
+
+                <div class="card mb-6">
+                    <div class="custom-tab">
+                        <ul class="flex flex-row text-gray font-semibold">
+                            <li class="px-6 py-4 cursor-pointer" (click)="changeTab('generalInfo')"
+                                [class.active]="currentTab === 'generalInfo'"
+                                [ngClass]="currentTab === 'generalInfo' ? 'text-black border-b-2 border-primary' : ''">
+                                {{'generalInfo' | translate}}
                             </li>
-                            <li>
-                                <mat-form-field class="w-full" appearance="outline" color="primary">
-                                    <mat-label>{{'stateId'|translate}}</mat-label>
-                                    <input type="number"
-                                        [(ngModel)]="studentAddForGroupAssignModel.studentMaster.stateId" name="stateId"
-                                        matInput>
-                                </mat-form-field>
+                            <li class="px-6 py-4 cursor-pointer" (click)="changeTab('enrollmentInfo')"
+                                [class.active]="currentTab === 'enrollmentInfo'"
+                                [ngClass]="currentTab === 'enrollmentInfo' ? 'text-black border-b-2 border-primary' : ''">
+                                {{'enrollmentInfo' | translate}}
+                            </li>
+                            <li class="px-6 py-4 cursor-pointer" (click)="changeTab('medicalInfo')"
+                                [class.active]="currentTab === 'medicalInfo'"
+                                [ngClass]="currentTab === 'medicalInfo' ? 'text-black border-b-2 border-primary' : ''">
+                                {{'medicalInfo' | translate}}
+                            </li>
+                            <li class="px-6 py-4 cursor-pointer" (click)="changeTab('comment')"
+                                [class.active]="currentTab === 'comment'"
+                                [ngClass]="currentTab === 'comment' ? 'text-black border-b-2 border-primary' : ''">
+                                {{'comment' |
+                                translate}}
+                            </li>
+                            <li class="px-6 py-4 cursor-pointer" (click)="changeTab('documents')"
+                                [class.active]="currentTab === 'documents'"
+                                [ngClass]="currentTab === 'documents' ? 'text-black border-b-2 border-primary' : ''">
+                                {{'documents' |
+                                translate}}
                             </li>
                         </ul>
+                    </div>
+                    <mat-divider></mat-divider>
+                    <div [ngSwitch]="currentTab">
+                        <div *ngSwitchCase="'generalInfo'" class="px-4">
+                            <h4 class="text-primary pt-4 pb-2">{{'identificationInformation'|translate}}</h4>
+                            <ul
+                                class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 col-gap-8 row-gap-0">
+                                <li>
+                                    <mat-form-field class="w-full" appearance="outline" color="primary">
+                                        <mat-label>{{'districtId'|translate}}</mat-label>
+                                        <input type="number" name="districtId"
+                                            [(ngModel)]="studentAddForGroupAssignModel.studentMaster.districtId"
+                                            matInput>
+                                    </mat-form-field>
+                                </li>
+                                <li>
+                                    <mat-form-field class="w-full" appearance="outline" color="primary">
+                                        <mat-label>{{'stateId'|translate}}</mat-label>
+                                        <input type="number"
+                                            [(ngModel)]="studentAddForGroupAssignModel.studentMaster.stateId"
+                                            name="stateId" matInput>
+                                    </mat-form-field>
+                                </li>
+                            </ul>
 
-                        <hr class="-mx-4 mt-4">
+                            <hr class="-mx-4 mt-4">
 
-                        <h4 class="text-primary pt-4 pb-2">{{'demographicInformation'|translate}}</h4>
-                        <ul class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 col-gap-8 row-gap-0">
-                            <li>
-                                <mat-form-field fxFlex="auto" class="w-full" appearance="outline" color="primary">
-                                    <mat-label>{{'dateOfBirth'|translate}}</mat-label>
-                                    <input matInput [(ngModel)]="studentAddForGroupAssignModel.studentMaster.dob"
-                                        name="dob" [max]="today" [matDatepicker]="dob">
-                                    <mat-datepicker-toggle matSuffix [for]="dob"></mat-datepicker-toggle>
-                                    <mat-datepicker #dob></mat-datepicker>
-                                </mat-form-field>
-                            </li>
-                            <li>
-                                <mat-form-field fxFlex="auto" class="w-full" appearance="outline" color="primary">
-                                    <mat-label>{{'gender'|translate}}</mat-label>
-                                    <mat-select [(ngModel)]="studentAddForGroupAssignModel.studentMaster.gender"
-                                        name="gender">
-                                        <mat-option></mat-option>
-                                        <mat-option *ngFor="let gender of genderList" [value]="gender.lovColumnValue">
-                                            {{gender.lovColumnValue}}</mat-option>
-                                    </mat-select>
-                                </mat-form-field>
-                            </li>
-                            <li>
-                                <mat-form-field fxFlex="auto" class="w-full" appearance="outline" color="primary">
-                                    <mat-label>{{'race'|translate}}</mat-label>
-                                    <mat-select [(ngModel)]="studentAddForGroupAssignModel.studentMaster.race"
-                                        name="race">
-                                        <mat-option></mat-option>
-                                        <mat-option *ngFor="let race of raceList" [value]="race.lovColumnValue">
-                                            {{race.lovColumnValue}}</mat-option>
-                                    </mat-select>
-                                </mat-form-field>
-                            </li>
-                            <li>
-                                <mat-form-field fxFlex="auto" class="w-full" appearance="outline" color="primary">
-                                    <mat-label>{{'ethnicity'|translate}}</mat-label>
-                                    <mat-select [(ngModel)]="studentAddForGroupAssignModel.studentMaster.ethnicity"
-                                        name="ethnicity">
-                                        <mat-option></mat-option>
-                                        <mat-option *ngFor="let ethnicity of ethnicityList"
-                                            [value]="ethnicity.lovColumnValue">
-                                            {{ethnicity.lovColumnValue}}
-                                        </mat-option>
-                                    </mat-select>
-                                </mat-form-field>
-                            </li>
-                            <li>
-                                <mat-form-field fxFlex="auto" class="w-full" appearance="outline" color="primary">
-                                    <mat-label>{{'maritalStatus'|translate}}</mat-label>
-                                    <mat-select [(ngModel)]="studentAddForGroupAssignModel.studentMaster.maritalStatus"
-                                        name="maritalStatus">
-                                        <mat-option></mat-option>
-                                        <mat-option *ngFor="let maritalStatus of maritalStatusList"
-                                            [value]="maritalStatus.lovColumnValue">
-                                            {{maritalStatus.lovColumnValue}}</mat-option>
-                                    </mat-select>
-                                </mat-form-field>
-                            </li>
-                            <li>
-                                <mat-form-field fxFlex="auto" class="w-full" appearance="outline" color="primary">
-                                    <mat-label>{{'countryOfBirth'|translate}}</mat-label>
-                                    <mat-select [formControl]="countryOfBirthCtrl"
-                                        [(ngModel)]="studentAddForGroupAssignModel.studentMaster.countryOfBirth"
-                                        name="countryOfBirth">
-                                        <!-- <mat-option></mat-option> -->
-                                        <mat-option>
-                                            <ngx-mat-select-search [formControl]="countryOfBirthFilterCtrl"
-                                                ngxMatSelectSearchClear noEntriesFoundLabel="No matching country found"
-                                                placeholderLabel="Find country..."></ngx-mat-select-search>
-                                        </mat-option>
-                                        <mat-option *ngFor="let country of filteredcountryOfBirth| async"
-                                            [value]='country.id'>
-                                            {{country.name}}
-                                        </mat-option>
-                                    </mat-select>
-                                </mat-form-field>
-                            </li>
-                            <li>
-                                <mat-form-field fxFlex="auto" class="w-full" appearance="outline" color="primary">
-                                    <mat-label>{{'nationality'|translate}}</mat-label>
-                                    <mat-select [formControl]="nationalityCtrl"
-                                        [(ngModel)]="studentAddForGroupAssignModel.studentMaster.nationality"
-                                        name="nationality">
-                                        <!-- <mat-option></mat-option> -->
-                                        <mat-option>
-                                            <ngx-mat-select-search [formControl]="nationalityFilterCtrl"
-                                                ngxMatSelectSearchClear
-                                                noEntriesFoundLabel="No matching nationality found"
-                                                placeholderLabel="Find nationality..."></ngx-mat-select-search>
-                                        </mat-option>
-                                        <mat-option *ngFor="let country of filteredNationality| async"
-                                            [value]='country.id'>
-                                            {{country.name}}
-                                        </mat-option>
-                                    </mat-select>
-                                </mat-form-field>
-                            </li>
-                            <li>
-                                <mat-form-field fxFlex="auto" class="w-full" appearance="outline" color="primary">
-                                    <mat-label>{{'firstLanguage'|translate}}</mat-label>
-                                    <mat-select
-                                        [(ngModel)]="studentAddForGroupAssignModel.studentMaster.firstLanguageId"
-                                        name="firstLanguageId">
-                                        <mat-option></mat-option>
-                                        <mat-option *ngFor="let language of languageList" [value]="language.langId">
-                                            {{language.locale}}
-                                        </mat-option>
-                                    </mat-select>
-                                </mat-form-field>
-                            </li>
-                            <li>
-                                <mat-form-field fxFlex="auto" class="w-full" appearance="outline" color="primary">
-                                    <mat-label>{{'secondLanguage'|translate}}</mat-label>
-                                    <mat-select
-                                        [(ngModel)]="studentAddForGroupAssignModel.studentMaster.secondLanguageId"
-                                        name="secondLanguageId">
-                                        <mat-option></mat-option>
-                                        <mat-option *ngFor="let language of languageList" [value]="language.langId">
-                                            {{language.locale}}
-                                        </mat-option>
-                                    </mat-select>
-                                </mat-form-field>
-                            </li>
-                            <li>
-                                <mat-form-field fxFlex="auto" class="w-full" appearance="outline" color="primary">
-                                    <mat-label>{{'thirdLanguage'|translate}}</mat-label>
-                                    <mat-select
-                                        [(ngModel)]="studentAddForGroupAssignModel.studentMaster.thirdLanguageId"
-                                        name="thirdLanguageId">
-                                        <mat-option></mat-option>
-                                        <mat-option *ngFor="let language of languageList" [value]="language.langId">
-                                            {{language.locale}}
-                                        </mat-option>
-                                    </mat-select>
-                                </mat-form-field>
-                            </li>
-                        </ul>
+                            <h4 class="text-primary pt-4 pb-2">{{'demographicInformation'|translate}}</h4>
+                            <ul
+                                class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 col-gap-8 row-gap-0">
+                                <li>
+                                    <mat-form-field fxFlex="auto" class="w-full" appearance="outline" color="primary">
+                                        <mat-label>{{'dateOfBirth'|translate}}</mat-label>
+                                        <input matInput [(ngModel)]="studentAddForGroupAssignModel.studentMaster.dob"
+                                            name="dob" [max]="today" [matDatepicker]="dob">
+                                        <mat-datepicker-toggle matSuffix [for]="dob"></mat-datepicker-toggle>
+                                        <mat-datepicker #dob></mat-datepicker>
+                                    </mat-form-field>
+                                </li>
+                                <li>
+                                    <mat-form-field fxFlex="auto" class="w-full" appearance="outline" color="primary">
+                                        <mat-label>{{'gender'|translate}}</mat-label>
+                                        <mat-select [(ngModel)]="studentAddForGroupAssignModel.studentMaster.gender"
+                                            name="gender">
+                                            <mat-option></mat-option>
+                                            <mat-option *ngFor="let gender of genderList"
+                                                [value]="gender.lovColumnValue">
+                                                {{gender.lovColumnValue}}</mat-option>
+                                        </mat-select>
+                                    </mat-form-field>
+                                </li>
+                                <li>
+                                    <mat-form-field fxFlex="auto" class="w-full" appearance="outline" color="primary">
+                                        <mat-label>{{'race'|translate}}</mat-label>
+                                        <mat-select [(ngModel)]="studentAddForGroupAssignModel.studentMaster.race"
+                                            name="race">
+                                            <mat-option></mat-option>
+                                            <mat-option *ngFor="let race of raceList" [value]="race.lovColumnValue">
+                                                {{race.lovColumnValue}}</mat-option>
+                                        </mat-select>
+                                    </mat-form-field>
+                                </li>
+                                <li>
+                                    <mat-form-field fxFlex="auto" class="w-full" appearance="outline" color="primary">
+                                        <mat-label>{{'ethnicity'|translate}}</mat-label>
+                                        <mat-select [(ngModel)]="studentAddForGroupAssignModel.studentMaster.ethnicity"
+                                            name="ethnicity">
+                                            <mat-option></mat-option>
+                                            <mat-option *ngFor="let ethnicity of ethnicityList"
+                                                [value]="ethnicity.lovColumnValue">
+                                                {{ethnicity.lovColumnValue}}
+                                            </mat-option>
+                                        </mat-select>
+                                    </mat-form-field>
+                                </li>
+                                <li>
+                                    <mat-form-field fxFlex="auto" class="w-full" appearance="outline" color="primary">
+                                        <mat-label>{{'maritalStatus'|translate}}</mat-label>
+                                        <mat-select
+                                            [(ngModel)]="studentAddForGroupAssignModel.studentMaster.maritalStatus"
+                                            name="maritalStatus">
+                                            <mat-option></mat-option>
+                                            <mat-option *ngFor="let maritalStatus of maritalStatusList"
+                                                [value]="maritalStatus.lovColumnValue">
+                                                {{maritalStatus.lovColumnValue}}</mat-option>
+                                        </mat-select>
+                                    </mat-form-field>
+                                </li>
+                                <li>
+                                    <mat-form-field fxFlex="auto" class="w-full" appearance="outline" color="primary">
+                                        <mat-label>{{'countryOfBirth'|translate}}</mat-label>
+                                        <mat-select [formControl]="countryOfBirthCtrl"
+                                            [(ngModel)]="studentAddForGroupAssignModel.studentMaster.countryOfBirth"
+                                            name="countryOfBirth">
+                                            <!-- <mat-option></mat-option> -->
+                                            <mat-option>
+                                                <ngx-mat-select-search [formControl]="countryOfBirthFilterCtrl"
+                                                    ngxMatSelectSearchClear
+                                                    noEntriesFoundLabel="No matching country found"
+                                                    placeholderLabel="Find country..."></ngx-mat-select-search>
+                                            </mat-option>
+                                            <mat-option *ngFor="let country of filteredcountryOfBirth| async"
+                                                [value]='country.id'>
+                                                {{country.name}}
+                                            </mat-option>
+                                        </mat-select>
+                                    </mat-form-field>
+                                </li>
+                                <li>
+                                    <mat-form-field fxFlex="auto" class="w-full" appearance="outline" color="primary">
+                                        <mat-label>{{'nationality'|translate}}</mat-label>
+                                        <mat-select [formControl]="nationalityCtrl"
+                                            [(ngModel)]="studentAddForGroupAssignModel.studentMaster.nationality"
+                                            name="nationality">
+                                            <!-- <mat-option></mat-option> -->
+                                            <mat-option>
+                                                <ngx-mat-select-search [formControl]="nationalityFilterCtrl"
+                                                    ngxMatSelectSearchClear
+                                                    noEntriesFoundLabel="No matching nationality found"
+                                                    placeholderLabel="Find nationality..."></ngx-mat-select-search>
+                                            </mat-option>
+                                            <mat-option *ngFor="let country of filteredNationality| async"
+                                                [value]='country.id'>
+                                                {{country.name}}
+                                            </mat-option>
+                                        </mat-select>
+                                    </mat-form-field>
+                                </li>
+                                <li>
+                                    <mat-form-field fxFlex="auto" class="w-full" appearance="outline" color="primary">
+                                        <mat-label>{{'firstLanguage'|translate}}</mat-label>
+                                        <mat-select
+                                            [(ngModel)]="studentAddForGroupAssignModel.studentMaster.firstLanguageId"
+                                            name="firstLanguageId">
+                                            <mat-option></mat-option>
+                                            <mat-option *ngFor="let language of languageList" [value]="language.langId">
+                                                {{language.locale}}
+                                            </mat-option>
+                                        </mat-select>
+                                    </mat-form-field>
+                                </li>
+                                <li>
+                                    <mat-form-field fxFlex="auto" class="w-full" appearance="outline" color="primary">
+                                        <mat-label>{{'secondLanguage'|translate}}</mat-label>
+                                        <mat-select
+                                            [(ngModel)]="studentAddForGroupAssignModel.studentMaster.secondLanguageId"
+                                            name="secondLanguageId">
+                                            <mat-option></mat-option>
+                                            <mat-option *ngFor="let language of languageList" [value]="language.langId">
+                                                {{language.locale}}
+                                            </mat-option>
+                                        </mat-select>
+                                    </mat-form-field>
+                                </li>
+                                <li>
+                                    <mat-form-field fxFlex="auto" class="w-full" appearance="outline" color="primary">
+                                        <mat-label>{{'thirdLanguage'|translate}}</mat-label>
+                                        <mat-select
+                                            [(ngModel)]="studentAddForGroupAssignModel.studentMaster.thirdLanguageId"
+                                            name="thirdLanguageId">
+                                            <mat-option></mat-option>
+                                            <mat-option *ngFor="let language of languageList" [value]="language.langId">
+                                                {{language.locale}}
+                                            </mat-option>
+                                        </mat-select>
+                                    </mat-form-field>
+                                </li>
+                            </ul>
 
-                        <hr class="-mx-4 mt-4">
+                            <hr class="-mx-4 mt-4">
 
 
-                        <ul
-                            class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 col-gap-8 row-gap-0 mt-6">
-                            <!-- <vex-custom-field-without-form [schoolDetailsForViewAndEdit]="studentAddForGroupAssignModel" [module]="'Student'"
+                            <ul
+                                class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 col-gap-8 row-gap-0 mt-6">
+                                <!-- <vex-custom-field-without-form [schoolDetailsForViewAndEdit]="studentAddForGroupAssignModel" [module]="'Student'"
                             [categoryId]="0" [studentCreateMode]="studentCreateMode"></vex-custom-field-without-form> -->
                                 <li *ngFor="let customField of studentCustomFields; let index = index"
                                     [ngSwitch]="customField.type">
                                     <div *ngSwitchCase="'Checkbox'">
-                                        
-                                    <mat-checkbox
-                                        [(ngModel)]="customField.customFieldsValue[0].customFieldValue"
-                                        name="{{customField.title.replace(' ','_')}}" color="primary" class="mr-6"  #stCheckBox="ngModel" [required]="customField.required ? true : null ">
-                                        {{customField.title}}
-                                    </mat-checkbox>
-                                    <mat-error *ngIf="stCheckBox.errors?.required">{{customField.title}} {{'isRequired' | translate}}</mat-error>
-                                      
+
+                                        <mat-checkbox [(ngModel)]="customField.customFieldsValue[0].customFieldValue"
+                                            name="{{customField.title.replace(' ','_')}}" color="primary" class="mr-6"
+                                            #stCheckBox="ngModel" [required]="customField.required ? true : null ">
+                                            {{customField.title}}
+                                        </mat-checkbox>
+                                        <mat-error *ngIf="stCheckBox.errors?.required">{{customField.title}}
+                                            {{'isRequired' | translate}}</mat-error>
+
                                         <!-- <mat-checkbox
                                             [(ngModel)]="customField?.customFieldsValue[0].customFieldValue"
                                             name="{{customField.title.replace(' ','_')}}" color="primary" class="mr-6">
@@ -443,7 +467,8 @@
                                     <div *ngSwitchCase="'Dropdown'">
                                         <mat-form-field class="w-full" appearance="outline" color="primary">
                                             <mat-label>{{customField.title}}</mat-label>
-                                            <mat-select name="{{customField.title.replace(' ','_')}}" #schoolDropdown="ngModel"
+                                            <mat-select name="{{customField.title.replace(' ','_')}}"
+                                                #schoolDropdown="ngModel"
                                                 [(ngModel)]="customField?.customFieldsValue[0].customFieldValue"
                                                 [required]="customField.required ? true : null ">
                                                 <mat-option *ngFor="let option of customField.selectOptions.split('|')"
@@ -452,16 +477,17 @@
                                             </mat-select>
                                             <mat-error *ngIf="schoolDropdown.errors?.required">
                                                 {{customField.title}} {{'isRequired' | translate}}</mat-error>
-                
+
                                         </mat-form-field>
                                     </div>
                                     <div *ngSwitchCase="'Textarea'">
                                         <mat-form-field class="w-full" appearance="outline" color="primary">
                                             <mat-label>{{customField.title}}</mat-label>
-                                            <textarea name="{{customField.title.replace(' ','_')}}" #schoolTextArea="ngModel" matInput
+                                            <textarea name="{{customField.title.replace(' ','_')}}"
+                                                #schoolTextArea="ngModel" matInput
                                                 [(ngModel)]="customField?.customFieldsValue[0].customFieldValue"
                                                 [required]="customField.required ? true : null "></textarea>
-                
+
                                             <mat-error *ngIf="schoolTextArea.errors?.required">
                                                 {{customField.title}} {{'isRequired' | translate}}</mat-error>
                                         </mat-form-field>
@@ -469,27 +495,30 @@
                                     <div *ngSwitchCase="'number'">
                                         <mat-form-field class="w-full" appearance="outline" color="primary">
                                             <mat-label>{{customField.title}}</mat-label>
-                                            <input matInput [type]="customField.type" maxlength="100" #studentNumber="ngModel" [(ngModel)]="customField?.customFieldsValue[0].customFieldValue"
+                                            <input matInput [type]="customField.type" maxlength="100"
+                                                #studentNumber="ngModel"
+                                                [(ngModel)]="customField?.customFieldsValue[0].customFieldValue"
                                                 [required]="customField.required ? true : null"
                                                 name="{{customField.title.replace(' ','_')}}">
-                                                <mat-error *ngIf="studentNumber.errors?.required">
-                                                    {{customField.title}} {{'isRequired' | translate}}</mat-error>
+                                            <mat-error *ngIf="studentNumber.errors?.required">
+                                                {{customField.title}} {{'isRequired' | translate}}</mat-error>
                                         </mat-form-field>
-                                        
+
                                     </div>
-                
+
                                     <div *ngSwitchCase="'Date'">
                                         <mat-form-field class="w-full" appearance="outline" color="primary">
                                             <mat-label>{{customField.title}}</mat-label>
-                                            <input name="{{customField.title.replace(' ','_')}}"  #studentDate="ngModel"
+                                            <input name="{{customField.title.replace(' ','_')}}" #studentDate="ngModel"
                                                 [(ngModel)]="customField?.customFieldsValue[0].customFieldValue"
-                                                [matDatepicker]="testDate" matInput [required]="customField.required ? true : null ">
+                                                [matDatepicker]="testDate" matInput
+                                                [required]="customField.required ? true : null ">
                                             <mat-datepicker-toggle [for]="testDate" matSuffix></mat-datepicker-toggle>
                                             <mat-datepicker #testDate></mat-datepicker>
                                             <mat-error *ngIf="studentDate.errors?.required">
                                                 {{customField.title}} {{'isRequired' | translate}}</mat-error>
                                         </mat-form-field>
-                                        
+
                                     </div>
                                     <div *ngSwitchCase="'Text'">
                                         <mat-form-field class="w-full" appearance="outline" color="primary">
@@ -500,24 +529,24 @@
                                                 [required]="customField.required ? true : null ">
                                             <mat-error *ngIf="schoolField.errors?.required">
                                                 {{customField.title}} {{'isRequired' | translate}}</mat-error>
-                
+
                                         </mat-form-field>
                                     </div>
                                     <div *ngSwitchCase="'Multiple SelectBox'">
                                         <mat-form-field class="w-full" appearance="outline" color="primary">
                                             <mat-label>{{customField.title}}</mat-label>
                                             <mat-select name="{{customField.title.replace(' ','_')}}"
-                                                [(ngModel)]="studentMultiSelectValue"
-                                                multiple [required]="customField.required ? true : null ">
+                                                [(ngModel)]="studentMultiSelectValue" multiple
+                                                [required]="customField.required ? true : null ">
                                                 <mat-option *ngFor="let option of customField.selectOptions.split('|')"
                                                     [value]="option">
                                                     {{option}}</mat-option>
                                             </mat-select>
                                         </mat-form-field>
                                     </div>
-                
+
                                 </li>
-                            <!-- <li>
+                                <!-- <li>
                                 
                                 <mat-form-field class="w-full" appearance="outline" color="primary">
                                     <mat-label>{{'customField1'| translate}}</mat-label>
@@ -532,254 +561,290 @@
                                     </mat-select>
                                 </mat-form-field>
                             </li> -->
-                        </ul>
-                    </div>
+                            </ul>
+                        </div>
 
-                    <div *ngSwitchCase="'enrollmentInfo'" class="px-4 pb-10">
-                        <h4 class="text-primary pt-4 pb-2">{{'schoolInformation'|translate}}</h4>
-                        <ul class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 col-gap-8 row-gap-0 mb-2">
-                            <li>
-                                <mat-form-field fxFlex="auto" class="w-full" appearance="outline" color="primary">
-                                    <mat-label>{{'enrollmentCalendar'|translate}}</mat-label>
-                                    <mat-select #calendarId="ngModel" name="enrollment_calendar"
-                                        [(ngModel)]="studentEnrollmentForGroupAssignModel.studentEnrollments.calenderId">
-                                        <mat-option *ngFor="let calendar of calendarListModel.calendarList"
-                                            value={{calendar.calenderId}}>{{calendar.title}}</mat-option>
-                                    </mat-select>
-                                    <mat-error *ngIf="calendarId.errors?.required">
-                                        {{'calendarNameIsRequired'|translate}}
-                                    </mat-error>
-                                </mat-form-field>
-                            </li>
-                            <li>
-                                <mat-form-field fxFlex="auto" class="w-full" appearance="outline" color="primary">
-                                    <mat-label>{{'rollingRetentionOption'|translate}}</mat-label>
-                                    <mat-select #rollingOption="ngModel" name="rolling_retention_option"
-                                        [(ngModel)]="studentEnrollmentForGroupAssignModel.studentEnrollments.rollingOption">
-                                        <mat-option *ngFor="let rollingOption of rollingOptions"
-                                            value="{{rollingOption}}">
-                                            {{rollingOption}}</mat-option>
-                                    </mat-select>
-                                    <mat-error *ngIf="rollingOption.errors?.required">
-                                        {{'rollingOptionIsRequired'|translate}}
-                                    </mat-error>
-                                </mat-form-field>
-                            </li>
-                            <li>
-                                <mat-form-field fxFlex="auto" class="w-full" appearance="outline" color="primary">
-                                    <mat-label>{{'section'|translate}}</mat-label>
-                                    <mat-select [(ngModel)]="studentEnrollmentForGroupAssignModel.sectionId"
-                                        name="sectionId">
-                                        <mat-option *ngIf="sectionList?.tableSectionsList?.length==0">{{'noSectionsFound' | translate}}
-                                        </mat-option>
-                                        <mat-option *ngFor="let section of sectionList.tableSectionsList"
-                                            [value]='section.sectionId'>
-                                            {{section.name}}</mat-option>
-                                    </mat-select>
-                                </mat-form-field>
-                            </li>
-                            <li>
-                                <mat-form-field fxFlex="auto" class="w-full" appearance="outline" color="primary">
-                                    <mat-label>{{'estimatedGraduationDate'|translate}}</mat-label>
-                                    <input name="estimatedGradDate"
-                                        [(ngModel)]="studentEnrollmentForGroupAssignModel.estimatedGradDate"
-                                        [matDatepicker]="estimatedGradDate" matInput>
-                                    <mat-datepicker-toggle [for]="estimatedGradDate" matSuffix></mat-datepicker-toggle>
-                                    <mat-datepicker #estimatedGradDate></mat-datepicker>
-                                </mat-form-field>
-                            </li>
-                            <li>
-                                <mat-form-field fxFlex="auto" class="w-full" appearance="outline" color="primary">
-                                    <mat-label>{{'gradeLevel'|translate}}</mat-label>
-                                    <mat-select [(ngModel)]="studentEnrollmentForGroupAssignModel.studentEnrollments.gradeId" name="gradeLevel">
-                                        <mat-option *ngFor="let grade of gradeLevelList" [value]='grade.gradeId' (click)="selectGrade(grade)">
-                                            {{grade.title}}
-                                        </mat-option>
-                                    </mat-select>
-                                </mat-form-field>
-                            </li>
-                            <li>
-                                <mat-form-field fxFlex="auto" class="w-full" appearance="outline" color="primary">
-                                    <mat-label>{{'enrollmentDate'|translate}}</mat-label>
-                                    <input name="enrollmentDate"
-                                        [(ngModel)]="studentEnrollmentForGroupAssignModel.studentEnrollments.enrollmentDate"
-                                        [matDatepicker]="enrollmentDate" matInput>
-                                    <mat-datepicker-toggle [for]="enrollmentDate" matSuffix></mat-datepicker-toggle>
-                                    <mat-datepicker #enrollmentDate></mat-datepicker>
-                                </mat-form-field>
-                            </li>
-                        </ul>
-                        <ul class="grid grid-cols-1 col-gap-8 row-gap-0">
-                            <li>
-                                <mat-checkbox name="eligibility504"
-                                    [(ngModel)]="studentEnrollmentForGroupAssignModel.eligibility504" color="primary"
-                                    class="mr-6 mb-2">
-                                    {{'504Eligibility' | translate}}</mat-checkbox>
-                                <mat-checkbox name="economicDisadvantage"
-                                    [(ngModel)]="studentEnrollmentForGroupAssignModel.economicDisadvantage"
-                                    color="primary" class="mr-6 mb-2">
-                                    {{'economicDisadvantage' | translate}}</mat-checkbox>
-                                <mat-checkbox name="freeLunchEligibility"
-                                    [(ngModel)]="studentEnrollmentForGroupAssignModel.freeLunchEligibility"
-                                    color="primary" class="mr-6 mb-2">
-                                    {{'freeLunchEligibility' | translate}}</mat-checkbox>
-                                <mat-checkbox name="specialEducationIndicator"
-                                    [(ngModel)]="studentEnrollmentForGroupAssignModel.specialEducationIndicator"
-                                    color="primary" class="mr-6 mb-2">
-                                    {{'specialEducationIndicator' | translate}}</mat-checkbox>
-                                <mat-checkbox name="lepIndicator"
-                                    [(ngModel)]="studentEnrollmentForGroupAssignModel.lepIndicator" color="primary">
-                                    {{'lepIndicator' | translate}}
-                                </mat-checkbox>
-                            </li>
-                        </ul>
-                    </div>
+                        <div *ngSwitchCase="'enrollmentInfo'" class="px-4 pb-10">
+                            <h4 class="text-primary pt-4 pb-2">{{'schoolInformation'|translate}}</h4>
+                            <ul class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 col-gap-8 row-gap-0 mb-2">
+                                <li>
+                                    <mat-form-field fxFlex="auto" class="w-full" appearance="outline" color="primary">
+                                        <mat-label>{{'enrollmentCalendar'|translate}}</mat-label>
+                                        <mat-select #calendarId="ngModel" name="enrollment_calendar"
+                                            [(ngModel)]="studentEnrollmentForGroupAssignModel.studentEnrollments.calenderId">
+                                            <mat-option *ngFor="let calendar of calendarListModel.calendarList"
+                                                value={{calendar.calenderId}}>{{calendar.title}}</mat-option>
+                                        </mat-select>
+                                        <mat-error *ngIf="calendarId.errors?.required">
+                                            {{'calendarNameIsRequired'|translate}}
+                                        </mat-error>
+                                    </mat-form-field>
+                                </li>
+                                <li>
+                                    <mat-form-field fxFlex="auto" class="w-full" appearance="outline" color="primary">
+                                        <mat-label>{{'rollingRetentionOption'|translate}}</mat-label>
+                                        <mat-select #rollingOption="ngModel" name="rolling_retention_option"
+                                            [(ngModel)]="studentEnrollmentForGroupAssignModel.studentEnrollments.rollingOption">
+                                            <mat-option *ngFor="let rollingOption of rollingOptions"
+                                                value="{{rollingOption}}">
+                                                {{rollingOption}}</mat-option>
+                                        </mat-select>
+                                        <mat-error *ngIf="rollingOption.errors?.required">
+                                            {{'rollingOptionIsRequired'|translate}}
+                                        </mat-error>
+                                    </mat-form-field>
+                                </li>
+                                <li
+                                    *ngIf="studentEnrollmentForGroupAssignModel.studentEnrollments.rollingOption=='Enrol to another school'">
+                                    <mat-form-field fxFlex="auto" class="w-full" appearance="outline" color="primary"
+                                        floatLabel="never">
+                                        <mat-label>{{'transferToSchool'|translate}}</mat-label>
+                                        <ng-container *ngIf="schoolList.length > 0">
+                                            <mat-select #EnrollOtherSchoolId="ngModel" name="{{'transferToSchool'}}"
+                                                [(ngModel)]="studentEnrollmentForGroupAssignModel.studentEnrollments.EnrollOtherSchoolId"
+                                                required>
+                                                <mat-option
+                                                    *ngFor="let school of schoolList;let transferredSchoolIndex=index"
+                                                    [value]="school.schoolId" [disabled]="school.schoolId == schoolId">
+                                                    {{school.schoolName}}</mat-option>
+                                            </mat-select>
+                                            <mat-error *ngIf="EnrollOtherSchoolId.errors?.required">
+                                                {{'transferredSchoolNameIsRequired'|translate}}
+                                            </mat-error>
+                                        </ng-container>
+                                    </mat-form-field>
 
-                    <div *ngSwitchCase="'medicalInfo'" class="px-4">
-                        <h4 class="text-primary pt-4 pb-2">{{'providerInformation'|translate}}</h4>
-                        <ul class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 col-gap-8 row-gap-0">
-                            <li>
-                                <mat-form-field fxFlex="auto" class="w-full" appearance="outline" color="primary">
-                                    <mat-label>{{'primaryCarePhysician'|translate}}</mat-label>
-                                    <input name="primaryCarePhysician"
-                                        [(ngModel)]="AddEditStudentMedicalProviderForGroupAssignModel.studentMedicalProvider.primaryCarePhysician"
-                                        matInput>
-                                </mat-form-field>
-                            </li>
-                            <li>
-                                <mat-form-field fxFlex="auto" class="w-full" appearance="outline" color="primary">
-                                    <mat-label>{{'primaryCarePhysicianPhone'|translate}}</mat-label>
-                                    <input name="primaryCarePhysicianPhone"
-                                        [(ngModel)]="AddEditStudentMedicalProviderForGroupAssignModel.studentMedicalProvider.primaryCarePhysicianPhone"
-                                        maxlength="20" minlength="10" #primaryCarePhysicianPhone="ngModel" matInput>
-                                        <mat-error *ngIf="!primaryCarePhysicianPhone.errors?.required && primaryCarePhysicianPhone.errors?.minlength">
-                                            {{'minLengthTelephoneNumber'|translate}}</mat-error>
-                                </mat-form-field>
-                            </li>
-                            <li>
-                                <mat-form-field fxFlex="auto" class="w-full" appearance="outline" color="primary">
-                                    <mat-label>{{'insuranceCompany'|translate}}</mat-label>
-                                    <input name="insuranceCompany"
-                                        [(ngModel)]="AddEditStudentMedicalProviderForGroupAssignModel.studentMedicalProvider.insuranceCompany"
-                                        matInput>
-                                </mat-form-field>
-                            </li>
-                            <li>
-                                <mat-form-field fxFlex="auto" class="w-full" appearance="outline" color="primary">
-                                    <mat-label>{{'insuranceCompanyPhone'|translate}}</mat-label>
-                                    <input name="insuranceCompanyPhone"
-                                        [(ngModel)]="AddEditStudentMedicalProviderForGroupAssignModel.studentMedicalProvider.insuranceCompanyPhone"
-                                        maxlength="20" minlength="10" #insuranceCompanyPhone="ngModel" matInput>
-                                        <mat-error *ngIf="!insuranceCompanyPhone.errors?.required && insuranceCompanyPhone.errors?.minlength">
-                                            {{'minLengthTelephoneNumber'|translate}}</mat-error>
-                                </mat-form-field>
-                            </li>
-                            <li>
-                                <mat-form-field fxFlex="auto" class="w-full" appearance="outline" color="primary">
-                                    <mat-label>{{'preferredMedicalFacility'|translate}}</mat-label>
-                                    <input name="medicalFacility"
-                                        [(ngModel)]="AddEditStudentMedicalProviderForGroupAssignModel.studentMedicalProvider.preferredMedicalFacility"
-                                        matInput>
-                                </mat-form-field>
-                            </li>
-                            <li>
-                                <mat-form-field fxFlex="auto" class="w-full" appearance="outline" color="primary">
-                                    <mat-label>{{'preferredMedicalFacilityPhone'|translate}}</mat-label>
-                                    <input name="medicalFacilityPhone"
-                                        [(ngModel)]="AddEditStudentMedicalProviderForGroupAssignModel.studentMedicalProvider.preferredMedicalFacilityPhone"
-                                        maxlength="20" minlength="10" #medicalFacilityPhone="ngModel" matInput>
-                                        <mat-error *ngIf="!medicalFacilityPhone.errors?.required && medicalFacilityPhone.errors?.minlength">
-                                            {{'minLengthTelephoneNumber'|translate}}</mat-error>
-                                </mat-form-field>
-                            </li>
-                            <li>
-                                <mat-form-field fxFlex="auto" class="w-full" appearance="outline" color="primary">
-                                    <mat-label>{{'dentist'|translate}}</mat-label>
-                                    <input name="dentist"
-                                        [(ngModel)]="AddEditStudentMedicalProviderForGroupAssignModel.studentMedicalProvider.dentistName"
-                                        matInput>
-                                </mat-form-field>
-                            </li>
-                            <li>
-                                <mat-form-field fxFlex="auto" class="w-full" appearance="outline" color="primary">
-                                    <mat-label>{{'dentistsPhone'|translate}}</mat-label>
-                                    <input name="dentistPhone"
-                                        [(ngModel)]="AddEditStudentMedicalProviderForGroupAssignModel.studentMedicalProvider.dentistPhone"
-                                        #dentistPhone="ngModel" maxlength="20" minlength="10" matInput>
-                                        <mat-error *ngIf="!dentistPhone.errors?.required && dentistPhone.errors?.minlength">
-                                            {{'minLengthTelephoneNumber'|translate}}</mat-error>
-                                </mat-form-field>
-                            </li>
-                            <li>
-                                <mat-form-field fxFlex="auto" class="w-full" appearance="outline" color="primary">
-                                    <mat-label>{{'vision'|translate}}</mat-label>
-                                    <input name="vision"
-                                        [(ngModel)]="AddEditStudentMedicalProviderForGroupAssignModel.studentMedicalProvider.visionName"
-                                        matInput>
-                                </mat-form-field>
-                            </li>
-                            <li>
-                                <mat-form-field fxFlex="auto" class="w-full" appearance="outline" color="primary">
-                                    <mat-label>{{'visionProvidersPhone'|translate}}</mat-label>
-                                    <input name="visionPhone"
-                                        [(ngModel)]="AddEditStudentMedicalProviderForGroupAssignModel.studentMedicalProvider.visionProviderPhone"
-                                        #visionPhone="ngModel" maxlength="20" minlength="10" matInput>
-                                        <mat-error *ngIf="!visionPhone.errors?.required && visionPhone.errors?.minlength">
-                                            {{'minLengthTelephoneNumber'|translate}}</mat-error>
-                                </mat-form-field>
-                            </li>
-                        </ul>
-                    </div>
+                                </li>
 
-                    <div *ngSwitchCase="'comment'" class="px-4 pb-2">
-                        <form [formGroup]="form">
 
-                            <h4 class="text-primary pt-4 pb-2">{{'comment'|translate}}</h4>
-                            <div class="mb-6 border rounded">
-                                <quill-editor formControlName="Body" name="Body"
-                                    (onEditorChanged)="changedEditor($event)"
-                                    placeholder="{{ 'insertTextHere' | translate }}" [styles]="{ height: '250px' }">
-                                </quill-editor>
-                            </div>
-                        </form>
-                    </div>
+                                <li>
+                                    <mat-form-field fxFlex="auto" class="w-full" appearance="outline" color="primary">
+                                        <mat-label>{{'section'|translate}}</mat-label>
+                                        <mat-select [(ngModel)]="studentEnrollmentForGroupAssignModel.sectionId"
+                                            name="sectionId">
+                                            <mat-option
+                                                *ngIf="sectionList?.tableSectionsList?.length==0">{{'noSectionsFound' |
+                                                translate}}
+                                            </mat-option>
+                                            <mat-option *ngFor="let section of sectionList.tableSectionsList"
+                                                [value]='section.sectionId'>
+                                                {{section.name}}</mat-option>
+                                        </mat-select>
+                                    </mat-form-field>
+                                </li>
+                                <li>
+                                    <mat-form-field fxFlex="auto" class="w-full" appearance="outline" color="primary">
+                                        <mat-label>{{'estimatedGraduationDate'|translate}}</mat-label>
+                                        <input name="estimatedGradDate"
+                                            [(ngModel)]="studentEnrollmentForGroupAssignModel.estimatedGradDate"
+                                            [matDatepicker]="estimatedGradDate" matInput>
+                                        <mat-datepicker-toggle [for]="estimatedGradDate"
+                                            matSuffix></mat-datepicker-toggle>
+                                        <mat-datepicker #estimatedGradDate></mat-datepicker>
+                                    </mat-form-field>
+                                </li>
+                                <li>
+                                    <mat-form-field fxFlex="auto" class="w-full" appearance="outline" color="primary">
+                                        <mat-label>{{'gradeLevel'|translate}}</mat-label>
+                                        <mat-select
+                                            [(ngModel)]="studentEnrollmentForGroupAssignModel.studentEnrollments.gradeId"
+                                            name="gradeLevel">
+                                            <mat-option *ngFor="let grade of gradeLevelList" [value]='grade.gradeId'
+                                                (click)="selectGrade(grade)">
+                                                {{grade.title}}
+                                            </mat-option>
+                                        </mat-select>
+                                    </mat-form-field>
+                                </li>
+                                <li>
+                                    <mat-form-field fxFlex="auto" class="w-full" appearance="outline" color="primary">
+                                        <mat-label>{{'enrollmentDate'|translate}}</mat-label>
+                                        <input name="enrollmentDate"
+                                            [(ngModel)]="studentEnrollmentForGroupAssignModel.studentEnrollments.enrollmentDate"
+                                            [matDatepicker]="enrollmentDate" matInput>
+                                        <mat-datepicker-toggle [for]="enrollmentDate" matSuffix></mat-datepicker-toggle>
+                                        <mat-datepicker #enrollmentDate></mat-datepicker>
+                                    </mat-form-field>
+                                </li>
+                            </ul>
+                            <ul class="grid grid-cols-1 col-gap-8 row-gap-0">
+                                <li>
+                                    <mat-checkbox name="eligibility504"
+                                        [(ngModel)]="studentEnrollmentForGroupAssignModel.eligibility504"
+                                        color="primary" class="mr-6 mb-2">
+                                        {{'504Eligibility' | translate}}</mat-checkbox>
+                                    <mat-checkbox name="economicDisadvantage"
+                                        [(ngModel)]="studentEnrollmentForGroupAssignModel.economicDisadvantage"
+                                        color="primary" class="mr-6 mb-2">
+                                        {{'economicDisadvantage' | translate}}</mat-checkbox>
+                                    <mat-checkbox name="freeLunchEligibility"
+                                        [(ngModel)]="studentEnrollmentForGroupAssignModel.freeLunchEligibility"
+                                        color="primary" class="mr-6 mb-2">
+                                        {{'freeLunchEligibility' | translate}}</mat-checkbox>
+                                    <mat-checkbox name="specialEducationIndicator"
+                                        [(ngModel)]="studentEnrollmentForGroupAssignModel.specialEducationIndicator"
+                                        color="primary" class="mr-6 mb-2">
+                                        {{'specialEducationIndicator' | translate}}</mat-checkbox>
+                                    <mat-checkbox name="lepIndicator"
+                                        [(ngModel)]="studentEnrollmentForGroupAssignModel.lepIndicator" color="primary">
+                                        {{'lepIndicator' | translate}}
+                                    </mat-checkbox>
+                                </li>
+                            </ul>
+                        </div>
 
-                    <div *ngSwitchCase="'documents'" class="p-4">
-                        <ngx-dropzone (change)="onSelect($event)"
-                            [accept]="'image/*,application/pdf,.txt,.docx,.doc,.psd,.xls,.xlsx'"
-                            class="custom-dropzone">
-                            <ngx-dropzone-label>
-                                <p class="text-lg mt-12"><span class="text-primary">{{'clickHere' | translate}}</span>
-                                    {{
-                                    'toBrowseFiles' | translate}}(20 MB max)</p>
-                                <p class="my-2">or</p>
-                                <p class="text-lg">{{ 'dropFilesHereToUpload' | translate}}(20 MB max)</p>
-                            </ngx-dropzone-label>
-                            <ngx-dropzone-preview *ngFor="let f of files" [removable]="true" (removed)="onRemove(f)">
-                                <ngx-dropzone-label>{{ f.name }} ({{ f.type }})</ngx-dropzone-label>
-                            </ngx-dropzone-preview>
-                        </ngx-dropzone>
+                        <div *ngSwitchCase="'medicalInfo'" class="px-4">
+                            <h4 class="text-primary pt-4 pb-2">{{'providerInformation'|translate}}</h4>
+                            <ul
+                                class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 col-gap-8 row-gap-0">
+                                <li>
+                                    <mat-form-field fxFlex="auto" class="w-full" appearance="outline" color="primary">
+                                        <mat-label>{{'primaryCarePhysician'|translate}}</mat-label>
+                                        <input name="primaryCarePhysician"
+                                            [(ngModel)]="AddEditStudentMedicalProviderForGroupAssignModel.studentMedicalProvider.primaryCarePhysician"
+                                            matInput>
+                                    </mat-form-field>
+                                </li>
+                                <li>
+                                    <mat-form-field fxFlex="auto" class="w-full" appearance="outline" color="primary">
+                                        <mat-label>{{'primaryCarePhysicianPhone'|translate}}</mat-label>
+                                        <input name="primaryCarePhysicianPhone"
+                                            [(ngModel)]="AddEditStudentMedicalProviderForGroupAssignModel.studentMedicalProvider.primaryCarePhysicianPhone"
+                                            maxlength="20" minlength="10" #primaryCarePhysicianPhone="ngModel" matInput>
+                                        <mat-error
+                                            *ngIf="!primaryCarePhysicianPhone.errors?.required && primaryCarePhysicianPhone.errors?.minlength">
+                                            {{'minLengthTelephoneNumber'|translate}}</mat-error>
+                                    </mat-form-field>
+                                </li>
+                                <li>
+                                    <mat-form-field fxFlex="auto" class="w-full" appearance="outline" color="primary">
+                                        <mat-label>{{'insuranceCompany'|translate}}</mat-label>
+                                        <input name="insuranceCompany"
+                                            [(ngModel)]="AddEditStudentMedicalProviderForGroupAssignModel.studentMedicalProvider.insuranceCompany"
+                                            matInput>
+                                    </mat-form-field>
+                                </li>
+                                <li>
+                                    <mat-form-field fxFlex="auto" class="w-full" appearance="outline" color="primary">
+                                        <mat-label>{{'insuranceCompanyPhone'|translate}}</mat-label>
+                                        <input name="insuranceCompanyPhone"
+                                            [(ngModel)]="AddEditStudentMedicalProviderForGroupAssignModel.studentMedicalProvider.insuranceCompanyPhone"
+                                            maxlength="20" minlength="10" #insuranceCompanyPhone="ngModel" matInput>
+                                        <mat-error
+                                            *ngIf="!insuranceCompanyPhone.errors?.required && insuranceCompanyPhone.errors?.minlength">
+                                            {{'minLengthTelephoneNumber'|translate}}</mat-error>
+                                    </mat-form-field>
+                                </li>
+                                <li>
+                                    <mat-form-field fxFlex="auto" class="w-full" appearance="outline" color="primary">
+                                        <mat-label>{{'preferredMedicalFacility'|translate}}</mat-label>
+                                        <input name="medicalFacility"
+                                            [(ngModel)]="AddEditStudentMedicalProviderForGroupAssignModel.studentMedicalProvider.preferredMedicalFacility"
+                                            matInput>
+                                    </mat-form-field>
+                                </li>
+                                <li>
+                                    <mat-form-field fxFlex="auto" class="w-full" appearance="outline" color="primary">
+                                        <mat-label>{{'preferredMedicalFacilityPhone'|translate}}</mat-label>
+                                        <input name="medicalFacilityPhone"
+                                            [(ngModel)]="AddEditStudentMedicalProviderForGroupAssignModel.studentMedicalProvider.preferredMedicalFacilityPhone"
+                                            maxlength="20" minlength="10" #medicalFacilityPhone="ngModel" matInput>
+                                        <mat-error
+                                            *ngIf="!medicalFacilityPhone.errors?.required && medicalFacilityPhone.errors?.minlength">
+                                            {{'minLengthTelephoneNumber'|translate}}</mat-error>
+                                    </mat-form-field>
+                                </li>
+                                <li>
+                                    <mat-form-field fxFlex="auto" class="w-full" appearance="outline" color="primary">
+                                        <mat-label>{{'dentist'|translate}}</mat-label>
+                                        <input name="dentist"
+                                            [(ngModel)]="AddEditStudentMedicalProviderForGroupAssignModel.studentMedicalProvider.dentistName"
+                                            matInput>
+                                    </mat-form-field>
+                                </li>
+                                <li>
+                                    <mat-form-field fxFlex="auto" class="w-full" appearance="outline" color="primary">
+                                        <mat-label>{{'dentistsPhone'|translate}}</mat-label>
+                                        <input name="dentistPhone"
+                                            [(ngModel)]="AddEditStudentMedicalProviderForGroupAssignModel.studentMedicalProvider.dentistPhone"
+                                            #dentistPhone="ngModel" maxlength="20" minlength="10" matInput>
+                                        <mat-error
+                                            *ngIf="!dentistPhone.errors?.required && dentistPhone.errors?.minlength">
+                                            {{'minLengthTelephoneNumber'|translate}}</mat-error>
+                                    </mat-form-field>
+                                </li>
+                                <li>
+                                    <mat-form-field fxFlex="auto" class="w-full" appearance="outline" color="primary">
+                                        <mat-label>{{'vision'|translate}}</mat-label>
+                                        <input name="vision"
+                                            [(ngModel)]="AddEditStudentMedicalProviderForGroupAssignModel.studentMedicalProvider.visionName"
+                                            matInput>
+                                    </mat-form-field>
+                                </li>
+                                <li>
+                                    <mat-form-field fxFlex="auto" class="w-full" appearance="outline" color="primary">
+                                        <mat-label>{{'visionProvidersPhone'|translate}}</mat-label>
+                                        <input name="visionPhone"
+                                            [(ngModel)]="AddEditStudentMedicalProviderForGroupAssignModel.studentMedicalProvider.visionProviderPhone"
+                                            #visionPhone="ngModel" maxlength="20" minlength="10" matInput>
+                                        <mat-error
+                                            *ngIf="!visionPhone.errors?.required && visionPhone.errors?.minlength">
+                                            {{'minLengthTelephoneNumber'|translate}}</mat-error>
+                                    </mat-form-field>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div *ngSwitchCase="'comment'" class="px-4 pb-2">
+                            <form [formGroup]="form">
+
+                                <h4 class="text-primary pt-4 pb-2">{{'comment'|translate}}</h4>
+                                <div class="mb-6 border rounded">
+                                    <quill-editor formControlName="Body" name="Body"
+                                        (onEditorChanged)="changedEditor($event)"
+                                        placeholder="{{ 'insertTextHere' | translate }}" [styles]="{ height: '250px' }">
+                                    </quill-editor>
+                                </div>
+                            </form>
+                        </div>
+                        <div *ngSwitchCase="'documents'" class="p-4">
+                            <ngx-dropzone (change)="onSelect($event)"
+                                [accept]="'image/*,application/pdf,.txt,.docx,.doc,.psd,.xls,.xlsx'"
+                                class="custom-dropzone">
+                                <ngx-dropzone-label>
+                                    <p class="text-lg mt-12"><span class="text-primary">{{'clickHere' |
+                                            translate}}</span>
+                                        {{
+                                        'toBrowseFiles' | translate}}(20 MB max)</p>
+                                    <p class="my-2">or</p>
+                                    <p class="text-lg">{{ 'dropFilesHereToUpload' | translate}}(20 MB max)</p>
+                                </ngx-dropzone-label>
+                                <ngx-dropzone-preview *ngFor="let f of files" [removable]="true"
+                                    (removed)="onRemove(f)">
+                                    <ngx-dropzone-label>{{ f.name }} ({{ f.type }})</ngx-dropzone-label>
+                                </ngx-dropzone-preview>
+                            </ngx-dropzone>
+                        </div>
                     </div>
                 </div>
 
+                <div class="text-right">
+                    <button (click)="backToselectedStudent()" mat-button>{{ 'cancel' | translate }}</button>
+                    <button (click)="finalSubmit()" mat-raised-button color="primary" class="ml-6">{{
+                        'assignInfoToSelectedStudents' | translate
+                        }}</button>
+                </div>
             </div>
-
-            <div class="text-right">
-                <button (click)="backToselectedStudent()" mat-button>{{ 'cancel' | translate }}</button>
-                <button (click)="finalSubmit()" mat-raised-button color="primary" class="ml-6">{{
-                    'assignInfoToSelectedStudents' | translate
-                    }}</button>
-            </div>
-        </div>
-    </vex-page-layout-content>
-</vex-page-layout>
+        </vex-page-layout-content>
+    </vex-page-layout>
+</form>
 
 <div class="fixed top-0 left-0 w-full h-full z-50" *ngIf="showAdvanceSearchPanel">
     <div class="advance-search-panel absolute bg-white w-full sm:w-4/6 md:w-3/6 lg:w-2/6 h-full z-20" @fadeInRight>
-        <vex-common-search-student [filterJsonParams]="filterJsonParams"
-            [incomingSearchValue]="searchValue" (toggelValues)="getToggleValues($event)" [advancedSearchExpansion]="advancedSearchExpansionModel"
-            [incomingToggleValues]="toggleValues" (filteredValue)="filterData($event)" (showHideAdvanceSearch)="hideAdvanceSearch($event)"
-            (searchValue)="getSearchInput($event)">
+        <vex-common-search-student [filterJsonParams]="filterJsonParams" [incomingSearchValue]="searchValue"
+            (toggelValues)="getToggleValues($event)" [advancedSearchExpansion]="advancedSearchExpansionModel"
+            [incomingToggleValues]="toggleValues" (filteredValue)="filterData($event)"
+            (showHideAdvanceSearch)="hideAdvanceSearch($event)" (searchValue)="getSearchInput($event)">
         </vex-common-search-student>
     </div>
     <div class="advance-search-backdrop bg-black opacity-50 fiexd top-0 left-0 w-full h-full z-10"></div>
