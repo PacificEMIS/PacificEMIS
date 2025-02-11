@@ -1027,7 +1027,6 @@ export class GroupAssignStudentInfoComponent implements OnInit, OnDestroy{
   finalSubmit() {
       this.studentAddForGroupAssignModel.fieldsCategoryList[0].customFields = this.studentCustomFields;
       this.AddEditStudentMedicalProviderForGroupAssignModel.fieldsCategoryList[4].customFields = this.studentMedicalCustomFields;
-      
       this.addStudentGeneralInfo();
       if(this?.studentEnrollmentForGroupAssignModel?.studentEnrollments?.rollingOption == 'Enrol to another school' && this?.studentEnrollmentForGroupAssignModel?.studentEnrollments?.enrollOtherSchoolId){
         this.submitEnrollment();
@@ -1355,7 +1354,6 @@ export class GroupAssignStudentInfoComponent implements OnInit, OnDestroy{
       }
     });
   }
-  
 
   ngOnDestroy() {
     this.destroySubject$.next();
