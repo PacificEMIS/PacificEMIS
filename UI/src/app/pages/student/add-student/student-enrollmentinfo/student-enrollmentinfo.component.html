@@ -30,6 +30,28 @@
                             </mat-error>
                         </mat-form-field>
                     </li>
+                    <li *ngIf="studentEnrollmentModel.rollingOption=='Enrol to another school'">
+                        <mat-form-field fxFlex="auto" class="w-full" appearance="outline"
+                            color="primary" floatLabel="never">
+                            <mat-label>{{'transferToSchool'|translate}}</mat-label>
+                            <!-- (selectionChange)="onRolingSchoolChange($event.value)" -->
+                            <ng-container *ngIf="schoolList.length > 0">
+                            <mat-select #enrollOtherSchoolId="ngModel"
+                                name="{{'transferToSchool'}}"
+                                [(ngModel)]="studentEnrollmentModel.enrollOtherSchoolId"
+                                required>
+                                <mat-option
+                                *ngFor="let school of schoolList;let transferredSchoolIndex=index"
+                                [value]="school.schoolId"
+                                [disabled]="school.schoolId == schoolId">
+                                {{school.schoolName}}</mat-option>
+                            </mat-select>
+                            <mat-error *ngIf="enrollOtherSchoolId.errors?.required">
+                                {{'transferredSchoolNameIsRequired'|translate}}
+                            </mat-error>
+                        </ng-container>
+                        </mat-form-field>
+                    </li>
                     <li>
                         <mat-form-field fxFlex="auto" class="w-full" appearance="outline" color="primary">
                             <mat-label>{{'section'|translate}}</mat-label>
@@ -259,6 +281,16 @@
                                                 </mat-error>
                                             </mat-form-field>
                                         </li>
+                                        <li>
+                                            <mat-form-field fxFlex="auto" class="w-full" appearance="outline" color="primary">
+                                                <mat-label>{{'exitReason'|translate}}</mat-label>
+                                                <input [(ngModel)]="this.cloneStudentEnrollment.studentEnrollments[index].exitReason"
+                                                [required]="this.cloneStudentEnrollment.studentEnrollments[index].exitCode"
+                                                    name="{{'exitReason'+index}}" #exitReason="ngModel" matInput maxlength="100">
+                                                <mat-error class="text-red" *ngIf="exitReason.errors?.required">
+                                                    {{'exitReasonRequired'|translate}}</mat-error>
+                                            </mat-form-field>
+                                        </li>
                                     </ul>
                                 </div>
                             </div>
@@ -312,7 +344,11 @@
                     <p class="mt-1 text-sm leading-5 sm:mt-0 sm:col-span-2 whitespace-pre-wrap">{{studentEnrollmentModel?.rollingOption}}
                     </p>
                 </li>
-
+                <li *ngIf="studentEnrollmentModel?.rollingOption == 'Enrol to another school' ">
+                    <label class="text-sm leading-5 text-gray">{{'schoolName' | translate}}</label>
+                    <p class="mt-1 text-sm leading-5 sm:mt-0 sm:col-span-2 whitespace-pre-wrap">{{studentEnrollmentModel?.transferredSchoolName}}
+                    </p>
+                </li>
                 <li>
                     <label class="text-sm leading-5 text-gray">{{'section' | translate}}</label>
                     <p class="mt-1 text-base leading-5 sm:mt-0 sm:col-span-2 whitespace-pre-wrap">{{sectionNameInViewMode}}</p>
@@ -604,9 +640,13 @@
                                         {{enrollment.exitDate|date}}
                                         <mat-icon [icIcon]="icDrop" class="text-warn align-middle mx-2"
                                             *ngIf="enrollment.exitType==='Drop' && enrollment.rolloverId !== null && enrollment.showDrop"></mat-icon>
-                                        Not enrolled</span>
+                                        Not enrolled
+                                        </span>
+                                        <span *ngIf="enrollment.showDrop && enrollment?.exitReason">
+                                            <mat-icon [icIcon]="icInfo" class="text-black align-middle mx-2" matTooltip="{{enrollment?.exitReason}}" [matTooltipPosition]="'above'">
+                                            </mat-icon>
+                                        </span>
                             </td>
-
                             <td>{{enrollment.schoolName}}</td>
                         </tr>
                     </tbody>

@@ -1962,5 +1962,8 @@
     "deleteSelected": "Delete Selected",
     "youWantToDeleteSelectedStudents": "You want to delete selected students",
     "deleteStaff": "Delete Staff",
-    "youWantToDeleteStaff": "You want to delete staff"
+    "youWantToDeleteStaff": "You want to delete staff",
+    "exitReason":"Exit Reason",
+    "exitReasonRequired":"Exit Reason is Requard",
+    "error":"Error"
 }

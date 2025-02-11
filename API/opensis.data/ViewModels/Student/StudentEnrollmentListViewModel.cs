@@ -43,6 +43,7 @@ namespace opensis.data.ViewModels.Student
         public int? CalenderId { get; set; }
         public string? AcademicYear { get; set; }
         public string? RollingOption { get; set; }
+        public int? EnrollOtherSchoolId { get; set; }
         public int? SchoolId { get; set; }
         public Guid? StudentGuid { get; set; }
         public int? SectionId { get; set; }

@@ -6496,6 +6496,10 @@ namespace opensis.data.Models
                     .HasColumnType("date")
                     .HasColumnName("exit_date");
 
+                entity.Property(e => e.ExitReason)
+                    .HasMaxLength(100)
+                    .HasColumnName("exit_reason");
+
                 entity.Property(e => e.GradeId).HasColumnName("grade_id");
 
                 entity.Property(e => e.GradeLevelTitle)
@@ -6525,6 +6529,7 @@ namespace opensis.data.Models
                 entity.Property(e => e.TransferredGrade)
                     .HasMaxLength(50)
                     .HasColumnName("transferred_grade");
+                entity.Property(e => e.EnrollOtherSchoolId).HasColumnName("enroll_other_school_id");
 
                 entity.Property(e => e.TransferredSchoolId).HasColumnName("transferred_school_id");
 

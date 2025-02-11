@@ -613,6 +613,7 @@ export class StudentComponent implements OnInit, OnDestroy {
     else{
       this.getAllStudent.filterParams = JSON.parse(filter.jsonList);
       this.getAllStudent.sortingModel = null;
+      this.getAllStudent.pageSize = this.pageSize;
       this.studentService.GetAllStudentList(this.getAllStudent).subscribe(data => {
        if(data._failure){
         this.commonService.checkTokenValidOrNot(data._message);

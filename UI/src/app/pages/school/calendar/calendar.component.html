@@ -63,7 +63,8 @@
         </div>
 
         <ng-template #customCellTemplate let-day="day" let-locale="locale">
-          <div [ngClass]="{'cell-holiday flex-grow' : (day.events.length > 0 && getHoliDay(day.events)) || (!day.isWeekend && isSessionCalender) || (!day.inMonth && isSessionCalender), 'bg-green-light': (isSessionCalender && !day.isWeekend && day.inMonth) && (day.events.length>0 ? checkEvent(day.events) : true), 'bg-white': (!day.inMonth && isSessionCalender), 'bg-red-light': day.inMonth && (day.events.length>0 ? getHoliDay(day.events) : false)}">  
+          <!-- <div [ngClass]="{'cell-holiday flex-grow' : (day.events.length > 0 && getHoliDay(day.events)) || (!day.isWeekend && isSessionCalender) || (!day.inMonth && isSessionCalender), 'bg-green-light': (isSessionCalender && !day.isWeekend && day.inMonth) && (day.events.length>0 ? checkEvent(day.events) : true), 'bg-white': (!day.inMonth && isSessionCalender), 'bg-red-light': day.inMonth && (day.events.length>0 ? getHoliDay(day.events) : false)}">   -->
+            <div [ngClass]="{'cell-holiday flex-grow' : (day.events.length > 0 && getHoliDay(day.events)) || (!day.isWeekend && isSessionCalender) || (!day.inMonth && isSessionCalender), 'bg-green-light': (!day.isWeekend && day.inMonth) && (day.events.length>0 ? checkEvent(day.events) : true), 'bg-white': (!day.inMonth && isSessionCalender), 'bg-red-light': day.inMonth && (day.events.length>0 ? getHoliDay(day.events) : false)}">  
             
             <div class="cal-cell-top">
               <div class="flex justify-between items-center mx-3 mt-2">

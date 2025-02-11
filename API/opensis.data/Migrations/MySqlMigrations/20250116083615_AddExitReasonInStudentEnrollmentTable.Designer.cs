@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using opensis.data.Models;
 
@@ -10,9 +11,10 @@ using opensis.data.Models;
 namespace opensis.data.Migrations.MySqlMigrations
 {
     [DbContext(typeof(CRMContextMySQL))]
-    partial class CRMContextMySQLModelSnapshot : ModelSnapshot
+    [Migration("20250116083615_AddExitReasonInStudentEnrollmentTable")]
+    partial class AddExitReasonInStudentEnrollmentTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

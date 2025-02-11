@@ -38,12 +38,15 @@ namespace opensis.data.ViewModels.Student
         public int? CalenderId { get; set; }
         public decimal? AcademicYear { get; set; }
         public string? RollingOption { get; set; }
+        public int? EnrollOtherSchoolId { get; set; }
         public string? SchoolName { get; set; }
         public string? GradeLevelTitle { get; set; }
         public DateTime? EnrollmentDate { get; set; }
         public string? EnrollmentCode { get; set; }
+        public int? EnrollmentCodeId { get; set; }
         public DateTime? ExitDate { get; set; }
         public string? ExitCode { get; set; }
+        public int? ExitCodeId { get; set; }
         public int? TransferredSchoolId { get; set; }
         public string? SchoolTransferred { get; set; }
         public string? TransferredGrade { get; set; }
@@ -60,5 +63,6 @@ namespace opensis.data.ViewModels.Student
         public string? StartYear { get; set; }
         public string? EndYear { get; set; }
         public bool? IsActive { get; set; }
+        public string? ExitReason { get; set; }
     }
 }

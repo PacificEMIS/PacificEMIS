@@ -211,6 +211,7 @@ export class StudentEnrollmentDetailsForGroupAssignModel {
     gradeId: number;
     gradeLevelTitle: string;
     updatedBy: string;
+    enrollmentDate?: string;
 }
 
 
@@ -606,6 +607,7 @@ export class StudentEnrollmentDetails {
     exitCodeName? : string;
     programId? : number | string;
     transferredProgramId? : number | string;
+    exitReason : string;
 }
 export class StudentEnrollmentModel extends CommonField {
     studentEnrollments: Array<StudentEnrollmentDetails>;
@@ -626,7 +628,10 @@ export class StudentEnrollmentModel extends CommonField {
     lepIndicator: boolean;
     fieldsCategoryList;
     selectedCategoryId;
-    
+    transferredSchoolId;
+    transferredSchoolName;
+    enrollOtherSchoolId;
+    statusCode;
     constructor() {
         super();
         this.studentEnrollments = [new StudentEnrollmentDetails];

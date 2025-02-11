@@ -174,7 +174,7 @@ export class GroupDeleteComponent implements OnInit, AfterViewInit, OnDestroy {
 
   // For open select Course Section dialog
   selectCourseSection() {
-    if (this.defaultService.checkAcademicYear()) {
+    if (this.defaultService.checkAcademicYear() && (this?.subjectList?.length > 0 && this.courseList?.length > 0 )) {
       this.studentDetails = new MatTableDataSource([]);
       this.scheduleStudentListViewModel = new GetUnassociatedStudentListByCourseSectionModel();
       this.searchCtrl = new FormControl();
@@ -502,7 +502,7 @@ export class GroupDeleteComponent implements OnInit, AfterViewInit, OnDestroy {
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
       maxWidth: '400px',
       data: {
-        title: this.defaultService.translateKey('areYouSure?'),
+        title: this.defaultService.translateKey('areYouSure'),
         message: selectedStudentsStaffsLength > 1 ? this.defaultService.translateKey('areYouSureYouWantToDeleteTheSelectedStudentsFromTheCourseSection?') : this.defaultService.translateKey('areYouSureYouWantToDeleteTheSelectedStudentFromTheCourseSection?')
       }
     });

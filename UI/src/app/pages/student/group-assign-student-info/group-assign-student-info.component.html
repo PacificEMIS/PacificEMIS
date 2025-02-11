@@ -598,6 +598,16 @@
                                     </mat-select>
                                 </mat-form-field>
                             </li>
+                            <li>
+                                <mat-form-field fxFlex="auto" class="w-full" appearance="outline" color="primary">
+                                    <mat-label>{{'enrollmentDate'|translate}}</mat-label>
+                                    <input name="enrollmentDate"
+                                        [(ngModel)]="studentEnrollmentForGroupAssignModel.studentEnrollments.enrollmentDate"
+                                        [matDatepicker]="enrollmentDate" matInput>
+                                    <mat-datepicker-toggle [for]="enrollmentDate" matSuffix></mat-datepicker-toggle>
+                                    <mat-datepicker #enrollmentDate></mat-datepicker>
+                                </mat-form-field>
+                            </li>
                         </ul>
                         <ul class="grid grid-cols-1 col-gap-8 row-gap-0">
                             <li>

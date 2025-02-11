@@ -962,7 +962,7 @@ export class GroupAssignStudentInfoComponent implements OnInit, OnDestroy{
 
   submitEnrollment() {
     this.studentEnrollmentForGroupAssignModel.estimatedGradDate = this.commonFunction.formatDateSaveWithoutTime(this.studentEnrollmentForGroupAssignModel.estimatedGradDate)
-
+    this.studentEnrollmentForGroupAssignModel.studentEnrollments.enrollmentDate = this.commonFunction.formatDateSaveWithoutTime(this.studentEnrollmentForGroupAssignModel.studentEnrollments.enrollmentDate);
     this.studentEnrollmentForGroupAssignModel.academicYear = this.defaultValuesService.getAcademicYear()?.toString();
     this.studentEnrollmentForGroupAssignModel.schoolId = +this.defaultValuesService.getSchoolID();
     this.studentEnrollmentForGroupAssignModel._userName = this.defaultValuesService.getUserName();
