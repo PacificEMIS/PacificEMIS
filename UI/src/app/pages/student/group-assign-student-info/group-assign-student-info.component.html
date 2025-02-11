@@ -608,7 +608,8 @@
                                                     [value]="school.schoolId" [disabled]="school.schoolId == schoolId">
                                                     {{school.schoolName}}</mat-option>
                                             </mat-select>
-                                            <mat-error *ngIf="enrollOtherSchoolId.errors?.required && enrollOtherSchoolId.touched">
+                                            <mat-error
+                                                *ngIf="enrollOtherSchoolId.errors?.required && enrollOtherSchoolId.touched">
                                                 {{'transferredSchoolNameIsRequired'|translate}}
                                             </mat-error>
                                         </ng-container>
