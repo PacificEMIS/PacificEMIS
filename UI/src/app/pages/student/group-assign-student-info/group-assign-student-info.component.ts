@@ -1029,7 +1029,7 @@ export class GroupAssignStudentInfoComponent implements OnInit, OnDestroy{
       this.AddEditStudentMedicalProviderForGroupAssignModel.fieldsCategoryList[4].customFields = this.studentMedicalCustomFields;
       
       this.addStudentGeneralInfo();
-      if(this?.studentEnrollmentForGroupAssignModel?.studentEnrollments?.rollingOption == 'Enrol to another school' && this?.studentEnrollmentForGroupAssignModel?.studentEnrollments?.EnrollOtherSchoolId){
+      if(this?.studentEnrollmentForGroupAssignModel?.studentEnrollments?.rollingOption == 'Enrol to another school' && this?.studentEnrollmentForGroupAssignModel?.studentEnrollments?.enrollOtherSchoolId){
         this.submitEnrollment();
       }else if(this?.studentEnrollmentForGroupAssignModel?.studentEnrollments?.rollingOption == '' || this?.studentEnrollmentForGroupAssignModel?.studentEnrollments?.rollingOption != 'Enrol to another school'){
         this.submitEnrollment();

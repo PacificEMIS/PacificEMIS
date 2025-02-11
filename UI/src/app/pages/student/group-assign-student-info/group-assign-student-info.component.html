@@ -600,15 +600,15 @@
                                         floatLabel="never">
                                         <mat-label>{{'transferToSchool'|translate}}</mat-label>
                                         <ng-container *ngIf="schoolList.length > 0">
-                                            <mat-select #EnrollOtherSchoolId="ngModel" name="{{'transferToSchool'}}"
-                                                [(ngModel)]="studentEnrollmentForGroupAssignModel.studentEnrollments.EnrollOtherSchoolId"
+                                            <mat-select #enrollOtherSchoolId="ngModel" name="{{'transferToSchool'}}"
+                                                [(ngModel)]="studentEnrollmentForGroupAssignModel.studentEnrollments.enrollOtherSchoolId"
                                                 [required]="studentEnrollmentForGroupAssignModel.studentEnrollments.rollingOption=='Enrol to another school' ? true : null">
                                                 <mat-option
                                                     *ngFor="let school of schoolList;let transferredSchoolIndex=index"
                                                     [value]="school.schoolId" [disabled]="school.schoolId == schoolId">
                                                     {{school.schoolName}}</mat-option>
                                             </mat-select>
-                                            <mat-error *ngIf="EnrollOtherSchoolId.errors?.required && EnrollOtherSchoolId.touched">
+                                            <mat-error *ngIf="enrollOtherSchoolId.errors?.required && enrollOtherSchoolId.touched">
                                                 {{'transferredSchoolNameIsRequired'|translate}}
                                             </mat-error>
                                         </ng-container>
