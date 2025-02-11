@@ -695,7 +695,7 @@ export class GroupAssignStudentInfoComponent implements OnInit, OnDestroy{
       }
     });
   }
-  
+
   changeTab(status) {
     this.currentTab = status;
   }
@@ -1027,11 +1027,11 @@ export class GroupAssignStudentInfoComponent implements OnInit, OnDestroy{
   finalSubmit() {
       this.studentAddForGroupAssignModel.fieldsCategoryList[0].customFields = this.studentCustomFields;
       this.AddEditStudentMedicalProviderForGroupAssignModel.fieldsCategoryList[4].customFields = this.studentMedicalCustomFields;
-
+      
       this.addStudentGeneralInfo();
-      if(this.studentEnrollmentForGroupAssignModel.studentEnrollments.rollingOption == 'Enrol to another school' && this.studentEnrollmentForGroupAssignModel.studentEnrollments.EnrollOtherSchoolId){
+      if(this?.studentEnrollmentForGroupAssignModel?.studentEnrollments?.rollingOption == 'Enrol to another school' && this?.studentEnrollmentForGroupAssignModel?.studentEnrollments?.EnrollOtherSchoolId){
         this.submitEnrollment();
-      }else if(this.studentEnrollmentForGroupAssignModel.studentEnrollments.rollingOption == '' || this.studentEnrollmentForGroupAssignModel.studentEnrollments.rollingOption != 'Enrol to another school'){
+      }else if(this?.studentEnrollmentForGroupAssignModel?.studentEnrollments?.rollingOption == '' || this?.studentEnrollmentForGroupAssignModel?.studentEnrollments?.rollingOption != 'Enrol to another school'){
         this.submitEnrollment();
       }
       this.submitComment();
