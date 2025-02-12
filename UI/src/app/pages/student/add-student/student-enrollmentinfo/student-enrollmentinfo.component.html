@@ -593,9 +593,6 @@
                                     <mat-icon [icIcon]="icDrop" class="text-warn align-middle mx-2"
                                         *ngIf="enrollment.enrollmentType=='Drop' && enrollment.rollingOption !=='Retain' && enrollment.type=='Internal'">
                                     </mat-icon>
-                                    <!-- <mat-icon [icIcon]="icRetained" class="text-warn align-middle mx-2"
-                                        *ngIf="enrollment.enrollmentCode==='Dropped Out' && enrollment.rollingOption==='Retain' && enrollment.type=='Internal'">
-                                    </mat-icon> -->
                                     <mat-icon [icIcon]="icRetained" class="text-warn align-middle mx-2"
                                         *ngIf="(enrollment.enrollmentCode==='Dropped Out' || enrollment?.enrollmentCodeName === 'Dropped Out') && enrollment.rollingOption==='Retain' && enrollment.type=='Internal'">
                                     </mat-icon>
@@ -608,7 +605,6 @@
                                     <mat-icon [icIcon]="icTrasnferIn" class="text-blue align-middle mx-2"
                                         *ngIf="enrollment.enrollmentType=='Enroll (Transfer)' && enrollment.type=='Internal'">
                                     </mat-icon>
-                                    <!-- {{enrollment.type=="External"?'Enrolled as External Student':enrollment.enrollmentCode=='Rolled Over'?'Promoted':enrollment.enrollmentCode==='Dropped Out'?'Retained': enrollment.enrollmentCode}} -->
                                     {{enrollment.type=="External"?'Enrolled as External Student':(enrollment.enrollmentCode=='Rolled Over' || enrollment?.enrollmentCodeName == 'Rolled Over')?'Promoted':(enrollment.enrollmentCode==='Dropped Out' || enrollment?.enrollmentCodeName === 'Dropped Out')?'Retained': enrollment.enrollmentCodeName}}
                                 </span></td>
                             <td><span>{{enrollment.gradeLevelTitle}}</span></td>

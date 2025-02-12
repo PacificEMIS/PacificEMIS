@@ -733,7 +733,7 @@ export class StudentEnrollmentinfoComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.destroySubject$.next();
     this.destroySubject$.complete();
-    
+  
   }
 
 }
