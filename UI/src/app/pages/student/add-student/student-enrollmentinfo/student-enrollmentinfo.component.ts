@@ -539,10 +539,20 @@ export class StudentEnrollmentinfoComponent implements OnInit, OnDestroy {
       const index = this.schoolListWithGradeLevelsAndEnrollCodes.findIndex((x) => {
         return x.schoolId == +this.studentEnrollmentModel.studentEnrollmentListForView[i].schoolId;
       });
-      for (let j = 0; j < this.schoolListWithGradeLevelsAndEnrollCodes[index].studentEnrollmentCode?.length; j++) {
-        if (this.studentEnrollmentModel.studentEnrollmentListForView[i].exitCode == this.schoolListWithGradeLevelsAndEnrollCodes[index].studentEnrollmentCode[j].title) {
-          this.studentEnrollmentModel.studentEnrollmentListForView[i].exitCode = this.schoolListWithGradeLevelsAndEnrollCodes[index].studentEnrollmentCode[j].enrollmentCode.toString();
-          break;
+      // for (let j = 0; j < this.schoolListWithGradeLevelsAndEnrollCodes[index].studentEnrollmentCode?.length; j++) {
+      //   if (this.studentEnrollmentModel.studentEnrollmentListForView[i].exitCode == this.schoolListWithGradeLevelsAndEnrollCodes[index].studentEnrollmentCode[j].title) {
+      //     // this.studentEnrollmentModel.studentEnrollmentListForView[i].exitCode = this.schoolListWithGradeLevelsAndEnrollCodes[index].studentEnrollmentCode[j].enrollmentCode.toString();
+      //     this.studentEnrollmentModel.studentEnrollmentListForView[i].exitCode = this.schoolListWithGradeLevelsAndEnrollCodes[index].schoolMaster.studentEnrollmentCode[j].title;
+      //     break;
+      //   }
+      // }
+      if (index !== -1 && this.schoolListWithGradeLevelsAndEnrollCodes[index].schoolMaster 
+        && this.schoolListWithGradeLevelsAndEnrollCodes[index].schoolMaster.studentEnrollmentCode) {
+          for (let j = 0; j < this.schoolListWithGradeLevelsAndEnrollCodes[index].studentEnrollmentCode?.length; j++) {
+            if (this.studentEnrollmentModel.studentEnrollmentListForView[i].exitCode == this.schoolListWithGradeLevelsAndEnrollCodes[index].studentEnrollmentCode[j].title) {
+              this.studentEnrollmentModel.studentEnrollmentListForView[i].exitCode = this.schoolListWithGradeLevelsAndEnrollCodes[index].schoolMaster.studentEnrollmentCode[j].title;
+              break;
+            }
         }
       }
     }
