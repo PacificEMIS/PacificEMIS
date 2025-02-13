@@ -183,7 +183,7 @@
                                                     <ng-container
                                                         *ngFor="let enrollmentCode of schoolListWithGradeLevelsAndEnrollCodes[selectedSchoolIndex[index]]?.studentEnrollmentCode">
                                                         <mat-option
-                                                            [disabled]="enrollmentCode.type!='Add'"
+                                                        [disabled]="enrollmentCode.type!='Add'"
                                                             *ngIf="enrollmentCode.type !=='Rolled Over'"
                                                             value="{{enrollmentCode.enrollmentCode}}">{{enrollmentCode.title}}
                                                         </mat-option>
@@ -594,7 +594,7 @@
                                         *ngIf="enrollment.enrollmentType=='Drop' && enrollment.rollingOption !=='Retain' && enrollment.type=='Internal'">
                                     </mat-icon>
                                     <mat-icon [icIcon]="icRetained" class="text-warn align-middle mx-2"
-                                        *ngIf="enrollment.enrollmentCode==='Dropped Out' && enrollment.rollingOption==='Retain' && enrollment.type=='Internal'">
+                                        *ngIf="(enrollment.enrollmentCode==='Dropped Out' || enrollment?.enrollmentCodeName === 'Dropped Out') && enrollment.rollingOption==='Retain' && enrollment.type=='Internal'">
                                     </mat-icon>
                                     <mat-icon [icIcon]="icPromoted" class="text-green align-middle mx-2"
                                         *ngIf="enrollment.enrollmentType=='Rolled Over' && enrollment.type=='Internal'">
@@ -605,7 +605,7 @@
                                     <mat-icon [icIcon]="icTrasnferIn" class="text-blue align-middle mx-2"
                                         *ngIf="enrollment.enrollmentType=='Enroll (Transfer)' && enrollment.type=='Internal'">
                                     </mat-icon>
-                                    {{enrollment.type=="External"?'Enrolled as External Student':enrollment.enrollmentCode=='Rolled Over'?'Promoted':enrollment.enrollmentCode==='Dropped Out'?'Retained': enrollment.enrollmentCode}}
+                                    {{enrollment.type=="External"?'Enrolled as External Student':(enrollment.enrollmentCode=='Rolled Over' || enrollment?.enrollmentCodeName == 'Rolled Over')?'Promoted':(enrollment.enrollmentCode==='Dropped Out' || enrollment?.enrollmentCodeName === 'Dropped Out')?'Retained': enrollment.enrollmentCodeName || enrollment.enrollmentCode}}
                                 </span></td>
                             <td><span>{{enrollment.gradeLevelTitle}}</span></td>
                             <td><span

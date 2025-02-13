@@ -511,7 +511,7 @@ export class StudentEnrollmentinfoComponent implements OnInit, OnDestroy {
         //   this.studentEnrollmentViewModel.studentEnrollmentListForView.push(new StudentEnrollmentDetails());
         // }
         //let lastIndex = this.studentEnrollmentViewModel.studentEnrollmentListForView?.length - 1;
-        this.studentEnrollmentViewModel.studentEnrollmentListForView.push(this.studentEnrollmentModel.studentEnrollmentListForView[i]);
+        this.studentEnrollmentViewModel.studentEnrollmentListForView.push(this.studentEnrollmentModel.studentEnrollmentListForView[i]); 
       }
 
     }
@@ -525,10 +525,12 @@ export class StudentEnrollmentinfoComponent implements OnInit, OnDestroy {
       const index = this.schoolListWithGradeLevelsAndEnrollCodes.findIndex((x) => {
         return x.schoolId == +this.studentEnrollmentModel.studentEnrollmentListForView[i].schoolId;
       });
-      for (let j = 0; j < this.schoolListWithGradeLevelsAndEnrollCodes?.[index]?.studentEnrollmentCode?.length; j++) {
-        if (this.studentEnrollmentModel.studentEnrollmentListForView[i].enrollmentCode == this.schoolListWithGradeLevelsAndEnrollCodes[index].studentEnrollmentCode[j].title) {
-          this.studentEnrollmentModel.studentEnrollmentListForView[i].enrollmentCode = this.schoolListWithGradeLevelsAndEnrollCodes[index].studentEnrollmentCode[j].enrollmentCode.toString();
-          break;
+      if(this.schoolListWithGradeLevelsAndEnrollCodes[index].schoolMaster && this.schoolListWithGradeLevelsAndEnrollCodes[index].schoolMaster.studentEnrollmentCode){
+        for (let j = 0; j < this.schoolListWithGradeLevelsAndEnrollCodes?.[index]?.studentEnrollmentCode?.length; j++) {
+          if (this.studentEnrollmentModel.studentEnrollmentListForView[i].enrollmentCode == this.schoolListWithGradeLevelsAndEnrollCodes[index].schoolMaster.studentEnrollmentCode[j].title) {
+            this.studentEnrollmentModel.studentEnrollmentListForView[i].enrollmentCode = this.schoolListWithGradeLevelsAndEnrollCodes[index].schoolMaster.studentEnrollmentCode[j].title;
+            break;
+          }
         }
       }
     }
@@ -539,10 +541,13 @@ export class StudentEnrollmentinfoComponent implements OnInit, OnDestroy {
       const index = this.schoolListWithGradeLevelsAndEnrollCodes.findIndex((x) => {
         return x.schoolId == +this.studentEnrollmentModel.studentEnrollmentListForView[i].schoolId;
       });
-      for (let j = 0; j < this.schoolListWithGradeLevelsAndEnrollCodes[index].studentEnrollmentCode?.length; j++) {
-        if (this.studentEnrollmentModel.studentEnrollmentListForView[i].exitCode == this.schoolListWithGradeLevelsAndEnrollCodes[index].studentEnrollmentCode[j].title) {
-          this.studentEnrollmentModel.studentEnrollmentListForView[i].exitCode = this.schoolListWithGradeLevelsAndEnrollCodes[index].studentEnrollmentCode[j].enrollmentCode.toString();
-          break;
+      if (this.schoolListWithGradeLevelsAndEnrollCodes[index].schoolMaster 
+        && this.schoolListWithGradeLevelsAndEnrollCodes[index].schoolMaster.studentEnrollmentCode) {
+          for (let j = 0; j < this.schoolListWithGradeLevelsAndEnrollCodes[index].studentEnrollmentCode?.length; j++) {
+            if (this.studentEnrollmentModel.studentEnrollmentListForView[i].exitCode == this.schoolListWithGradeLevelsAndEnrollCodes[index].studentEnrollmentCode[j].title) {
+              this.studentEnrollmentModel.studentEnrollmentListForView[i].exitCode = this.schoolListWithGradeLevelsAndEnrollCodes[index].schoolMaster.studentEnrollmentCode[j].title;
+              break;
+            }
         }
       }
     }
@@ -575,8 +580,17 @@ export class StudentEnrollmentinfoComponent implements OnInit, OnDestroy {
     }
     for (let i = 0; i < this.cloneStudentEnrollment.studentEnrollments.length; i++) {
       this.selectedExitCodes[i] = null;
+      // this.cloneStudentEnrollment.studentEnrollments[i].schoolId = this.studentEnrollmentModel.studentEnrollmentListForView[i].schoolId?.toString();
+      // this.cloneStudentEnrollment.studentEnrollments[i].gradeId = this.studentEnrollmentModel.studentEnrollmentListForView[i].gradeId?.toString();
+      this.cloneStudentEnrollment.studentEnrollments[i].enrollmentCodeName = this.studentEnrollmentModel.studentEnrollmentListForView[i]?.enrollmentCode?.toString();
+      this.cloneStudentEnrollment.studentEnrollments[i].exitCodeName = this.studentEnrollmentModel.studentEnrollmentListForView[i]?.exitCode?.toString();
       this.cloneStudentEnrollment.studentEnrollments[i].schoolId = this.studentEnrollmentModel.studentEnrollmentListForView[i].schoolId?.toString();
       this.cloneStudentEnrollment.studentEnrollments[i].gradeId = this.studentEnrollmentModel.studentEnrollmentListForView[i].gradeId?.toString();
+      this.cloneStudentEnrollment.studentEnrollments[i].programId = this.studentEnrollmentModel.studentEnrollmentListForView[i].programId?.toString();
+      this.cloneStudentEnrollment.studentEnrollments[i].transferredProgramId = this.studentEnrollmentModel.studentEnrollmentListForView[i].transferredProgramId?.toString();
+      this.cloneStudentEnrollment.studentEnrollments[i].enrollmentCode = this.studentEnrollmentModel.studentEnrollmentListForView[i]?.enrollmentCodeId?.toString();
+      this.cloneStudentEnrollment.studentEnrollments[i].exitCode = this.studentEnrollmentModel.studentEnrollmentListForView[i]?.exitCodeId?.toString();
+      
     }
     this.findCalendarNameById();
   }
@@ -714,7 +728,7 @@ export class StudentEnrollmentinfoComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.destroySubject$.next();
     this.destroySubject$.complete();
-
+  
   }
 
 }
