@@ -608,7 +608,7 @@ export class StudentEnrollmentDetails {
     exitCodeName? : string;
     programId? : number | string;
     transferredProgramId? : number | string;
-    exitReason : string;
+    exitReason? : string;
 }
 export class StudentEnrollmentModel extends CommonField {
     studentEnrollments: Array<StudentEnrollmentDetails>;
